@@ -16,14 +16,14 @@ class PromiseDeclared extends Event {
     /** @var string */
     private $description;
 
-    /** @var int|null */
+    /** @var int */
     private $limit;
 
     /**
      * @param AccountIdentifier $backer
      * @param CurrencyIdentifier $currency
      * @param string $description
-     * @param int|null $limit
+     * @param int $limit
      */
     public function __construct(AccountIdentifier $backer, CurrencyIdentifier $currency,
                                 $description, $limit) {
@@ -57,7 +57,7 @@ class PromiseDeclared extends Event {
     }
 
     /**
-     * @return int|null
+     * @return int
      */
     public function getLimit() {
         return $this->limit;

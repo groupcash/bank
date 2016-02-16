@@ -19,7 +19,7 @@ class DeclarePromise {
     /** @var string */
     private $description;
 
-    /** @var int|null */
+    /** @var int */
     private $limit;
 
     /**
@@ -27,7 +27,7 @@ class DeclarePromise {
      * @param AccountIdentifier $backer
      * @param CurrencyIdentifier $currency
      * @param string $description
-     * @param int|null $limit
+     * @param int $limit
      * @throws \Exception
      */
     public function __construct(Authentication $issuer, AccountIdentifier $backer, CurrencyIdentifier $currency,
@@ -76,7 +76,7 @@ class DeclarePromise {
     }
 
     /**
-     * @return int|null
+     * @return int
      */
     public function getLimit() {
         return $this->limit;
