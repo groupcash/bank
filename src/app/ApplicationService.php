@@ -45,18 +45,18 @@ class ApplicationService {
 
         $handleMethod = 'handle' . (new \ReflectionClass($command))->getShortName();
         $returned = call_user_func([$aggregate, $handleMethod], $command);
-        
-        $this->store->save($aggregateIdentifier, $stream);
 
         foreach ($aggregate->getRecordedEvents() as $event) {
             $stream->add($event);
+        }
+        $this->store->save($aggregateIdentifier, $stream);
 
+        foreach ($aggregate->getRecordedEvents() as $event) {
             $onMethod = 'on' . (new \ReflectionClass($event))->getShortName();
             if (method_exists($this, $onMethod)) {
                 call_user_func([$this, $onMethod], $event);
             }
         }
-
         return $returned;
     }
 
