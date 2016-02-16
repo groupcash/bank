@@ -73,7 +73,7 @@ class SendCoinsSpec {
         $this->scenario->given->_Sends__To('marge', 1, 'foo', 'maggie');
 
         $this->scenario->given->_Sends__To('maggie', 3, 'foo', 'bart');
-        $this->scenario->given->_Sends__To('bart', 3, 'foo', 'milhouse');
+        $this->scenario->given->_Sends__To('bart', 3, 'foo', 'apu');
 
         $this->scenario->then->allShouldBeFine();
     }
@@ -102,14 +102,14 @@ class SendCoinsSpec {
         $this->scenario->when->_Sends__th_To('bart', 1, 2, 'foo', 'lisa');
         $this->scenario->when->_Sends__th_To('bart', 1, 2, 'foo', 'homer');
 
-        $this->scenario->tryThat->_Sends__th_To('bart', 1, 10, 'foo', 'marge');
+        $this->scenario->tryThat->_Sends__th_To('bart', 1, 100, 'foo', 'marge');
         $this->scenario->then->itShouldFailWith('Not sufficient coins of this currency available in account.');
 
         $this->scenario->when->_Sends__th_To('lisa', 1, 2, 'foo', 'marge');
-        $this->scenario->tryThat->_Sends__th_To('lisa', 1, 10, 'foo', 'maggie');
+        $this->scenario->tryThat->_Sends__th_To('lisa', 1, 100, 'foo', 'maggie');
         $this->scenario->then->itShouldFailWith('Not sufficient coins of this currency available in account.');
 
-        $this->scenario->tryThat->_Sends__th_To('homer', 3, 5, 'foo', 'maggie');
+        $this->scenario->tryThat->_Sends__th_To('homer', 6, 10, 'foo', 'maggie');
         $this->scenario->then->itShouldFailWith('Not sufficient coins of this currency available in account.');
     }
 

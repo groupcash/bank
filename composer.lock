@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "7898e2511a026a886203080b4dfd6cb7",
+    "hash": "53c97d550c98037f89ed22ff288035a3",
     "content-hash": "f5606a531e1f5bf47ce8a301110045cb",
     "packages": [
         {
@@ -65,12 +65,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/groupcash/php.git",
-                "reference": "5fd5a67022f16612f5bf2a9926e094cd0efb3254"
+                "reference": "7b26f835bb1a1e9ec09bdd9147b248469a3a75fc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/groupcash/php/zipball/5fd5a67022f16612f5bf2a9926e094cd0efb3254",
-                "reference": "5fd5a67022f16612f5bf2a9926e094cd0efb3254",
+                "url": "https://api.github.com/repos/groupcash/php/zipball/7b26f835bb1a1e9ec09bdd9147b248469a3a75fc",
+                "reference": "7b26f835bb1a1e9ec09bdd9147b248469a3a75fc",
                 "shasum": ""
             },
             "require": {
@@ -98,7 +98,7 @@
                 }
             ],
             "description": "PHP implementation of the groupcash protocol",
-            "time": "2016-02-14 04:24:09"
+            "time": "2016-02-16 14:34:01"
         },
         {
             "name": "mdanter/ecc",
@@ -267,12 +267,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/console.git",
-                "reference": "d59b01b03451dfc1497b9736120ac6bcb422ff10"
+                "reference": "ae8fc4e8a50ea197ab8edb00ab0cc67ea343f84a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/console/zipball/d59b01b03451dfc1497b9736120ac6bcb422ff10",
-                "reference": "d59b01b03451dfc1497b9736120ac6bcb422ff10",
+                "url": "https://api.github.com/repos/symfony/console/zipball/ae8fc4e8a50ea197ab8edb00ab0cc67ea343f84a",
+                "reference": "ae8fc4e8a50ea197ab8edb00ab0cc67ea343f84a",
                 "shasum": ""
             },
             "require": {
@@ -319,7 +319,7 @@
             ],
             "description": "Symfony Console Component",
             "homepage": "https://symfony.com",
-            "time": "2016-02-03 18:01:35"
+            "time": "2016-02-16 06:09:38"
         },
         {
             "name": "symfony/polyfill-mbstring",
