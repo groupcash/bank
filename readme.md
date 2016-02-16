@@ -30,7 +30,7 @@ Download the project with [git] and build it with [composer]
 
 Execute the specifications to make sure everything works
 
-    vendor/bin/scrut spec
+    vendor/bin/scrut
 
 Start a development server to run the web application on [localhost:8080](http://localhost:8080)
 
