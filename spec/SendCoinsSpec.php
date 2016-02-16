@@ -43,23 +43,6 @@ class SendCoinsSpec {
         $this->scenario->then->allShouldBeFine();
     }
 
-    function complexSending() {
-        $this->scenario->given->_issues__to('issuer', 3, 'foo', 'bart');
-
-        $this->scenario->given->_Sends__To('bart', 1, 'foo', 'lisa');
-        $this->scenario->given->_Sends__To('bart', 1, 'foo', 'homer');
-        $this->scenario->given->_Sends__To('bart', 1, 'foo', 'marge');
-
-        $this->scenario->given->_Sends__To('lisa', 1, 'foo', 'maggie');
-        $this->scenario->given->_Sends__To('homer', 1, 'foo', 'maggie');
-        $this->scenario->given->_Sends__To('marge', 1, 'foo', 'maggie');
-
-        $this->scenario->given->_Sends__To('maggie', 3, 'foo', 'bart');
-        $this->scenario->given->_Sends__To('bart', 3, 'foo', 'milhouse');
-
-        $this->scenario->then->allShouldBeFine();
-    }
-
     function subtractSentCoins() {
         $this->scenario->given->_issues__to('issuer', 3, 'foo', 'bart');
         $this->scenario->given->_Sends__To('bart', 3, 'foo', 'lisa');
@@ -74,6 +57,23 @@ class SendCoinsSpec {
         $this->scenario->given->_Sends__To('bart', 1, 'foo', 'lisa');
         $this->scenario->given->_Sends__To('bart', 1, 'foo', 'homer');
         $this->scenario->when->_Sends__To('bart', 1, 'foo', 'marge');
+
+        $this->scenario->then->allShouldBeFine();
+    }
+
+    function complexSending() {
+        $this->scenario->given->_issues__to('issuer', 3, 'foo', 'bart');
+
+        $this->scenario->given->_Sends__To('bart', 1, 'foo', 'lisa');
+        $this->scenario->given->_Sends__To('bart', 1, 'foo', 'homer');
+        $this->scenario->given->_Sends__To('bart', 1, 'foo', 'marge');
+
+        $this->scenario->given->_Sends__To('lisa', 1, 'foo', 'maggie');
+        $this->scenario->given->_Sends__To('homer', 1, 'foo', 'maggie');
+        $this->scenario->given->_Sends__To('marge', 1, 'foo', 'maggie');
+
+        $this->scenario->given->_Sends__To('maggie', 3, 'foo', 'bart');
+        $this->scenario->given->_Sends__To('bart', 3, 'foo', 'milhouse');
 
         $this->scenario->then->allShouldBeFine();
     }
@@ -97,8 +97,6 @@ class SendCoinsSpec {
     }
 
     function fractionOfCoin() {
-        $this->scenario->blockedBy('fractions');
-
         $this->scenario->given->_issues__to('issuer', 1, 'foo', 'bart');
 
         $this->scenario->when->_Sends__th_To('bart', 1, 2, 'foo', 'lisa');
@@ -116,8 +114,6 @@ class SendCoinsSpec {
     }
 
     function combineFractions() {
-        $this->scenario->blockedBy('fractions');
-
         $this->scenario->given->_issues__to('issuer', 3, 'foo', 'bart');
 
         $this->scenario->given->_Sends__th_To('bart', 1, 2, 'foo', 'lisa');

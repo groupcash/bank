@@ -17,6 +17,7 @@ use groupcash\bank\IssueCoins;
 use groupcash\bank\SendCoins;
 use groupcash\php\Groupcash;
 use groupcash\php\model\Coin;
+use groupcash\php\model\Fraction;
 use groupcash\php\model\Promise;
 use groupcash\php\model\Transference;
 
@@ -166,15 +167,37 @@ class Bank extends AggregateRoot {
         $owner = new AccountIdentifier($this->lib->getAddress($ownerKey));
         $coins = $this->get($this->coins, [$c->getCurrency(), $owner], []);
 
-        if (count($coins) < $c->getAmount()->getFloat()) {
+        $total = array_sum(array_map(function ($coinFraction) {
+            /** @var Fraction $fraction */
+            $fraction = $coinFraction['fraction'];
+            return $fraction->getFloat();
+        }, $coins));
+
+        if ($total < $c->getAmount()->getFloat()) {
             throw new \Exception('Not sufficient coins of this currency available in account.');
         }
 
-        foreach (array_slice($coins, 0, $c->getAmount()->getFloat()) as $coin) {
+        $sent = new Fraction(0);
+        foreach ($coins as $coinFraction) {
+            /** @var Coin $coin */
+            $coin = $coinFraction['coin'];
+            /** @var Fraction $fraction */
+            $fraction = $coinFraction['fraction'];
+
+            if ($c->getAmount()->getFloat() < $fraction->getFloat()) {
+                $fraction = $c->getAmount();
+            }
+
             $this->record(new CoinSent(
                 $coin,
-                $this->lib->transferCoin($ownerKey, $coin, (string)$c->getTarget())
+                $this->lib->transferCoin($ownerKey, $coin, (string)$c->getTarget(), $fraction)
             ));
+
+            $sent = $sent->plus($fraction);
+
+            if ($sent->getFloat() >= $c->getAmount()->getFloat()) {
+                break;
+            }
         }
     }
 
@@ -182,9 +205,40 @@ class Bank extends AggregateRoot {
         $owner = new AccountIdentifier($e->getCoin()->getTransaction()->getTarget());
         $currency = new CurrencyIdentifier($this->extractPromise($e->getCoin())->getCurrency());
 
+        $transaction = $e->getTransferred()->getTransaction();
+        if ($transaction instanceof Transference) {
+            $sentFraction = $transaction->getFraction();
+        } else {
+            $sentFraction = new Fraction(1);
+        }
+
         $coins = $this->get($this->coins, [$currency, $owner], []);
-        $remaining = array_diff($coins, [$e->getCoin()]);
-        $this->coins[(string)$currency][(string)$owner] = $remaining;
+
+        foreach ($coins as $i => $coinFraction) {
+            /** @var Fraction $fraction */
+            $fraction = $coinFraction['fraction'];
+
+            $fractionToBeSent = $sentFraction;
+            if ($fraction->getFloat() < $fractionToBeSent->getFloat()) {
+                $fractionToBeSent = $fraction;
+            }
+
+            $diff = $fractionToBeSent->times(new Fraction(-1));
+            $newFraction = $fraction->plus($diff);
+
+            if ($newFraction->getFloat() == 0) {
+                unset($coins[$i]);
+            } else {
+                $coins[$i]['fraction'] = $newFraction;
+            }
+
+            $sentFraction = $sentFraction->plus($diff);
+            if ($sentFraction->getFloat() == 0) {
+                break;
+            }
+        }
+
+        $this->coins[(string)$currency][(string)$owner] = $coins;
     }
 
     public function handleDeliverCoin(DeliverCoin $c) {
@@ -196,7 +250,10 @@ class Bank extends AggregateRoot {
         $promise = $this->extractPromise($coin);
         $target = $coin->getTransaction()->getTarget();
 
-        $this->coins[$promise->getCurrency()][$target][] = $coin;
+        $this->coins[$promise->getCurrency()][$target][] = [
+            'coin' => $coin,
+            'fraction' => new Fraction(1)
+        ];
     }
 
     private function guardIssuerOfCurrency($authentication, $currency) {
