@@ -33,7 +33,7 @@ class IssueCoins {
     }
 
     /**
-     * @return |Authentication
+     * @return Authentication
      */
     public function getIssuer() {
         return $this->issuer;

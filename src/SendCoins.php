@@ -12,7 +12,7 @@ class SendCoins {
     private $owner;
 
     /** @var Fraction */
-    private $amount;
+    private $fraction;
 
     /** @var CurrencyIdentifier */
     private $currency;
@@ -28,7 +28,7 @@ class SendCoins {
      */
     public function __construct(Authentication $owner, $amount, CurrencyIdentifier $currency, AccountIdentifier $target) {
         $this->owner = $owner;
-        $this->amount = ($amount instanceof Fraction) ? $amount : new Fraction(intval($amount));
+        $this->fraction = ($amount instanceof Fraction) ? $amount : new Fraction(intval($amount));
         $this->currency = $currency;
         $this->target = $target;
     }
@@ -43,8 +43,8 @@ class SendCoins {
     /**
      * @return Fraction
      */
-    public function getAmount() {
-        return $this->amount;
+    public function getFraction() {
+        return $this->fraction;
     }
 
     /**

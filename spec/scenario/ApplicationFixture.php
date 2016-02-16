@@ -4,6 +4,7 @@ namespace spec\groupcash\bank\scenario;
 use groupcash\bank\AddBacker;
 use groupcash\bank\app\ApplicationService;
 use groupcash\bank\AuthorizeIssuer;
+use groupcash\bank\CreateAccount;
 use groupcash\bank\DeclarePromise;
 use groupcash\bank\IssueCoins;
 use groupcash\bank\model\AccountIdentifier;
@@ -34,6 +35,9 @@ class ApplicationFixture {
 
     /** @var Assert */
     private $assert;
+
+    /** @var mixed */
+    private $returned;
 
     public function __construct(Assert $assert, ExceptionFixture $except) {
         $this->assert = $assert;
@@ -114,5 +118,13 @@ class ApplicationFixture {
 
     public function allShouldBeFine() {
         $this->except->thenNoExceptionShouldBeThrown();
+    }
+
+    public function ICreateAnAccountWithPassword($password) {
+        $this->returned = $this->app->handle(new CreateAccount($password));
+    }
+
+    public function isShouldReturn($value) {
+        $this->assert->equals($this->returned, $value);
     }
 }

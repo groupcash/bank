@@ -5,6 +5,7 @@ use groupcash\bank\AddBacker;
 use groupcash\bank\app\AggregateRoot;
 use groupcash\bank\app\Cryptography;
 use groupcash\bank\AuthorizeIssuer;
+use groupcash\bank\CreateAccount;
 use groupcash\bank\DeclarePromise;
 use groupcash\bank\DeliverCoin;
 use groupcash\bank\events\BackerAdded;
@@ -52,6 +53,15 @@ class Bank extends AggregateRoot {
     public function __construct(Groupcash $lib, Cryptography $crypto, $secret) {
         $this->lib = $lib;
         $this->auth = new Authenticator($crypto, $secret);
+    }
+
+    public function handleCreateAccount(CreateAccount $c) {
+        $key = $this->lib->generateKey();
+
+        return [
+            'key' => $this->auth->encrypt($key, $c->getPassword()),
+            'address' => $this->lib->getAddress($key)
+        ];
     }
 
     public function handleAuthorizeIssuer(AuthorizeIssuer $c) {
@@ -173,7 +183,7 @@ class Bank extends AggregateRoot {
             return $fraction->toFloat();
         }, $coins));
 
-        if ($total < $c->getAmount()->toFloat()) {
+        if ($total < $c->getFraction()->toFloat()) {
             throw new \Exception('Not sufficient coins of this currency available in account.');
         }
 
@@ -184,8 +194,8 @@ class Bank extends AggregateRoot {
             /** @var Fraction $fraction */
             $fraction = $coinFraction['fraction'];
 
-            if ($c->getAmount()->toFloat() < $fraction->toFloat()) {
-                $fraction = $c->getAmount();
+            if ($c->getFraction()->toFloat() < $fraction->toFloat()) {
+                $fraction = $c->getFraction();
             }
             $transferFraction = $fraction->dividedBy($coin->getFraction());
 
@@ -196,7 +206,7 @@ class Bank extends AggregateRoot {
 
             $sent = $sent->plus($fraction);
 
-            if ($sent->toFloat() >= $c->getAmount()->toFloat()) {
+            if ($sent->toFloat() >= $c->getFraction()->toFloat()) {
                 break;
             }
         }
