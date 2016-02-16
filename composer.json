@@ -1,0 +1,30 @@
+{
+  "name": "groupcash/bank",
+  "description": "Web application for running groupcash currencies",
+  "type": "application",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Nikolas Martens",
+      "email": "Nikolas.M@rtens.org"
+    }
+  ],
+  "minimum-stability": "dev",
+  "require": {
+    "php": ">=5.5",
+    "groupcash/php": "dev-master"
+  },
+  "require-dev": {
+    "rtens/scrut": "dev-master"
+  },
+  "autoload": {
+    "psr-4": {
+      "groupcash\\bank\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "spec\\groupcash\\bank\\": "spec/"
+    }
+  }
+}
