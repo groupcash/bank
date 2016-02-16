@@ -12,7 +12,12 @@
   "minimum-stability": "dev",
   "require": {
     "php": ">=5.5",
-    "groupcash/php": "dev-master"
+    "ext-mcrypt": "*",
+    "ext-openssl": "*",
+    "groupcash/php": "dev-master",
+    "watoki/stores": "dev-master",
+    "rtens/domin": "dev-master",
+    "watoki/curir": "dev-master"
   },
   "require-dev": {
     "rtens/scrut": "dev-master"

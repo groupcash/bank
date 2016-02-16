@@ -17,5 +17,10 @@ abstract class Identifier {
         return $this->identifier;
     }
 
-
+    /**
+     * @return string
+     */
+    public function getIdentifier() {
+        return $this->identifier;
+    }
 }
