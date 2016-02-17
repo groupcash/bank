@@ -52,7 +52,8 @@ class TransactionHistory extends Projection {
             $this->transactions[] = new Transaction(
                 $e->getWhen(),
                 $e->getCurrency(),
-                $sum->negative()
+                $sum->negative(),
+                $e->getSubject()
             );
             $this->total = $this->total->minus($sum);
         }
@@ -64,7 +65,8 @@ class TransactionHistory extends Projection {
             $this->transactions[] = new Transaction(
                 $e->getWhen(),
                 $e->getCurrency(),
-                $sum
+                $sum,
+                $e->getSubject()
             );
             $this->total = $this->total->plus($sum);
 

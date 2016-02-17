@@ -19,19 +19,25 @@ class CoinsSent extends Event {
     /** @var AccountIdentifier */
     private $target;
 
+    /** @var null|string */
+    private $subject;
+
     /**
      * @param CurrencyIdentifier $currency
      * @param AccountIdentifier $owner
      * @param AccountIdentifier $target
      * @param SentCoin[] $sentCoins
+     * @param null|string $subject
      */
-    public function __construct(CurrencyIdentifier $currency, AccountIdentifier $owner, AccountIdentifier $target, $sentCoins) {
+    public function __construct(CurrencyIdentifier $currency, AccountIdentifier $owner, AccountIdentifier $target,
+                                $sentCoins, $subject = null) {
         parent::__construct();
 
         $this->sentCoins = $sentCoins;
         $this->owner = $owner;
         $this->currency = $currency;
         $this->target = $target;
+        $this->subject = $subject;
     }
 
     /**
@@ -60,5 +66,12 @@ class CoinsSent extends Event {
      */
     public function getTarget() {
         return $this->target;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getSubject() {
+        return $this->subject;
     }
 }

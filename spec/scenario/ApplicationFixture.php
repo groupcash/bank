@@ -12,6 +12,7 @@ use groupcash\bank\ListTransactions;
 use groupcash\bank\model\AccountIdentifier;
 use groupcash\bank\model\Authentication;
 use groupcash\bank\model\CurrencyIdentifier;
+use groupcash\bank\projecting\Transaction;
 use groupcash\bank\projecting\TransactionHistory;
 use groupcash\bank\SendCoins;
 use groupcash\php\Groupcash;
@@ -71,11 +72,16 @@ class ApplicationFixture {
     }
 
     public function _Sends__To($owner, $amount, $currency, $target) {
+        $this->_Sends__To_WithSubject($owner, $amount, $currency, $target, null);
+    }
+
+    public function _Sends__To_WithSubject($owner, $amount, $currency, $target, $subject) {
         $this->app->handle(new SendCoins(
             new Authentication("private $owner"),
             $amount,
             new CurrencyIdentifier($currency),
-            new AccountIdentifier($target)
+            new AccountIdentifier($target),
+            $subject
         ));
     }
 
@@ -144,12 +150,25 @@ class ApplicationFixture {
         $this->assert->size($this->transactionHistory->getTransactions(), $int);
     }
 
-    public function transaction_ShouldBe($pos, $value) {
-        $this->assert->equals($this->transactionHistory->getTransactions()[$pos - 1], $value);
-    }
-
     public function nowIs($when) {
         Time::$frozen = new \DateTimeImmutable($when);
+    }
+
+    public function transaction_ShouldBeOf__On($pos, $amount, $currency, $when) {
+        $this->transaction_ShouldBeOf__th_On($pos, $amount, 1, $currency, $when);
+    }
+
+    public function transaction_ShouldBeOf__th_On($pos, $nominator, $denominator, $currency, $when) {
+        $this->assert->equals($this->transactionHistory->getTransactions()[$pos - 1],
+            new Transaction(
+                new \DateTimeImmutable($when),
+                new CurrencyIdentifier($currency),
+                new Fraction($nominator, $denominator)
+            ));
+    }
+
+    public function transaction_ShouldHaveTheSubject($pos, $subject) {
+        $this->assert->equals($this->transactionHistory->getTransactions()[$pos - 1]->getSubject(), $subject);
     }
 
     public function theTotalShouldBe__th($nominator, $denominator) {

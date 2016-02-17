@@ -190,7 +190,12 @@ class Bank extends AggregateRoot {
 
             $left = $left->minus($fraction);
             if ($left == new Fraction(0)) {
-                $this->record(new CoinsSent($c->getCurrency(), $owner, $c->getTarget(), $sent));
+                $this->record(new CoinsSent(
+                    $c->getCurrency(),
+                    $owner,
+                    $c->getTarget(),
+                    $sent,
+                    $c->getSubject()));
                 return;
             }
         }
@@ -218,7 +223,11 @@ class Bank extends AggregateRoot {
     }
 
     public function handleDeliverCoins(DeliverCoins $c) {
-        $this->record(new CoinsDelivered($c->getCurrency(), $c->getTarget(), $c->getCoins()));
+        $this->record(new CoinsDelivered(
+            $c->getCurrency(),
+            $c->getTarget(),
+            $c->getCoins(),
+            $c->getSubject()));
     }
 
     protected function applyCoinsDelivered(CoinsDelivered $e) {

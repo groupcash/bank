@@ -16,15 +16,20 @@ class DeliverCoins {
     /** @var CurrencyIdentifier */
     private $currency;
 
+    /** @var null|string */
+    private $subject;
+
     /**
      * @param CurrencyIdentifier $currency
      * @param AccountIdentifier $target
      * @param Coin[] $coins
+     * @param null|string $subject
      */
-    public function __construct(CurrencyIdentifier $currency, AccountIdentifier $target, array $coins) {
+    public function __construct(CurrencyIdentifier $currency, AccountIdentifier $target, array $coins, $subject = null) {
         $this->coins = $coins;
         $this->target = $target;
         $this->currency = $currency;
+        $this->subject = $subject;
     }
 
     /**
@@ -46,5 +51,12 @@ class DeliverCoins {
      */
     public function getCurrency() {
         return $this->currency;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getSubject() {
+        return $this->subject;
     }
 }

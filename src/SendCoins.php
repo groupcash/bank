@@ -20,17 +20,23 @@ class SendCoins {
     /** @var AccountIdentifier */
     private $target;
 
+    /** @var null|string */
+    private $subject;
+
     /**
      * @param Authentication $owner
      * @param int|Fraction $amount
      * @param CurrencyIdentifier $currency
      * @param AccountIdentifier $target
+     * @param null|string $subject
      */
-    public function __construct(Authentication $owner, $amount, CurrencyIdentifier $currency, AccountIdentifier $target) {
+    public function __construct(Authentication $owner, $amount, CurrencyIdentifier $currency,
+                                AccountIdentifier $target, $subject = null) {
         $this->owner = $owner;
         $this->fraction = ($amount instanceof Fraction) ? $amount : new Fraction(intval($amount));
         $this->currency = $currency;
         $this->target = $target;
+        $this->subject = $subject;
     }
 
     /**
@@ -59,5 +65,12 @@ class SendCoins {
      */
     public function getTarget() {
         return $this->target;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getSubject() {
+        return $this->subject;
     }
 }

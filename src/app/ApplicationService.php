@@ -80,7 +80,7 @@ class ApplicationService {
     }
 
     protected function onCoinsIssued(CoinsIssued $e) {
-        $this->handle(new DeliverCoins($e->getCurrency(), $e->getBacker(), $e->getCoins()));
+        $this->handle(new DeliverCoins($e->getCurrency(), $e->getBacker(), $e->getCoins(), 'Issued'));
     }
 
     protected function onCoinsSent(CoinsSent $e) {
@@ -89,6 +89,7 @@ class ApplicationService {
             $e->getTarget(),
             array_map(function (SentCoin $sentCoin) {
                 return $sentCoin->getTransferred();
-            }, $e->getSentCoins())));
+            }, $e->getSentCoins()),
+            $e->getSubject()));
     }
 }

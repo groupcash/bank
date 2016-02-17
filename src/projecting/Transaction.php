@@ -15,15 +15,20 @@ class Transaction {
     /** @var \DateTimeImmutable */
     private $when;
 
+    /** @var null|string */
+    private $subject;
+
     /**
      * @param \DateTimeImmutable $when
      * @param CurrencyIdentifier $currency
      * @param Fraction $amount
+     * @param null|string $subject
      */
-    public function __construct(\DateTimeImmutable $when, CurrencyIdentifier $currency, Fraction $amount) {
+    public function __construct(\DateTimeImmutable $when, CurrencyIdentifier $currency, Fraction $amount, $subject = null) {
         $this->amount = $amount;
         $this->currency = $currency;
         $this->when = $when;
+        $this->subject = $subject;
     }
 
     /**
@@ -45,5 +50,12 @@ class Transaction {
      */
     public function getWhen() {
         return $this->when;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getSubject() {
+        return $this->subject;
     }
 }
