@@ -12,15 +12,27 @@ class CoinSent extends Event {
     /** @var Coin */
     private $transferred;
 
+    /** @var Coin */
+    private $remaining;
+
     /**
      * @param Coin $coin
      * @param Coin $transferred
+     * @param Coin $remaining
      */
-    public function __construct(Coin $coin, Coin $transferred) {
+    public function __construct(Coin $coin, Coin $transferred, Coin $remaining) {
         parent::__construct();
 
         $this->coin = $coin;
         $this->transferred = $transferred;
+        $this->remaining = $remaining;
+    }
+
+    /**
+     * @return Coin
+     */
+    public function getRemaining() {
+        return $this->remaining;
     }
 
     /**
