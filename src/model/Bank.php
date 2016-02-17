@@ -179,12 +179,12 @@ class Bank extends AggregateRoot {
         /** @var Coin[] $coins */
         $coins = $this->get($this->coins, [$c->getCurrency(), $owner], []);
 
-        $sent = new Fraction(0);
+        $left = $c->getFraction();
         foreach ($coins as $coin) {
             $fraction = $coin->getFraction();
 
-            if ($c->getFraction()->toFloat() < $fraction->toFloat()) {
-                $fraction = $c->getFraction();
+            if ($left->toFloat() < $fraction->toFloat()) {
+                $fraction = $left;
             }
             $transferFraction = $fraction->dividedBy($coin->getFraction());
             $remainFraction = (new Fraction(1))->minus($transferFraction);
@@ -195,8 +195,8 @@ class Bank extends AggregateRoot {
                 $this->lib->transferCoin($ownerKey, $coin, (string)$owner, $remainFraction)
             ));
 
-            $sent = $sent->plus($fraction);
-            if ($sent->toFloat() == $c->getFraction()->toFloat()) {
+            $left = $left->minus($fraction);
+            if ($left == new Fraction(0)) {
                 return;
             }
         }

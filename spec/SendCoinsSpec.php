@@ -13,7 +13,7 @@ class SendCoinsSpec {
     function before() {
         $this->scenario->given->_Authorizes('foo', 'issuer');
         $this->scenario->given->_Adds_To('issuer', 'bart', 'foo');
-        $this->scenario->given->_Declares_Of_By_For('issuer', 3, 'My Promise', 'bart', 'foo');
+        $this->scenario->given->_Declares_Of_By_For('issuer', 5, 'My Promise', 'bart', 'foo');
     }
 
     function noCoins() {
@@ -121,6 +121,15 @@ class SendCoinsSpec {
         $this->scenario->given->_Sends__th_To('bart', 1, 2, 'foo', 'lisa');
 
         $this->scenario->when->_Sends__th_To('lisa', 3, 2, 'foo', 'marge');
+        $this->scenario->then->allShouldBeFine();
+    }
+
+    function wholeAndFractions() {
+        $this->scenario->given->_issues__to('issuer', 5, 'foo', 'bart');
+        $this->scenario->given->_Sends__To('bart', 5, 'foo', 'lisa');
+
+        $this->scenario->when->_Sends__To('lisa', 2, 'foo', 'homer');
+        $this->scenario->when->_Sends__th_To('lisa', 5, 2, 'foo', 'marge');
         $this->scenario->then->allShouldBeFine();
     }
 }
