@@ -7,20 +7,19 @@ use groupcash\bank\app\Cryptography;
 use groupcash\bank\AuthorizeIssuer;
 use groupcash\bank\CreateAccount;
 use groupcash\bank\DeclarePromise;
-use groupcash\bank\DeliverCoin;
+use groupcash\bank\DeliverCoins;
 use groupcash\bank\events\BackerAdded;
-use groupcash\bank\events\CoinDelivered;
-use groupcash\bank\events\CoinIssued;
-use groupcash\bank\events\CoinSent;
+use groupcash\bank\events\CoinsDelivered;
+use groupcash\bank\events\CoinsIssued;
+use groupcash\bank\events\CoinsSent;
 use groupcash\bank\events\IssuerAuthorized;
 use groupcash\bank\events\PromiseDeclared;
+use groupcash\bank\events\SentCoin;
 use groupcash\bank\IssueCoins;
 use groupcash\bank\SendCoins;
 use groupcash\php\Groupcash;
 use groupcash\php\model\Coin;
 use groupcash\php\model\Fraction;
-use groupcash\php\model\Promise;
-use groupcash\php\model\Transference;
 
 class Bank extends AggregateRoot {
 
@@ -149,27 +148,20 @@ class Bank extends AggregateRoot {
             $use = min($available[$i], $number);
             $number -= $use;
 
-            $coins = $this->lib->issueCoins(
+            $this->record(new CoinsIssued(
+                $c->getCurrency(), $c->getBacker(), $this->lib->issueCoins(
                 $this->auth->getKey($c->getIssuer()),
                 (string)$c->getCurrency(),
                 (string)$promise->getDescription(),
                 (string)$promise->getBacker(),
                 $issuedCoins[$i] + 1,
-                $use);
-
-            foreach ($coins as $coin) {
-                $this->record(new CoinIssued($coin));
-            }
+                $use)));
         }
     }
 
-    protected function applyCoinIssued(CoinIssued $e) {
-        $promise = $this->extractPromise($e->getCoin());
-
-        $currency = $promise->getCurrency();
-        $backer = $promise->getBacker();
-
-        $this->issued[$currency][$backer] = $this->get($this->issued, [$currency, $backer], 0) + 1;
+    protected function applyCoinsIssued(CoinsIssued $e) {
+        $this->issued[(string)$e->getCurrency()][(string)$e->getBacker()] =
+            $this->get($this->issued, [$e->getCurrency(), $e->getBacker()], 0) + count($e->getCoins());
     }
 
     public function handleSendCoins(SendCoins $c) {
@@ -179,6 +171,7 @@ class Bank extends AggregateRoot {
         /** @var Coin[] $coins */
         $coins = $this->get($this->coins, [$c->getCurrency(), $owner], []);
 
+        $sent = [];
         $left = $c->getFraction();
         foreach ($coins as $coin) {
             $fraction = $coin->getFraction();
@@ -189,14 +182,15 @@ class Bank extends AggregateRoot {
             $transferFraction = $fraction->dividedBy($coin->getFraction());
             $remainFraction = (new Fraction(1))->minus($transferFraction);
 
-            $this->record(new CoinSent(
+            $sent[] = new SentCoin(
                 $coin,
                 $this->lib->transferCoin($ownerKey, $coin, (string)$c->getTarget(), $transferFraction),
                 $this->lib->transferCoin($ownerKey, $coin, (string)$owner, $remainFraction)
-            ));
+            );
 
             $left = $left->minus($fraction);
             if ($left == new Fraction(0)) {
+                $this->record(new CoinsSent($c->getCurrency(), $owner, $c->getTarget(), $sent));
                 return;
             }
         }
@@ -204,32 +198,33 @@ class Bank extends AggregateRoot {
         throw new \Exception('Not sufficient coins of this currency available in account.');
     }
 
-    function applyCoinSent(CoinSent $e) {
-        $owner = new AccountIdentifier($e->getCoin()->getTransaction()->getTarget());
-        $currency = new CurrencyIdentifier($this->extractPromise($e->getCoin())->getCurrency());
+    function applyCoinsSent(CoinsSent $e) {
+        $owner = $e->getOwner();
+        $currency = $e->getCurrency();
 
         $coins = $this->get($this->coins, [$currency, $owner], []);
 
-        if ($e->getRemaining()->getFraction() == new Fraction(0)) {
-            $replacement = [];
-        } else {
-            $replacement = [$e->getRemaining()];
+        foreach ($e->getSentCoins() as $sentCoin) {
+            if ($sentCoin->getRemaining()->getFraction() == new Fraction(0)) {
+                $replacement = [];
+            } else {
+                $replacement = [$sentCoin->getRemaining()];
+            }
+
+            array_splice($coins, array_search($sentCoin->getCoin(), $coins), 1, $replacement);
         }
 
-        array_splice($coins, array_search($e->getCoin(), $coins), 1, $replacement);
         $this->coins[(string)$currency][(string)$owner] = $coins;
     }
 
-    public function handleDeliverCoin(DeliverCoin $c) {
-        $this->record(new CoinDelivered($c->getCoin()));
+    public function handleDeliverCoins(DeliverCoins $c) {
+        $this->record(new CoinsDelivered($c->getCurrency(), $c->getTarget(), $c->getCoins()));
     }
 
-    protected function applyCoinDelivered(CoinDelivered $e) {
-        $coin = $e->getCoin();
-        $promise = $this->extractPromise($coin);
-        $target = $coin->getTransaction()->getTarget();
-
-        $this->coins[$promise->getCurrency()][$target][] = $coin;
+    protected function applyCoinsDelivered(CoinsDelivered $e) {
+        foreach ($e->getCoins() as $coin) {
+            $this->coins[(string)$e->getCurrency()][(string)$e->getTarget()][] = $coin;
+        }
     }
 
     private function guardIssuerOfCurrency($authentication, $currency) {
@@ -261,23 +256,5 @@ class Bank extends AggregateRoot {
             $array = $array[(string)$key];
         }
         return $array;
-    }
-
-    /**
-     * @param Coin $coin
-     * @return Promise
-     * @throws \Exception
-     */
-    private function extractPromise(Coin $coin) {
-        $transaction = $coin->getTransaction();
-        while ($transaction instanceof Transference) {
-            $transaction = $transaction->getCoin()->getTransaction();
-        }
-
-        if ($transaction instanceof Promise) {
-            return $transaction;
-        }
-
-        throw new \Exception('Could not analyze coin');
     }
 }

@@ -1,10 +1,9 @@
 <?php
 namespace groupcash\bank\events;
 
-use groupcash\bank\app\Event;
 use groupcash\php\model\Coin;
 
-class CoinSent extends Event {
+class SentCoin {
 
     /** @var Coin */
     private $coin;
@@ -21,8 +20,6 @@ class CoinSent extends Event {
      * @param Coin $remaining
      */
     public function __construct(Coin $coin, Coin $transferred, Coin $remaining) {
-        parent::__construct();
-
         $this->coin = $coin;
         $this->transferred = $transferred;
         $this->remaining = $remaining;

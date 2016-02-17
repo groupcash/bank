@@ -9,6 +9,7 @@ use groupcash\bank\AuthorizeIssuer;
 use groupcash\bank\CreateAccount;
 use groupcash\bank\DeclarePromise;
 use groupcash\bank\IssueCoins;
+use groupcash\bank\ListTransactions;
 use groupcash\bank\SendCoins;
 use groupcash\php\Groupcash;
 use groupcash\php\impl\EccKeyService;
@@ -53,19 +54,28 @@ class Launcher {
     }
 
     private function registerActions(WebApplication $domin) {
-        $this->addAction($domin, CreateAccount::class);
-        $this->addAction($domin, AuthorizeIssuer::class);
-        $this->addAction($domin, AddBacker::class);
-        $this->addAction($domin, DeclarePromise::class);
-        $this->addAction($domin, IssueCoins::class);
-        $this->addAction($domin, SendCoins::class);
+        $this->addCommand($domin, CreateAccount::class);
+        $this->addCommand($domin, AuthorizeIssuer::class);
+        $this->addCommand($domin, AddBacker::class);
+        $this->addCommand($domin, DeclarePromise::class);
+        $this->addCommand($domin, IssueCoins::class);
+        $this->addCommand($domin, SendCoins::class);
+        $this->addQuery($domin, ListTransactions::class);
     }
 
-    private function addAction(WebApplication $domin, $action) {
-        $handle = function ($action) {
+    private function addCommand(WebApplication $domin, $action) {
+        return $this->addAction($domin, $action, function ($action) {
             return $this->service->handle($action);
-        };
+        });
+    }
 
+    private function addQuery(WebApplication $domin, $action) {
+        return $this->addAction($domin, $action, function ($action) {
+            return $this->service->execute($action);
+        });
+    }
+
+    private function addAction(WebApplication $domin, $action, $handle) {
         $objectAction = new GenericObjectAction($action, $domin->types, $domin->parser, $handle);
         $domin->actions->add((new \ReflectionClass($action))->getShortName(), $objectAction);
 

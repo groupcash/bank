@@ -1,11 +1,14 @@
 <?php
 namespace groupcash\bank\app;
 
-use groupcash\bank\DeliverCoin;
-use groupcash\bank\events\CoinIssued;
-use groupcash\bank\events\CoinSent;
+use groupcash\bank\DeliverCoins;
+use groupcash\bank\events\CoinsIssued;
+use groupcash\bank\events\CoinsSent;
+use groupcash\bank\events\SentCoin;
+use groupcash\bank\ListTransactions;
 use groupcash\bank\model\Bank;
 use groupcash\bank\model\BankIdentifier;
+use groupcash\bank\projecting\TransactionHistory;
 use groupcash\php\Groupcash;
 
 class ApplicationService {
@@ -33,6 +36,15 @@ class ApplicationService {
         $this->store = $store;
         $this->crypto = $crypto;
         $this->secret = $secret;
+    }
+
+    public function execute($query) {
+        if ($query instanceof ListTransactions) {
+            $stream = $this->store->read(BankIdentifier::singleton());
+            return new TransactionHistory($stream, $query, $this->lib, $this->crypto, $this->secret);
+        }
+
+        throw new \Exception('Cannot execute unkown query.');
     }
 
     public function handle($command) {
@@ -67,11 +79,16 @@ class ApplicationService {
         return new Bank($this->lib, $this->crypto, $this->secret);
     }
 
-    protected function onCoinIssued(CoinIssued $e) {
-        $this->handle(new DeliverCoin($e->getCoin()));
+    protected function onCoinsIssued(CoinsIssued $e) {
+        $this->handle(new DeliverCoins($e->getCurrency(), $e->getBacker(), $e->getCoins()));
     }
 
-    protected function onCoinSent(CoinSent $e) {
-        $this->handle(new DeliverCoin($e->getTransferred()));
+    protected function onCoinsSent(CoinsSent $e) {
+        $this->handle(new DeliverCoins(
+            $e->getCurrency(),
+            $e->getTarget(),
+            array_map(function (SentCoin $sentCoin) {
+                return $sentCoin->getTransferred();
+            }, $e->getSentCoins())));
     }
 }

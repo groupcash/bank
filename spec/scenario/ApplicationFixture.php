@@ -3,13 +3,16 @@ namespace spec\groupcash\bank\scenario;
 
 use groupcash\bank\AddBacker;
 use groupcash\bank\app\ApplicationService;
+use groupcash\bank\app\Time;
 use groupcash\bank\AuthorizeIssuer;
 use groupcash\bank\CreateAccount;
 use groupcash\bank\DeclarePromise;
 use groupcash\bank\IssueCoins;
+use groupcash\bank\ListTransactions;
 use groupcash\bank\model\AccountIdentifier;
 use groupcash\bank\model\Authentication;
 use groupcash\bank\model\CurrencyIdentifier;
+use groupcash\bank\projecting\TransactionHistory;
 use groupcash\bank\SendCoins;
 use groupcash\php\Groupcash;
 use groupcash\php\model\Fraction;
@@ -38,6 +41,9 @@ class ApplicationFixture {
 
     /** @var mixed */
     private $returned;
+
+    /** @var TransactionHistory */
+    private $transactionHistory;
 
     public function __construct(Assert $assert, ExceptionFixture $except) {
         $this->assert = $assert;
@@ -126,5 +132,27 @@ class ApplicationFixture {
 
     public function isShouldReturn($value) {
         $this->assert->equals($this->returned, $value);
+    }
+
+    public function _ListsTheirTransactions($account) {
+        $this->transactionHistory = $this->app->execute(new ListTransactions(
+            new Authentication("private $account")
+        ));
+    }
+
+    public function thereShouldBe_Transactions($int) {
+        $this->assert->size($this->transactionHistory->getTransactions(), $int);
+    }
+
+    public function transaction_ShouldBe($pos, $value) {
+        $this->assert->equals($this->transactionHistory->getTransactions()[$pos - 1], $value);
+    }
+
+    public function nowIs($when) {
+        Time::$frozen = new \DateTimeImmutable($when);
+    }
+
+    public function theTotalShouldBe__th($nominator, $denominator) {
+        $this->assert->equals($this->transactionHistory->getTotal(), new Fraction($nominator, $denominator));
     }
 }
