@@ -99,28 +99,28 @@ class SendCoinsSpec {
     function fractionOfCoin() {
         $this->scenario->given->_issues__to('issuer', 1, 'foo', 'bart');
 
-        $this->scenario->when->_Sends__th_To('bart', 1, 2, 'foo', 'lisa');
-        $this->scenario->when->_Sends__th_To('bart', 1, 2, 'foo', 'homer');
+        $this->scenario->when->_Sends__To('bart', .5, 'foo', 'lisa');
+        $this->scenario->when->_Sends__To('bart', .5, 'foo', 'homer');
 
-        $this->scenario->tryThat->_Sends__th_To('bart', 1, 100, 'foo', 'marge');
+        $this->scenario->tryThat->_Sends__To('bart', .01, 'foo', 'marge');
         $this->scenario->then->itShouldFailWith('Not sufficient coins of this currency available in account.');
 
-        $this->scenario->when->_Sends__th_To('lisa', 1, 2, 'foo', 'marge');
-        $this->scenario->tryThat->_Sends__th_To('lisa', 1, 100, 'foo', 'maggie');
+        $this->scenario->when->_Sends__To('lisa', .5, 'foo', 'marge');
+        $this->scenario->tryThat->_Sends__To('lisa', .01, 'foo', 'maggie');
         $this->scenario->then->itShouldFailWith('Not sufficient coins of this currency available in account.');
 
-        $this->scenario->tryThat->_Sends__th_To('homer', 6, 10, 'foo', 'maggie');
+        $this->scenario->tryThat->_Sends__To('homer', .6, 'foo', 'maggie');
         $this->scenario->then->itShouldFailWith('Not sufficient coins of this currency available in account.');
     }
 
     function combineFractions() {
         $this->scenario->given->_issues__to('issuer', 3, 'foo', 'bart');
 
-        $this->scenario->given->_Sends__th_To('bart', 1, 2, 'foo', 'lisa');
-        $this->scenario->given->_Sends__th_To('bart', 1, 2, 'foo', 'lisa');
-        $this->scenario->given->_Sends__th_To('bart', 1, 2, 'foo', 'lisa');
+        $this->scenario->given->_Sends__To('bart', .5, 'foo', 'lisa');
+        $this->scenario->given->_Sends__To('bart', .5, 'foo', 'lisa');
+        $this->scenario->given->_Sends__To('bart', .5, 'foo', 'lisa');
 
-        $this->scenario->when->_Sends__th_To('lisa', 3, 2, 'foo', 'marge');
+        $this->scenario->when->_Sends__To('lisa', 1.5, 'foo', 'marge');
         $this->scenario->then->allShouldBeFine();
     }
 
@@ -129,7 +129,7 @@ class SendCoinsSpec {
         $this->scenario->given->_Sends__To('bart', 5, 'foo', 'lisa');
 
         $this->scenario->when->_Sends__To('lisa', 2, 'foo', 'homer');
-        $this->scenario->when->_Sends__th_To('lisa', 5, 2, 'foo', 'marge');
+        $this->scenario->when->_Sends__To('lisa', 2.5, 'foo', 'marge');
         $this->scenario->then->allShouldBeFine();
     }
 }

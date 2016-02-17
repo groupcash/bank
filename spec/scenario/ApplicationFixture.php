@@ -62,15 +62,6 @@ class ApplicationFixture {
         );
     }
 
-    public function _Sends__th_To($owner, $nominator, $denominator, $currency, $target) {
-        $this->app->handle(new SendCoins(
-            new Authentication("private $owner"),
-            new Fraction($nominator, $denominator),
-            new CurrencyIdentifier($currency),
-            new AccountIdentifier($target)
-        ));
-    }
-
     public function _Sends__To($owner, $amount, $currency, $target) {
         $this->_Sends__To_WithSubject($owner, $amount, $currency, $target, null);
     }
@@ -78,7 +69,7 @@ class ApplicationFixture {
     public function _Sends__To_WithSubject($owner, $amount, $currency, $target, $subject) {
         $this->app->handle(new SendCoins(
             new Authentication("private $owner"),
-            $amount,
+            $this->toFraction($amount),
             new CurrencyIdentifier($currency),
             new AccountIdentifier($target),
             $subject
@@ -155,15 +146,11 @@ class ApplicationFixture {
     }
 
     public function transaction_ShouldBeOf__On($pos, $amount, $currency, $when) {
-        $this->transaction_ShouldBeOf__th_On($pos, $amount, 1, $currency, $when);
-    }
-
-    public function transaction_ShouldBeOf__th_On($pos, $nominator, $denominator, $currency, $when) {
         $this->assert->equals($this->transactionHistory->getTransactions()[$pos - 1],
             new Transaction(
                 new \DateTimeImmutable($when),
                 new CurrencyIdentifier($currency),
-                new Fraction($nominator, $denominator)
+                $this->toFraction($amount)
             ));
     }
 
@@ -171,7 +158,16 @@ class ApplicationFixture {
         $this->assert->equals($this->transactionHistory->getTransactions()[$pos - 1]->getSubject(), $subject);
     }
 
-    public function theTotalShouldBe__th($nominator, $denominator) {
-        $this->assert->equals($this->transactionHistory->getTotal(), new Fraction($nominator, $denominator));
+    public function theTotalShouldBe($amount) {
+        $this->assert->equals($this->transactionHistory->getTotal(), $this->toFraction($amount));
+    }
+
+    private function toFraction($amount) {
+        $factor = 1;
+        do {
+            $factor++;
+        } while ($amount * $factor != (int)($amount * $factor));
+
+        return new Fraction($amount * $factor, $factor);
     }
 }

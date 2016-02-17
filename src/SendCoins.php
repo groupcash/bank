@@ -25,15 +25,15 @@ class SendCoins {
 
     /**
      * @param Authentication $owner
-     * @param int|Fraction $amount
+     * @param Fraction $amount
      * @param CurrencyIdentifier $currency
      * @param AccountIdentifier $target
      * @param null|string $subject
      */
-    public function __construct(Authentication $owner, $amount, CurrencyIdentifier $currency,
+    public function __construct(Authentication $owner, Fraction $amount, CurrencyIdentifier $currency,
                                 AccountIdentifier $target, $subject = null) {
         $this->owner = $owner;
-        $this->fraction = ($amount instanceof Fraction) ? $amount : new Fraction(intval($amount));
+        $this->fraction = $amount;
         $this->currency = $currency;
         $this->target = $target;
         $this->subject = $subject;

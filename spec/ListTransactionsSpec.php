@@ -74,32 +74,32 @@ class ListTransactionsSpec {
         $this->scenario->given->_Sends__To('bart', 7, 'foo', 'lisa');
 
         $this->scenario->given->_Sends__To('lisa', 3, 'foo', 'homer');
-        $this->scenario->given->_Sends__th_To('lisa', 5, 2, 'foo', 'marge');
+        $this->scenario->given->_Sends__To('lisa', 2.5, 'foo', 'marge');
 
         $this->scenario->given->nowIs('2012-11-10');
         $this->scenario->given->_Sends__To('homer', 2, 'foo', 'lisa');
         $this->scenario->given->_Sends__To('bart', 2, 'foo', 'lisa');
-        $this->scenario->given->_Sends__th_To('marge', 2, 5, 'foo', 'lisa');
+        $this->scenario->given->_Sends__To('marge', 0.4, 'foo', 'lisa');
 
         $this->scenario->when->_ListsTheirTransactions('lisa');
 
         $this->scenario->then->thereShouldBe_Transactions(6);
         $this->scenario->then->transaction_ShouldBeOf__On(1, 7, 'foo', '2011-12-13');
         $this->scenario->then->transaction_ShouldBeOf__On(2, -3, 'foo', '2011-12-13');
-        $this->scenario->then->transaction_ShouldBeOf__th_On(3, -5, 2, 'foo', '2011-12-13');
+        $this->scenario->then->transaction_ShouldBeOf__On(3, -2.5, 'foo', '2011-12-13');
         $this->scenario->then->transaction_ShouldBeOf__On(4, 2, 'foo', '2012-11-10');
     }
 
     function calculateTotal() {
         $this->scenario->given->_Sends__To('bart', 7, 'foo', 'lisa');
         $this->scenario->given->_Sends__To('lisa', 3, 'foo', 'homer');
-        $this->scenario->given->_Sends__th_To('lisa', 5, 2, 'foo', 'marge');
+        $this->scenario->given->_Sends__To('lisa', 2.5, 'foo', 'marge');
         $this->scenario->given->_Sends__To('homer', 2, 'foo', 'lisa');
         $this->scenario->given->_Sends__To('bart', 2, 'foo', 'lisa');
-        $this->scenario->given->_Sends__th_To('marge', 2, 5, 'foo', 'lisa');
+        $this->scenario->given->_Sends__To('marge', 0.4, 'foo', 'lisa');
 
         $this->scenario->when->_ListsTheirTransactions('lisa');
 
-        $this->scenario->then->theTotalShouldBe__th(59, 10);
+        $this->scenario->then->theTotalShouldBe(5.9);
     }
 }
