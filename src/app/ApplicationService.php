@@ -6,8 +6,10 @@ use groupcash\bank\events\CoinsIssued;
 use groupcash\bank\events\CoinsSent;
 use groupcash\bank\events\SentCoin;
 use groupcash\bank\ListTransactions;
+use groupcash\bank\model\Authenticator;
 use groupcash\bank\model\Bank;
 use groupcash\bank\model\BankIdentifier;
+use groupcash\bank\model\Vault;
 use groupcash\bank\projecting\TransactionHistory;
 use groupcash\php\Groupcash;
 
@@ -22,26 +24,26 @@ class ApplicationService {
     /** @var Cryptography */
     private $crypto;
 
-    /** @var string */
-    private $secret;
+    /** @var Vault */
+    private $vault;
 
     /**
      * @param EventStore $store
      * @param Cryptography $crypto
      * @param Groupcash $lib
-     * @param string $secret
+     * @param Vault $vault
      */
-    public function __construct(EventStore $store, Cryptography $crypto, Groupcash $lib, $secret) {
+    public function __construct(EventStore $store, Cryptography $crypto, Groupcash $lib, Vault $vault) {
         $this->lib = $lib;
         $this->store = $store;
         $this->crypto = $crypto;
-        $this->secret = $secret;
+        $this->vault = $vault;
     }
 
     public function execute($query) {
         if ($query instanceof ListTransactions) {
             $stream = $this->store->read(BankIdentifier::singleton());
-            return new TransactionHistory($stream, $query, $this->lib, $this->crypto, $this->secret);
+            return new TransactionHistory($stream, $query, $this->lib, new Authenticator($this->crypto, $this->vault));
         }
 
         throw new \Exception('Cannot execute unkown query.');
@@ -76,7 +78,7 @@ class ApplicationService {
      * @return AggregateRoot
      */
     private function getAggregate() {
-        return new Bank($this->lib, $this->crypto, $this->secret);
+        return new Bank($this->lib, new Authenticator($this->crypto, $this->vault));
     }
 
     protected function onCoinsIssued(CoinsIssued $e) {

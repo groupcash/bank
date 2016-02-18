@@ -4,7 +4,9 @@ namespace groupcash\bank\web;
 use groupcash\bank\AddBacker;
 use groupcash\bank\app\ApplicationService;
 use groupcash\bank\app\McryptCryptography;
+use groupcash\bank\app\OpenSslRandomNumberGenerator;
 use groupcash\bank\app\PersistentEventStore;
+use groupcash\bank\app\PersistentVault;
 use groupcash\bank\AuthorizeIssuer;
 use groupcash\bank\CreateAccount;
 use groupcash\bank\DeclarePromise;
@@ -32,18 +34,7 @@ class Launcher {
             new PersistentEventStore($rootDir . '/user/data'),
             new McryptCryptography(),
             $this->lib,
-            $this->getSecret($rootDir . '/user/secret'));
-    }
-
-    private function getSecret($file) {
-        if (!file_exists($file)) {
-            mkdir(dirname($file), 0777, true);
-            $secret = base64_encode(openssl_random_pseudo_bytes(128));
-            file_put_contents($file, $secret);
-        } else {
-            $secret = file_get_contents($file);
-        }
-        return $secret;
+            new PersistentVault(new OpenSslRandomNumberGenerator(), $rootDir . '/user'));
     }
 
     public function run() {

@@ -1,7 +1,6 @@
 <?php
 namespace groupcash\bank\projecting;
 
-use groupcash\bank\app\Cryptography;
 use groupcash\bank\app\EventStream;
 use groupcash\bank\app\Projection;
 use groupcash\bank\events\CoinsDelivered;
@@ -24,8 +23,7 @@ class TransactionHistory extends Projection {
     /** @var Fraction */
     private $total;
 
-    public function __construct(EventStream $stream, ListTransactions $query, Groupcash $lib, Cryptography $crypto, $secret) {
-        $auth = new Authenticator($crypto, $secret);
+    public function __construct(EventStream $stream, ListTransactions $query, Groupcash $lib, Authenticator $auth) {
         $this->account = new AccountIdentifier($lib->getAddress($auth->getKey($query->getAccount())));
         $this->total = new Fraction(0);
 

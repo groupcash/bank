@@ -3,7 +3,6 @@ namespace groupcash\bank\model;
 
 use groupcash\bank\AddBacker;
 use groupcash\bank\app\AggregateRoot;
-use groupcash\bank\app\Cryptography;
 use groupcash\bank\AuthorizeIssuer;
 use groupcash\bank\CreateAccount;
 use groupcash\bank\DeclarePromise;
@@ -46,12 +45,11 @@ class Bank extends AggregateRoot {
 
     /**
      * @param Groupcash $lib
-     * @param Cryptography $crypto
-     * @param string $secret
+     * @param Authenticator $auth
      */
-    public function __construct(Groupcash $lib, Cryptography $crypto, $secret) {
+    public function __construct(Groupcash $lib, Authenticator $auth) {
         $this->lib = $lib;
-        $this->auth = new Authenticator($crypto, $secret);
+        $this->auth = $auth;
     }
 
     public function handleCreateAccount(CreateAccount $c) {

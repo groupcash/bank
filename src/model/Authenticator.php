@@ -8,16 +8,16 @@ class Authenticator {
     /** @var Cryptography */
     private $crypto;
 
-    /** @var string */
-    private $secret;
+    /** @var Vault */
+    private $vault;
 
     /**
      * @param Cryptography $crypto
-     * @param string $secret
+     * @param Vault $vault
      */
-    public function __construct(Cryptography $crypto, $secret) {
+    public function __construct(Cryptography $crypto, Vault $vault) {
         $this->crypto = $crypto;
-        $this->secret = $secret;
+        $this->vault = $vault;
     }
 
     public function encrypt($key, $password = null) {
@@ -25,7 +25,7 @@ class Authenticator {
             return $key;
         }
 
-        return $this->crypto->encrypt($key, $this->secret . $password);
+        return $this->crypto->encrypt($key, $this->vault->getSecret() . $password);
     }
 
     public function getKey(Authentication $authentication) {
@@ -33,6 +33,6 @@ class Authenticator {
             return $authentication->getKey();
         }
 
-        return $this->crypto->decrypt($authentication->getKey(), $this->secret . $authentication->getPassword());
+        return $this->crypto->decrypt($authentication->getKey(), $this->vault->getSecret() . $authentication->getPassword());
     }
 }

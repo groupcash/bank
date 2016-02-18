@@ -22,6 +22,8 @@ use rtens\scrut\fixtures\ExceptionFixture;
 use spec\groupcash\bank\fakes\FakeCryptography;
 use spec\groupcash\bank\fakes\FakeEventStore;
 use spec\groupcash\bank\fakes\FakeKeyService;
+use spec\groupcash\bank\fakes\FakeRandomNumberGenerator;
+use spec\groupcash\bank\fakes\FakeVault;
 
 class ApplicationFixture {
 
@@ -58,7 +60,9 @@ class ApplicationFixture {
             new Groupcash(
                 $this->key
             ),
-            'secret'
+            new FakeVault(
+                new FakeRandomNumberGenerator('secret')
+            )
         );
     }
 

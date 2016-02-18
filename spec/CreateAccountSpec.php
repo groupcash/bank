@@ -5,6 +5,8 @@ use groupcash\bank\model\Authentication;
 use groupcash\bank\model\Authenticator;
 use rtens\scrut\Assert;
 use spec\groupcash\bank\fakes\FakeCryptography;
+use spec\groupcash\bank\fakes\FakeRandomNumberGenerator;
+use spec\groupcash\bank\fakes\FakeVault;
 use spec\groupcash\bank\scenario\Scenario;
 
 /**
@@ -32,9 +34,9 @@ class CreateAccountSpec {
     }
 
     function authenticate() {
-        $auth = new Authenticator(new FakeCryptography(), 'secret');
+        $auth = new Authenticator(new FakeCryptography(), new FakeVault(new FakeRandomNumberGenerator('secret ')));
 
         $this->assert->equals($auth->getKey(new Authentication('key')), 'key');
-        $this->assert->equals($auth->getKey(new Authentication('key encrypted with secretpassword', 'password')), 'key');
+        $this->assert->equals($auth->getKey(new Authentication('key encrypted with secret password', 'password')), 'key');
     }
 }
