@@ -164,6 +164,7 @@ class Launcher {
     private function registerFields(WebApplication $domin) {
         $domin->fields->add(new PasswordField());
         $domin->fields->add(new FractionField());
+        $domin->fields->add(new IdentifierField());
         $domin->fields->add(new AuthenticationField($domin->types, $domin->fields, $this->getSessionAuthentication()));
     }
 
