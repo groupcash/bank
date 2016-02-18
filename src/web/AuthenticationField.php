@@ -51,6 +51,9 @@ class AuthenticationField extends ObjectField {
         return new Authentication($key, $authentication->getPassword());
     }
 
+    public function headElements(Parameter $parameter) {
+        return parent::headElements($this->getParameter($parameter));
+    }
 
     /**
      * @param Parameter $parameter
