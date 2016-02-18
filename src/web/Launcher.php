@@ -16,6 +16,8 @@ use groupcash\bank\SendCoins;
 use groupcash\php\Groupcash;
 use groupcash\php\impl\EccKeyService;
 use rtens\domin\delivery\web\adapters\curir\root\IndexResource;
+use rtens\domin\delivery\web\Element;
+use rtens\domin\delivery\web\renderers\dashboard\types\Panel;
 use rtens\domin\delivery\web\WebApplication;
 use rtens\domin\reflection\GenericObjectAction;
 use watoki\curir\WebDelivery;
@@ -43,7 +45,32 @@ class Launcher {
     }
 
     private function registerActions(WebApplication $domin) {
-        $this->addAction($domin, CreateAccount::class);
+        $this->addAction($domin, CreateAccount::class)
+            ->setAfterExecute(function ($keys) use ($domin) {
+                $keyPanel = function($heading, $content) {
+                    return new Panel($heading, new Element('div', [], [
+                        new Element('textarea', [
+                            'class' => 'form-control',
+                            'onclick' => 'this.select();'
+                        ], [
+                            $content
+                        ]),
+                        new Element('a', [
+                            'class' => 'btn btn-success',
+                            'download' => str_replace(' ', '_', strtolower($heading)) . '_' . substr(md5($content), -6),
+                            'href' => 'data:text/plain;base64,' . base64_encode($content),
+                            'target' => '_blank'
+                        ], [
+                            'Save as File'
+                        ])
+                    ]));
+                };
+
+                return [
+                    $keyPanel('Private Key', $keys['key']),
+                    $keyPanel('Public Address', $keys['address'])
+                ];
+            });
         $this->addAction($domin, AuthorizeIssuer::class);
         $this->addAction($domin, AddBacker::class);
         $this->addAction($domin, DeclarePromise::class);
