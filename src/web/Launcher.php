@@ -12,15 +12,21 @@ use groupcash\bank\CreateAccount;
 use groupcash\bank\DeclarePromise;
 use groupcash\bank\IssueCoins;
 use groupcash\bank\ListTransactions;
+use groupcash\bank\model\Authentication;
 use groupcash\bank\SendCoins;
 use groupcash\php\Groupcash;
 use groupcash\php\impl\EccKeyService;
 use rtens\domin\delivery\web\adapters\curir\root\IndexResource;
 use rtens\domin\delivery\web\Element;
+use rtens\domin\delivery\web\fields\AdapterField;
+use rtens\domin\delivery\web\fields\ObjectField;
 use rtens\domin\delivery\web\renderers\dashboard\types\Panel;
 use rtens\domin\delivery\web\WebApplication;
+use rtens\domin\Parameter;
+use rtens\domin\parameters\File;
 use rtens\domin\reflection\GenericObjectAction;
 use watoki\curir\WebDelivery;
+use watoki\reflect\type\ClassType;
 
 class Launcher {
 
@@ -47,7 +53,7 @@ class Launcher {
     private function registerActions(WebApplication $domin) {
         $this->addAction($domin, CreateAccount::class)
             ->setAfterExecute(function ($keys) use ($domin) {
-                $keyPanel = function($heading, $content) {
+                $keyPanel = function ($heading, $content) {
                     return new Panel($heading, new Element('div', [], [
                         new Element('textarea', [
                             'class' => 'form-control',
@@ -91,6 +97,26 @@ class Launcher {
     }
 
     private function registerFields(WebApplication $domin) {
+        $domin->fields->add((new AdapterField(new ObjectField($domin->types, $domin->fields)))
+            ->setHandles(function (Parameter $parameter) {
+                return $parameter->getType() == new ClassType(Authentication::class);
+            })
+            ->setTransformParameter(function (Parameter $parameter) {
+                return $parameter->withType(new ClassType(FileAuthentication::class));
+            })
+            ->setBeforeRender(function (Authentication $authentication = null) {
+                if (!$authentication) {
+                    return null;
+                }
+                return new FileAuthentication($authentication->getKey(), $authentication->getPassword());
+            })
+            ->setAfterInflate(function (FileAuthentication $authentication) {
+                $key = $authentication->getKey();
+                if ($key instanceof File) {
+                    $key = $key->getContent();
+                }
+                return new Authentication($key, $authentication->getPassword());
+            }));
         $domin->fields->add(new PasswordField());
     }
 }

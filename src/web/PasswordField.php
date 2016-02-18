@@ -13,7 +13,7 @@ class PasswordField extends StringField {
      * @return bool
      */
     public function handles(Parameter $parameter) {
-        return $parameter->getType() == new StringType() && strpos($parameter->getName(), '[password]');
+        return $parameter->getType() == new StringType() && strpos($parameter->getName(), 'password') !== false;
     }
 
     /**
