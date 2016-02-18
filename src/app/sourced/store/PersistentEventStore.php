@@ -1,7 +1,8 @@
 <?php
-namespace groupcash\bank\app;
+namespace groupcash\bank\app\sourced\store;
 
-use groupcash\bank\model\Identifier;
+use groupcash\bank\app\sourced\domain\EventStream;
+use groupcash\bank\app\sourced\messaging\Identifier;
 use watoki\stores\file\FileStore;
 use watoki\stores\Store;
 
@@ -40,5 +41,22 @@ class PersistentEventStore implements EventStore {
      */
     public function has(Identifier $aggregateIdentifier) {
         return $this->store->hasKey((string)$aggregateIdentifier);
+    }
+
+    /**
+     * @return EventStream
+     */
+    public function readAll() {
+        $all = new EventStream();
+
+        foreach ($this->store->keys() as $key) {
+            /** @var EventStream $stream */
+            $stream = $this->store->read($key);
+            foreach ($stream->getEvents() as $event) {
+                $all->add($event);
+            }
+        }
+
+        return $all;
     }
 }

@@ -1,14 +1,18 @@
 <?php
-namespace groupcash\bank\app;
+namespace groupcash\bank\app\sourced\domain;
+
+use groupcash\bank\app\sourced\messaging\Command;
 
 abstract class AggregateRoot {
 
-    /** @var Event[] */
+    /** @var DomainEvent[] */
     private $recordedEvents = [];
 
-    /**
-     * @param EventStream $stream
-     */
+    public function handle(Command $command) {
+        $handleMethod = 'handle' . (new \ReflectionClass($command))->getShortName();
+        return call_user_func([$this, $handleMethod], $command);
+    }
+
     public function reconstitute(EventStream $stream) {
         $this->applyStream($stream);
     }
@@ -19,7 +23,7 @@ abstract class AggregateRoot {
         }
     }
 
-    private function apply($event) {
+    private function apply(DomainEvent $event) {
         $method = 'apply' . (new \ReflectionClass($event))->getShortName();
         if (method_exists($this, $method)) {
             call_user_func([$this, $method], $event);
@@ -27,13 +31,13 @@ abstract class AggregateRoot {
     }
 
     /**
-     * @return Event[]
+     * @return DomainEvent[]
      */
     public function getRecordedEvents() {
         return $this->recordedEvents;
     }
 
-    protected function record(Event $event) {
+    protected function record(DomainEvent $event) {
         $this->recordedEvents[] = $event;
     }
 }

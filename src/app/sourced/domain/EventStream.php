@@ -1,19 +1,19 @@
 <?php
-namespace groupcash\bank\app;
+namespace groupcash\bank\app\sourced\domain;
 
 class EventStream {
 
-    /** @var Event[] */
+    /** @var DomainEvent[] */
     private $events = [];
 
     /**
-     * @return Event[]
+     * @return DomainEvent[]
      */
     public function getEvents() {
         return $this->events;
     }
 
-    public function add(Event $event) {
+    public function add(DomainEvent $event) {
         $this->events[] = $event;
     }
 }

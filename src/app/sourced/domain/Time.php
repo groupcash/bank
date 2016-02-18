@@ -1,5 +1,5 @@
 <?php
-namespace groupcash\bank\app;
+namespace groupcash\bank\app\sourced\domain;
 
 class Time {
 

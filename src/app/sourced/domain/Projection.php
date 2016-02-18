@@ -1,9 +1,9 @@
 <?php
-namespace groupcash\bank\app;
+namespace groupcash\bank\app\sourced\domain;
 
 class Projection {
 
-    public function __construct(EventStream $stream) {
+    public function apply(EventStream $stream) {
         foreach ($stream->getEvents() as $event) {
             $method = 'apply' . (new \ReflectionClass($event))->getShortName();
             if (method_exists($this, $method)) {

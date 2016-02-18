@@ -1,5 +1,5 @@
 <?php
-namespace groupcash\bank\model;
+namespace groupcash\bank\app\sourced\messaging;
 
 abstract class Identifier {
 

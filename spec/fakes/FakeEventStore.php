@@ -1,10 +1,10 @@
 <?php
 namespace spec\groupcash\bank\fakes;
 
-use groupcash\bank\app\Event;
-use groupcash\bank\app\EventStore;
-use groupcash\bank\app\EventStream;
-use groupcash\bank\model\Identifier;
+use groupcash\bank\app\sourced\domain\DomainEvent;
+use groupcash\bank\app\sourced\store\EventStore;
+use groupcash\bank\app\sourced\domain\EventStream;
+use groupcash\bank\app\sourced\messaging\Identifier;
 
 class FakeEventStore implements EventStore {
 
@@ -43,8 +43,21 @@ class FakeEventStore implements EventStore {
     }
 
     public function filterClass(Identifier $identifier, $class) {
-        return $this->filter($identifier, function (Event $event) use ($class) {
+        return $this->filter($identifier, function (DomainEvent $event) use ($class) {
             return is_a($event, $class);
         });
+    }
+
+    /**
+     * @return EventStream
+     */
+    public function readAll() {
+        $all = new EventStream();
+        foreach ($this->streams as $stream) {
+            foreach ($stream->getEvents() as $event) {
+                $all->add($event);
+            }
+        }
+        return $all;
     }
 }

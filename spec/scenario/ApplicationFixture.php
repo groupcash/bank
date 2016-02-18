@@ -2,8 +2,8 @@
 namespace spec\groupcash\bank\scenario;
 
 use groupcash\bank\AddBacker;
-use groupcash\bank\app\ApplicationService;
-use groupcash\bank\app\Time;
+use groupcash\bank\app\Application;
+use groupcash\bank\app\sourced\domain\Time;
 use groupcash\bank\AuthorizeIssuer;
 use groupcash\bank\CreateAccount;
 use groupcash\bank\DeclarePromise;
@@ -33,7 +33,7 @@ class ApplicationFixture {
     /** @var FakeKeyService */
     private $key;
 
-    /** @var ApplicationService */
+    /** @var Application */
     private $app;
 
     /** @var ExceptionFixture */
@@ -54,7 +54,7 @@ class ApplicationFixture {
 
         $this->key = new FakeKeyService();
         $this->store = new FakeEventStore();
-        $this->app = new ApplicationService(
+        $this->app = new Application(
             $this->store,
             new FakeCryptography(),
             new Groupcash(
@@ -136,7 +136,7 @@ class ApplicationFixture {
     }
 
     public function _ListsTheirTransactions($account) {
-        $this->transactionHistory = $this->app->execute(new ListTransactions(
+        $this->transactionHistory = $this->app->handle(new ListTransactions(
             new Authentication("private $account")
         ));
     }

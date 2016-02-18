@@ -1,9 +1,11 @@
 <?php
 namespace groupcash\bank;
 
+use groupcash\bank\app\sourced\messaging\Query;
 use groupcash\bank\model\Authentication;
 
-class ListTransactions {
+class ListTransactions implements Query {
+
     /** @var Authentication */
     private $account;
 

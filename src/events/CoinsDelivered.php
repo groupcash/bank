@@ -1,12 +1,12 @@
 <?php
 namespace groupcash\bank\events;
 
-use groupcash\bank\app\Event;
+use groupcash\bank\app\sourced\domain\DomainEvent;
 use groupcash\bank\model\AccountIdentifier;
 use groupcash\bank\model\CurrencyIdentifier;
 use groupcash\php\model\Coin;
 
-class CoinsDelivered extends Event {
+class CoinsDelivered extends DomainEvent {
 
     /** @var Coin[] */
     private $coins;

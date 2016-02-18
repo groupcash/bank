@@ -1,11 +1,11 @@
 <?php
 namespace groupcash\bank\events;
 
-use groupcash\bank\app\Event;
+use groupcash\bank\app\sourced\domain\DomainEvent;
 use groupcash\bank\model\AccountIdentifier;
 use groupcash\bank\model\CurrencyIdentifier;
 
-class BackerAdded extends Event {
+class BackerAdded extends DomainEvent {
 
     /** @var AccountIdentifier */
     private $backer;

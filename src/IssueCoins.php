@@ -1,11 +1,14 @@
 <?php
 namespace groupcash\bank;
 
+use groupcash\bank\app\sourced\messaging\Command;
+use groupcash\bank\app\sourced\messaging\Identifier;
 use groupcash\bank\model\AccountIdentifier;
 use groupcash\bank\model\Authentication;
+use groupcash\bank\model\BankIdentifier;
 use groupcash\bank\model\CurrencyIdentifier;
 
-class IssueCoins {
+class IssueCoins implements Command {
 
     /** @var Authentication */
     private $issuer;
@@ -65,5 +68,12 @@ class IssueCoins {
      */
     public function getBacker() {
         return $this->backer;
+    }
+
+    /**
+     * @return Identifier
+     */
+    public function getAggregateIdentifier() {
+        return BankIdentifier::singleton();
     }
 }

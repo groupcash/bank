@@ -1,7 +1,7 @@
 <?php
-namespace groupcash\bank\app;
+namespace groupcash\bank\app\sourced\domain;
 
-abstract class Event {
+abstract class DomainEvent {
 
     /** @var \DateTimeImmutable */
     private $when;

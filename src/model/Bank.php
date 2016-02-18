@@ -2,7 +2,7 @@
 namespace groupcash\bank\model;
 
 use groupcash\bank\AddBacker;
-use groupcash\bank\app\AggregateRoot;
+use groupcash\bank\app\sourced\domain\AggregateRoot;
 use groupcash\bank\AuthorizeIssuer;
 use groupcash\bank\CreateAccount;
 use groupcash\bank\DeclarePromise;

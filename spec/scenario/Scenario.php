@@ -1,7 +1,7 @@
 <?php
 namespace spec\groupcash\bank\scenario;
 
-use groupcash\bank\app\Time;
+use groupcash\bank\app\sourced\domain\Time;
 use rtens\scrut\Fixture;
 use rtens\scrut\fixtures\ExceptionFixture;
 

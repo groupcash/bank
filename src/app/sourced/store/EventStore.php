@@ -1,9 +1,15 @@
 <?php
-namespace groupcash\bank\app;
+namespace groupcash\bank\app\sourced\store;
 
-use groupcash\bank\model\Identifier;
+use groupcash\bank\app\sourced\domain\EventStream;
+use groupcash\bank\app\sourced\messaging\Identifier;
 
 interface EventStore {
+
+    /**
+     * @return EventStream
+     */
+    public function readAll();
 
     /**
      * @param Identifier $aggregateIdentifier

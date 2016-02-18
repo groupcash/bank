@@ -1,7 +1,11 @@
 <?php
 namespace groupcash\bank;
 
-class CreateAccount {
+use groupcash\bank\app\sourced\messaging\Command;
+use groupcash\bank\app\sourced\messaging\Identifier;
+use groupcash\bank\model\BankIdentifier;
+
+class CreateAccount implements Command {
 
     /** @var string|null */
     private $password;
@@ -18,5 +22,12 @@ class CreateAccount {
      */
     public function getPassword() {
         return $this->password;
+    }
+
+    /**
+     * @return Identifier
+     */
+    public function getAggregateIdentifier() {
+        return BankIdentifier::singleton();
     }
 }
