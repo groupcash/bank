@@ -431,18 +431,18 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/watoki/curir.git",
-                "reference": "d60d74d30d648d26bfaacca4c58786282051747c"
+                "reference": "6b79793a2d523cd9beaa3e8a0d9f87c06de2f3a4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/watoki/curir/zipball/d60d74d30d648d26bfaacca4c58786282051747c",
-                "reference": "d60d74d30d648d26bfaacca4c58786282051747c",
+                "url": "https://api.github.com/repos/watoki/curir/zipball/6b79793a2d523cd9beaa3e8a0d9f87c06de2f3a4",
+                "reference": "6b79793a2d523cd9beaa3e8a0d9f87c06de2f3a4",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.4",
                 "watoki/collections": "*",
-                "watoki/deli": "*",
+                "watoki/deli": "dev-master",
                 "watoki/factory": "*",
                 "watoki/stores": "*"
             },
@@ -475,20 +475,20 @@
                 "routing",
                 "watoki"
             ],
-            "time": "2016-02-17 17:30:12"
+            "time": "2016-02-18 01:40:26"
         },
         {
             "name": "watoki/deli",
-            "version": "v0.1",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/watoki/deli.git",
-                "reference": "b0b266651d4b64488ec3840c5fbdb3ab06d8d097"
+                "reference": "af7a672d6208b564c24384bf1014d8c00e91fda4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/watoki/deli/zipball/b0b266651d4b64488ec3840c5fbdb3ab06d8d097",
-                "reference": "b0b266651d4b64488ec3840c5fbdb3ab06d8d097",
+                "url": "https://api.github.com/repos/watoki/deli/zipball/af7a672d6208b564c24384bf1014d8c00e91fda4",
+                "reference": "af7a672d6208b564c24384bf1014d8c00e91fda4",
                 "shasum": ""
             },
             "require": {
@@ -527,7 +527,7 @@
                 "routing",
                 "watoki"
             ],
-            "time": "2014-12-05 10:06:01"
+            "time": "2016-02-18 01:43:12"
         },
         {
             "name": "watoki/factory",
