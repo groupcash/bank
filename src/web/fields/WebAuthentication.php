@@ -1,5 +1,5 @@
 <?php
-namespace groupcash\bank\web;
+namespace groupcash\bank\web\fields;
 
 use groupcash\bank\model\Authentication;
 use rtens\domin\parameters\File;

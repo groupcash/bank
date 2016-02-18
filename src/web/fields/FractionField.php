@@ -1,5 +1,5 @@
 <?php
-namespace groupcash\bank\web;
+namespace groupcash\bank\web\fields;
 
 use groupcash\php\model\Fraction;
 use rtens\domin\delivery\web\fields\StringField;

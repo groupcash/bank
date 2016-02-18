@@ -1,5 +1,5 @@
 <?php
-namespace groupcash\bank\web;
+namespace groupcash\bank\web\fields;
 
 use rtens\domin\delivery\web\Element;
 use rtens\domin\delivery\web\fields\StringField;
