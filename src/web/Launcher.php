@@ -38,6 +38,7 @@ class Launcher {
             WebApplication::init(function (WebApplication $domin) {
                 $domin->setNameAndBrand('bank');
                 $this->registerActions($domin);
+                $this->registerFields($domin);
             }, WebDelivery::init()));
     }
 
@@ -60,5 +61,9 @@ class Launcher {
         $domin->actions->add((new \ReflectionClass($action))->getShortName(), $objectAction);
 
         return $objectAction->generic();
+    }
+
+    private function registerFields(WebApplication $domin) {
+        $domin->fields->add(new PasswordField());
     }
 }
