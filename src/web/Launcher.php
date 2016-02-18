@@ -89,28 +89,9 @@ class Launcher {
     private function registerActions(WebApplication $domin) {
         $this->addAction($domin, CreateAccount::class)
             ->setAfterExecute(function ($keys) use ($domin) {
-                $keyPanel = function ($heading, $content) {
-                    return new Panel($heading, new Element('div', [], [
-                        new Element('textarea', [
-                            'class' => 'form-control',
-                            'onclick' => 'this.select();'
-                        ], [
-                            $content
-                        ]),
-                        new Element('a', [
-                            'class' => 'btn btn-success',
-                            'download' => str_replace(' ', '_', strtolower($heading)) . '_' . substr(md5($content), -6),
-                            'href' => 'data:text/plain;base64,' . base64_encode($content),
-                            'target' => '_blank'
-                        ], [
-                            'Save as File'
-                        ])
-                    ]));
-                };
-
                 return [
-                    $keyPanel('Private Key', $keys['key']),
-                    $keyPanel('Public Address', $keys['address'])
+                    $this->keyPanel('Private Key', $keys['key']),
+                    $this->keyPanel('Public Address', $keys['address'])
                 ];
             });
         $this->addAction($domin, AuthorizeIssuer::class);
@@ -121,6 +102,25 @@ class Launcher {
         $this->addAction($domin, ListTransactions::class)
             ->setModifying(false);
         $this->registerSessionManagement($domin);
+    }
+
+    function keyPanel($heading, $content) {
+        return new Panel($heading, new Element('div', [], [
+            new Element('textarea', [
+                'class' => 'form-control',
+                'onclick' => 'this.select();'
+            ], [
+                $content
+            ]),
+            new Element('a', [
+                'class' => 'btn btn-success',
+                'download' => str_replace(' ', '_', strtolower($heading)) . '_' . substr(md5($content), -6),
+                'href' => 'data:text/plain;base64,' . base64_encode($content),
+                'target' => '_blank'
+            ], [
+                'Save as File'
+            ])
+        ]));
     }
 
     public function startSession(Authentication $authentication) {
