@@ -4,7 +4,7 @@ namespace groupcash\bank\web;
 use groupcash\bank\model\Authentication;
 use rtens\domin\parameters\File;
 
-class FileAuthentication extends Authentication {
+class WebAuthentication extends Authentication {
 
     /**
      * @param string|File $key

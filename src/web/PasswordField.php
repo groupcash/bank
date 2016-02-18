@@ -26,7 +26,7 @@ class PasswordField extends StringField {
             'class' => 'form-control',
             'type' => 'password',
             'name' => $parameter->getName(),
-            'value' => ''
+            'value' => $value
         ], $parameter->isRequired() ? [
             'required' => 'required'
         ] : []));

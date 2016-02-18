@@ -13,37 +13,69 @@ use groupcash\bank\DeclarePromise;
 use groupcash\bank\IssueCoins;
 use groupcash\bank\ListTransactions;
 use groupcash\bank\model\Authentication;
+use groupcash\bank\model\Authenticator;
+use groupcash\bank\model\RandomNumberGenerator;
 use groupcash\bank\SendCoins;
 use groupcash\php\Groupcash;
 use groupcash\php\impl\EccKeyService;
 use rtens\domin\delivery\web\adapters\curir\root\IndexResource;
 use rtens\domin\delivery\web\Element;
-use rtens\domin\delivery\web\fields\AdapterField;
-use rtens\domin\delivery\web\fields\ObjectField;
+use rtens\domin\delivery\web\menu\ActionMenuItem;
 use rtens\domin\delivery\web\renderers\dashboard\types\Panel;
 use rtens\domin\delivery\web\WebApplication;
-use rtens\domin\Parameter;
+use rtens\domin\execution\RedirectResult;
 use rtens\domin\parameters\File;
+use rtens\domin\reflection\GenericMethodAction;
 use rtens\domin\reflection\GenericObjectAction;
+use watoki\curir\cookie\Cookie;
+use watoki\curir\cookie\CookieStore;
 use watoki\curir\WebDelivery;
-use watoki\reflect\type\ClassType;
+use watoki\stores\file\raw\RawFileStore;
 
 class Launcher {
+
+    const SESSION_COOKIE = 'groupcash_session';
+
+    /** @var Groupcash */
+    private $lib;
+
+    /** @var RandomNumberGenerator */
+    private $random;
 
     /** @var Application */
     private $app;
 
+    /** @var CookieStore */
+    private $cookies;
+
+    /** @var RawFileStore */
+    private $session;
+
+    /** @var Authenticator */
+    private $authenticator;
+
     public function __construct($rootDir) {
+        $this->random = new OpenSslRandomNumberGenerator();
+        $vault = new PersistentVault($this->random, $rootDir . '/user');
+        $crypto = new McryptCryptography();
+
+        $this->authenticator = new Authenticator($crypto, $vault);
+
+        $this->lib = new Groupcash(new EccKeyService());
         $this->app = new Application(
             new PersistentEventStore($rootDir . '/user/data'),
-            new McryptCryptography(),
-            new Groupcash(new EccKeyService()),
-            new PersistentVault(new OpenSslRandomNumberGenerator(), $rootDir . '/user'));
+            $crypto,
+            $this->lib,
+            $vault);
+
+        $this->session = new RawFileStore($rootDir . '/user/sessions');
     }
 
     public function run() {
         WebDelivery::quickResponse(IndexResource::class,
             WebApplication::init(function (WebApplication $domin) {
+                $this->cookies = $domin->factory->getInstance(CookieStore::class);
+
                 $domin->setNameAndBrand('bank');
                 $this->registerActions($domin);
                 $this->registerFields($domin);
@@ -82,7 +114,40 @@ class Launcher {
         $this->addAction($domin, DeclarePromise::class);
         $this->addAction($domin, IssueCoins::class);
         $this->addAction($domin, SendCoins::class);
-        $this->addAction($domin, ListTransactions::class);
+        $this->addAction($domin, ListTransactions::class)
+            ->setModifying(false);
+        $this->registerSessionManagement($domin);
+    }
+
+    public function startSession(Authentication $authentication) {
+        $key = $this->authenticator->getKey($authentication);
+        $this->lib->getAddress($key);
+
+        $sessionKey = md5($this->random->generate());
+        $sessionPassword = $this->random->generate();
+
+        $encryptedKey = $this->authenticator->encrypt($key, $sessionPassword);
+
+        $this->cookies->create(new Cookie([
+            'key' => $encryptedKey,
+            'session' => $sessionKey
+        ]), self::SESSION_COOKIE);
+
+        $this->session->create(new \watoki\stores\file\raw\File($sessionPassword), $sessionKey);
+
+        return new RedirectResult('.');
+    }
+
+    public function endSession() {
+        if ($this->cookies->hasKey(self::SESSION_COOKIE)) {
+            /** @var Cookie $cookie */
+            $cookie = $this->cookies->read(self::SESSION_COOKIE);
+
+            $this->session->delete($cookie->payload['session']);
+            $this->cookies->delete(self::SESSION_COOKIE);
+        }
+
+        return new RedirectResult('.');
     }
 
     private function addAction(WebApplication $domin, $action) {
@@ -97,26 +162,35 @@ class Launcher {
     }
 
     private function registerFields(WebApplication $domin) {
-        $domin->fields->add((new AdapterField(new ObjectField($domin->types, $domin->fields)))
-            ->setHandles(function (Parameter $parameter) {
-                return $parameter->getType() == new ClassType(Authentication::class);
-            })
-            ->setTransformParameter(function (Parameter $parameter) {
-                return $parameter->withType(new ClassType(FileAuthentication::class));
-            })
-            ->setBeforeRender(function (Authentication $authentication = null) {
-                if (!$authentication) {
-                    return null;
-                }
-                return new FileAuthentication($authentication->getKey(), $authentication->getPassword());
-            })
-            ->setAfterInflate(function (FileAuthentication $authentication) {
-                $key = $authentication->getKey();
-                if ($key instanceof File) {
-                    $key = $key->getContent();
-                }
-                return new Authentication($key, $authentication->getPassword());
-            }));
         $domin->fields->add(new PasswordField());
+        $domin->fields->add(new AuthenticationField($domin->types, $domin->fields, $this->getSessionAuthentication()));
+    }
+
+    private function getSessionAuthentication() {
+        if ($this->cookies->hasKey(self::SESSION_COOKIE)) {
+            /** @var Cookie $cookie */
+            $cookie = $this->cookies->read(self::SESSION_COOKIE);
+            $sessionPassword = $this->session->read($cookie->payload['session'])->getContents();
+
+            return new Authentication($cookie->payload['key'], $sessionPassword);
+        } else {
+            return null;
+        }
+    }
+
+    private function registerSessionManagement(WebApplication $domin) {
+        if (!$this->cookies->hasKey(self::SESSION_COOKIE)) {
+            $domin->actions->add('startSession',
+                (new GenericMethodAction($this, 'startSession', $domin->types, $domin->parser))
+                    ->generic()
+                    ->setCaption('Start Session'));
+            $domin->menu->addRight(new ActionMenuItem('Login', 'startSession'));
+        } else {
+            $domin->actions->add('endSession',
+                (new GenericMethodAction($this, 'endSession', $domin->types, $domin->parser))
+                    ->generic()
+                    ->setCaption('End Session'));
+            $domin->menu->addRight(new ActionMenuItem('Logout', 'endSession'));
+        }
     }
 }
