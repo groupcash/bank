@@ -55,7 +55,6 @@ class Application implements Builder, DomainEventListener {
      * @param Command $command
      * @return AggregateRoot
      * @throws \Exception
-     * @internal param string $class
      */
     public function buildAggregateRoot(Command $command) {
         $identifier = $command->getAggregateIdentifier();
@@ -71,7 +70,6 @@ class Application implements Builder, DomainEventListener {
      * @param Query $query
      * @return Projection
      * @throws \Exception
-     * @internal param string $class
      */
     public function buildProjection(Query $query) {
         if ($query instanceof ListTransactions) {
