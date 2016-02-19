@@ -15,8 +15,10 @@ use groupcash\bank\ListTransactions;
 use groupcash\bank\model\Authentication;
 use groupcash\bank\model\Authenticator;
 use groupcash\bank\model\RandomNumberGenerator;
+use groupcash\bank\RegisterCurrency;
 use groupcash\bank\SendCoins;
 use groupcash\bank\web\fields\AuthenticationField;
+use groupcash\bank\web\fields\CurrencyIdentifierField;
 use groupcash\bank\web\fields\FractionField;
 use groupcash\bank\web\fields\IdentifierField;
 use groupcash\bank\web\fields\PasswordField;
@@ -94,6 +96,7 @@ class Launcher {
                     $this->keyPanel('Public Address', $keys['address'])
                 ];
             });
+        $this->addAction($domin, RegisterCurrency::class);
         $this->addAction($domin, AuthorizeIssuer::class);
         $this->addAction($domin, AddBacker::class);
         $this->addAction($domin, DeclarePromise::class);
@@ -168,8 +171,9 @@ class Launcher {
     private function registerFields(WebApplication $domin) {
         $domin->fields->add(new PasswordField());
         $domin->fields->add(new FractionField());
-        $domin->fields->add(new IdentifierField());
         $domin->fields->add(new AuthenticationField($domin->types, $domin->fields, $this->getSessionAuthentication()));
+        $domin->fields->add(new CurrencyIdentifierField($domin->fields, $this->app));
+        $domin->fields->add(new IdentifierField());
     }
 
     private function getSessionAuthentication() {
