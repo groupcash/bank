@@ -14,6 +14,7 @@ use groupcash\bank\model\Authentication;
 use groupcash\bank\model\CurrencyIdentifier;
 use groupcash\bank\projecting\Transaction;
 use groupcash\bank\projecting\TransactionHistory;
+use groupcash\bank\RegisterCurrency;
 use groupcash\bank\SendCoins;
 use groupcash\php\Groupcash;
 use groupcash\php\model\Fraction;
@@ -173,5 +174,12 @@ class ApplicationFixture {
         } while ($amount * $factor != (int)($amount * $factor));
 
         return new Fraction($amount * $factor, $factor);
+    }
+
+    public function IRegister_As($address, $currency) {
+        $this->app->handle(new RegisterCurrency(
+            new AccountIdentifier($address),
+            $currency
+        ));
     }
 }

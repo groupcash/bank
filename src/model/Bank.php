@@ -11,10 +11,12 @@ use groupcash\bank\events\BackerAdded;
 use groupcash\bank\events\CoinsDelivered;
 use groupcash\bank\events\CoinsIssued;
 use groupcash\bank\events\CoinsSent;
+use groupcash\bank\events\CurrencyRegistered;
 use groupcash\bank\events\IssuerAuthorized;
 use groupcash\bank\events\PromiseDeclared;
 use groupcash\bank\events\SentCoin;
 use groupcash\bank\IssueCoins;
+use groupcash\bank\RegisterCurrency;
 use groupcash\bank\SendCoins;
 use groupcash\php\Groupcash;
 use groupcash\php\model\Coin;
@@ -43,6 +45,9 @@ class Bank extends AggregateRoot {
     /** @var Coin[][] */
     private $coins = [];
 
+    /** @var CurrencyIdentifier[] */
+    private $currencies = [];
+
     /**
      * @param Groupcash $lib
      * @param Authenticator $auth
@@ -59,6 +64,17 @@ class Bank extends AggregateRoot {
             'key' => $this->auth->encrypt($key, $c->getPassword()),
             'address' => $this->lib->getAddress($key)
         ];
+    }
+
+    public function handleRegisterCurrency(RegisterCurrency $c) {
+        if (array_key_exists($c->getName(), $this->currencies)) {
+            throw new \Exception('A currency with this name is already registered.');
+        }
+        $this->record(new CurrencyRegistered($c->getCurrency(), $c->getName()));
+    }
+
+    protected function applyCurrencyRegistered(CurrencyRegistered $e) {
+        $this->currencies[$e->getName()] = new CurrencyIdentifier((string)$e->getCurrency());
     }
 
     public function handleAuthorizeIssuer(AuthorizeIssuer $c) {
