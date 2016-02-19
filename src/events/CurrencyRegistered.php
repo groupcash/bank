@@ -2,21 +2,21 @@
 namespace groupcash\bank\events;
 
 use groupcash\bank\app\sourced\domain\DomainEvent;
-use groupcash\bank\model\AccountIdentifier;
+use groupcash\bank\model\CurrencyIdentifier;
 
 class CurrencyRegistered extends DomainEvent {
 
-    /** @var AccountIdentifier */
+    /** @var CurrencyIdentifier */
     private $currency;
 
     /** @var string */
     private $name;
 
     /**
-     * @param AccountIdentifier $currency
+     * @param CurrencyIdentifier $currency
      * @param string $name
      */
-    public function __construct(AccountIdentifier $currency, $name) {
+    public function __construct(CurrencyIdentifier $currency, $name) {
         parent::__construct();
 
         $this->currency = $currency;
@@ -24,7 +24,7 @@ class CurrencyRegistered extends DomainEvent {
     }
 
     /**
-     * @return AccountIdentifier
+     * @return CurrencyIdentifier
      */
     public function getCurrency() {
         return $this->currency;

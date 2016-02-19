@@ -70,7 +70,9 @@ class Bank extends AggregateRoot {
         if (array_key_exists($c->getName(), $this->currencies)) {
             throw new \Exception('A currency with this name is already registered.');
         }
-        $this->record(new CurrencyRegistered($c->getCurrency(), $c->getName()));
+        $this->record(new CurrencyRegistered(
+            new CurrencyIdentifier((string)$c->getCurrency()),
+            $c->getName()));
     }
 
     protected function applyCurrencyRegistered(CurrencyRegistered $e) {

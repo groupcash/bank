@@ -14,12 +14,14 @@ use groupcash\bank\DeliverCoins;
 use groupcash\bank\events\CoinsIssued;
 use groupcash\bank\events\CoinsSent;
 use groupcash\bank\events\SentCoin;
+use groupcash\bank\ListCurrencies;
 use groupcash\bank\ListTransactions;
 use groupcash\bank\model\AccountIdentifier;
 use groupcash\bank\model\Authenticator;
 use groupcash\bank\model\Bank;
 use groupcash\bank\model\BankIdentifier;
 use groupcash\bank\model\Vault;
+use groupcash\bank\projecting\AllCurrencies;
 use groupcash\bank\projecting\TransactionHistory;
 use groupcash\php\Groupcash;
 
@@ -76,6 +78,8 @@ class Application implements Builder, DomainEventListener {
             return new TransactionHistory(
                 new AccountIdentifier($this->lib->getAddress($this->auth->getKey($query->getAccount())))
             );
+        } else if ($query instanceof ListCurrencies) {
+            return new AllCurrencies();
         }
 
         throw new \Exception('Unknown query.');

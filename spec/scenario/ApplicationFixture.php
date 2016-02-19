@@ -8,10 +8,12 @@ use groupcash\bank\AuthorizeIssuer;
 use groupcash\bank\CreateAccount;
 use groupcash\bank\DeclarePromise;
 use groupcash\bank\IssueCoins;
+use groupcash\bank\ListCurrencies;
 use groupcash\bank\ListTransactions;
 use groupcash\bank\model\AccountIdentifier;
 use groupcash\bank\model\Authentication;
 use groupcash\bank\model\CurrencyIdentifier;
+use groupcash\bank\projecting\AllCurrencies;
 use groupcash\bank\projecting\Transaction;
 use groupcash\bank\projecting\TransactionHistory;
 use groupcash\bank\RegisterCurrency;
@@ -48,6 +50,9 @@ class ApplicationFixture {
 
     /** @var TransactionHistory */
     private $transactionHistory;
+
+    /** @var AllCurrencies */
+    private $currencies;
 
     public function __construct(Assert $assert, ExceptionFixture $except) {
         $this->assert = $assert;
@@ -181,5 +186,19 @@ class ApplicationFixture {
             new AccountIdentifier($address),
             $currency
         ));
+    }
+
+    public function IListAllCurrencies() {
+        $this->currencies = $this->app->handle(new ListCurrencies());
+    }
+
+    public function thereShouldBe_Currencies($int) {
+        $this->assert->size($this->currencies->getCurrencies(), $int);
+    }
+
+    public function currency_ShouldHaveTheAddress_AndTheName($pos, $address, $name) {
+        $currency = $this->currencies->getCurrencies()[$pos - 1];
+        $this->assert->equals($currency->getAddress(), new CurrencyIdentifier($address));
+        $this->assert->equals($currency->getName(), $name);
     }
 }
