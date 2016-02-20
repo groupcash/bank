@@ -1,21 +1,21 @@
 <?php
 namespace groupcash\bank\projecting;
 
-use groupcash\bank\model\AccountIdentifier;
+use groupcash\bank\model\BackerIdentifier;
 
 class Backer {
 
-    /** @var AccountIdentifier */
+    /** @var BackerIdentifier */
     private $address;
 
     /** @var string */
     private $name;
 
     /**
-     * @param AccountIdentifier $address
+     * @param BackerIdentifier $address
      * @param string $name
      */
-    public function __construct(AccountIdentifier $address, $name) {
+    public function __construct(BackerIdentifier $address, $name) {
         $this->address = $address;
         $this->name = $name;
     }

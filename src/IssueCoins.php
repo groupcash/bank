@@ -3,8 +3,8 @@ namespace groupcash\bank;
 
 use groupcash\bank\app\sourced\messaging\Command;
 use groupcash\bank\app\sourced\messaging\Identifier;
-use groupcash\bank\model\AccountIdentifier;
 use groupcash\bank\model\Authentication;
+use groupcash\bank\model\BackerIdentifier;
 use groupcash\bank\model\BankIdentifier;
 use groupcash\bank\model\CurrencyIdentifier;
 
@@ -19,16 +19,16 @@ class IssueCoins implements Command {
     /** @var CurrencyIdentifier */
     private $currency;
 
-    /** @var AccountIdentifier */
+    /** @var BackerIdentifier */
     private $backer;
 
     /**
      * @param Authentication $issuer
      * @param int|null $number
      * @param CurrencyIdentifier $currency
-     * @param AccountIdentifier $backer
+     * @param BackerIdentifier $backer
      */
-    public function __construct(Authentication $issuer, $number, CurrencyIdentifier $currency, AccountIdentifier $backer) {
+    public function __construct(Authentication $issuer, $number, CurrencyIdentifier $currency, BackerIdentifier $backer) {
         $this->issuer = $issuer;
         $this->number = $number;
         $this->currency = $currency;
@@ -64,7 +64,7 @@ class IssueCoins implements Command {
     }
 
     /**
-     * @return AccountIdentifier
+     * @return BackerIdentifier
      */
     public function getBacker() {
         return $this->backer;

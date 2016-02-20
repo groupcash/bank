@@ -107,7 +107,12 @@ class Application implements Builder, DomainEventListener {
     }
 
     protected function onCoinsIssued(CoinsIssued $e) {
-        $this->handler->handle(new DeliverCoins($e->getCurrency(), $e->getBacker(), $e->getCoins(), 'Issued'));
+        $this->handler->handle(new DeliverCoins(
+            $e->getCurrency(),
+            new AccountIdentifier((string)$e->getBacker()),
+            $e->getCoins(),
+            'Issued'
+        ));
     }
 
     protected function onCoinsSent(CoinsSent $e) {

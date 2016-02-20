@@ -2,12 +2,12 @@
 namespace groupcash\bank\events;
 
 use groupcash\bank\app\sourced\domain\DomainEvent;
-use groupcash\bank\model\AccountIdentifier;
+use groupcash\bank\model\BackerIdentifier;
 use groupcash\bank\model\CurrencyIdentifier;
 
 class BackerAdded extends DomainEvent {
 
-    /** @var AccountIdentifier */
+    /** @var BackerIdentifier */
     private $backer;
 
     /** @var string */
@@ -21,11 +21,11 @@ class BackerAdded extends DomainEvent {
 
     /**
      * @param CurrencyIdentifier $currency
-     * @param AccountIdentifier $backer
+     * @param BackerIdentifier $backer
      * @param string $backerKey
      * @param string $name
      */
-    public function __construct(CurrencyIdentifier $currency, AccountIdentifier $backer, $backerKey, $name) {
+    public function __construct(CurrencyIdentifier $currency, BackerIdentifier $backer, $backerKey, $name) {
         parent::__construct();
 
         $this->backer = $backer;
@@ -35,7 +35,7 @@ class BackerAdded extends DomainEvent {
     }
 
     /**
-     * @return AccountIdentifier
+     * @return BackerIdentifier
      */
     public function getBacker() {
         return $this->backer;

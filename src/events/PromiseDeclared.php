@@ -2,7 +2,7 @@
 namespace groupcash\bank\events;
 
 use groupcash\bank\app\sourced\domain\DomainEvent;
-use groupcash\bank\model\AccountIdentifier;
+use groupcash\bank\model\BackerIdentifier;
 use groupcash\bank\model\CurrencyIdentifier;
 
 class PromiseDeclared extends DomainEvent {
@@ -10,7 +10,7 @@ class PromiseDeclared extends DomainEvent {
     /** @var CurrencyIdentifier */
     private $currency;
 
-    /** @var AccountIdentifier */
+    /** @var BackerIdentifier */
     private $backer;
 
     /** @var string */
@@ -20,12 +20,12 @@ class PromiseDeclared extends DomainEvent {
     private $limit;
 
     /**
-     * @param AccountIdentifier $backer
+     * @param BackerIdentifier $backer
      * @param CurrencyIdentifier $currency
      * @param string $description
      * @param int $limit
      */
-    public function __construct(AccountIdentifier $backer, CurrencyIdentifier $currency,
+    public function __construct(BackerIdentifier $backer, CurrencyIdentifier $currency,
                                 $description, $limit) {
         parent::__construct();
 
@@ -43,7 +43,7 @@ class PromiseDeclared extends DomainEvent {
     }
 
     /**
-     * @return AccountIdentifier
+     * @return BackerIdentifier
      */
     public function getBacker() {
         return $this->backer;

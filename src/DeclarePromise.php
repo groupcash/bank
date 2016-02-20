@@ -3,8 +3,8 @@ namespace groupcash\bank;
 
 use groupcash\bank\app\sourced\messaging\Command;
 use groupcash\bank\app\sourced\messaging\Identifier;
-use groupcash\bank\model\AccountIdentifier;
 use groupcash\bank\model\Authentication;
+use groupcash\bank\model\BackerIdentifier;
 use groupcash\bank\model\BankIdentifier;
 use groupcash\bank\model\CurrencyIdentifier;
 
@@ -13,7 +13,7 @@ class DeclarePromise implements Command{
     /** @var Authentication */
     private $issuer;
 
-    /** @var AccountIdentifier */
+    /** @var BackerIdentifier */
     private $backer;
 
     /** @var CurrencyIdentifier */
@@ -27,13 +27,13 @@ class DeclarePromise implements Command{
 
     /**
      * @param Authentication $issuer
-     * @param AccountIdentifier $backer
+     * @param BackerIdentifier $backer
      * @param CurrencyIdentifier $currency
      * @param string $description
      * @param int $limit
      * @throws \Exception
      */
-    public function __construct(Authentication $issuer, AccountIdentifier $backer, CurrencyIdentifier $currency,
+    public function __construct(Authentication $issuer, BackerIdentifier $backer, CurrencyIdentifier $currency,
                                 $description, $limit) {
         $this->issuer = $issuer;
         $this->backer = $backer;
@@ -58,7 +58,7 @@ class DeclarePromise implements Command{
     }
 
     /**
-     * @return AccountIdentifier
+     * @return BackerIdentifier
      */
     public function getBacker() {
         return $this->backer;

@@ -13,6 +13,7 @@ use groupcash\bank\ListCurrencies;
 use groupcash\bank\ListTransactions;
 use groupcash\bank\model\AccountIdentifier;
 use groupcash\bank\model\Authentication;
+use groupcash\bank\model\BackerIdentifier;
 use groupcash\bank\model\CurrencyIdentifier;
 use groupcash\bank\projecting\AllCurrencies;
 use groupcash\bank\projecting\CurrencyBackers;
@@ -100,7 +101,7 @@ class ApplicationFixture {
             new Authentication("private $issuer"),
             $number,
             new CurrencyIdentifier($currency),
-            new AccountIdentifier($backer)
+            new BackerIdentifier($backer)
         ));
     }
 
@@ -132,7 +133,7 @@ class ApplicationFixture {
     public function _Declares_Of_By_For($issuer, $limit, $promise, $backer, $currency) {
         $this->app->handle(new DeclarePromise(
             new Authentication("private $issuer"),
-            new AccountIdentifier($backer),
+            new BackerIdentifier($backer),
             new CurrencyIdentifier($currency),
             $promise,
             $limit

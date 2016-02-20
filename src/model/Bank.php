@@ -33,7 +33,7 @@ class Bank extends AggregateRoot {
     /** @var AccountIdentifier[][] */
     private $issuers = [];
 
-    /** @var AccountIdentifier[][] */
+    /** @var BackerIdentifier[][] */
     private $backers = [];
 
     /** @var PromiseDeclared[][] */
@@ -104,7 +104,7 @@ class Bank extends AggregateRoot {
 
         $this->record(new BackerAdded(
             $c->getCurrency(),
-            new AccountIdentifier($this->lib->getAddress($key)),
+            new BackerIdentifier($this->lib->getAddress($key)),
             $key,
             $c->getName()
         ));
@@ -166,13 +166,15 @@ class Bank extends AggregateRoot {
             $number -= $use;
 
             $this->record(new CoinsIssued(
-                $c->getCurrency(), $c->getBacker(), $this->lib->issueCoins(
-                $this->auth->getKey($c->getIssuer()),
-                (string)$c->getCurrency(),
-                (string)$promise->getDescription(),
-                (string)$promise->getBacker(),
-                $issuedCoins[$i] + 1,
-                $use)));
+                $c->getCurrency(),
+                $c->getBacker(),
+                $this->lib->issueCoins(
+                    $this->auth->getKey($c->getIssuer()),
+                    (string)$c->getCurrency(),
+                    (string)$promise->getDescription(),
+                    (string)$promise->getBacker(),
+                    $issuedCoins[$i] + 1,
+                    $use)));
         }
     }
 
@@ -261,7 +263,7 @@ class Bank extends AggregateRoot {
         }
     }
 
-    private function guardIsBackerOfCurrency($currency, $backer) {
+    private function guardIsBackerOfCurrency(CurrencyIdentifier $currency, BackerIdentifier $backer) {
         if (!$this->contains($this->backers, $currency, $backer)) {
             throw new \Exception('This backer is not registered with this currency.');
         }
