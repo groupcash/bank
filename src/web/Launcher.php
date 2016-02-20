@@ -26,9 +26,7 @@ use groupcash\bank\web\fields\PasswordField;
 use groupcash\php\Groupcash;
 use groupcash\php\impl\EccKeyService;
 use rtens\domin\delivery\web\adapters\curir\root\IndexResource;
-use rtens\domin\delivery\web\Element;
 use rtens\domin\delivery\web\menu\ActionMenuItem;
-use rtens\domin\delivery\web\renderers\dashboard\types\Panel;
 use rtens\domin\delivery\web\WebApplication;
 use rtens\domin\execution\RedirectResult;
 use rtens\domin\parameters\File;
@@ -61,7 +59,10 @@ class Launcher {
     /** @var Authenticator */
     private $authenticator;
 
-    public function __construct($rootDir) {
+    /** @var string */
+    private $baseUrl;
+
+    public function __construct($rootDir, $baseUrl) {
         $this->random = new OpenSslRandomNumberGenerator();
         $vault = new PersistentVault($this->random, $rootDir . '/user');
         $crypto = new McryptCryptography();
@@ -76,6 +77,7 @@ class Launcher {
             $vault);
 
         $this->session = new RawFileStore($rootDir . '/user/sessions');
+        $this->baseUrl = $baseUrl;
     }
 
     public function run() {
@@ -92,10 +94,7 @@ class Launcher {
     private function registerActions(WebApplication $domin) {
         $this->addAction($domin, CreateAccount::class)
             ->setAfterExecute(function ($keys) use ($domin) {
-                return [
-                    $this->keyPanel('Private Key', $keys['key']),
-                    $this->keyPanel('Public Address', $keys['address'])
-                ];
+                return CreatedAccount::render($this->baseUrl . '/SendCoins', $keys);
             });
         $this->addAction($domin, RegisterCurrency::class);
         $this->addAction($domin, AuthorizeIssuer::class);
@@ -106,25 +105,6 @@ class Launcher {
         $this->addAction($domin, ListTransactions::class)
             ->setModifying(false);
         $this->registerSessionManagement($domin);
-    }
-
-    function keyPanel($heading, $content) {
-        return new Panel($heading, new Element('div', [], [
-            new Element('textarea', [
-                'class' => 'form-control',
-                'onclick' => 'this.select();'
-            ], [
-                $content
-            ]),
-            new Element('a', [
-                'class' => 'btn btn-success',
-                'download' => str_replace(' ', '_', strtolower($heading)) . '_' . substr(md5($content), -6),
-                'href' => 'data:text/plain;base64,' . base64_encode($content),
-                'target' => '_blank'
-            ], [
-                'Save as File'
-            ])
-        ]));
     }
 
     public function startSession(Authentication $authentication) {
