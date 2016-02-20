@@ -17,6 +17,7 @@ use groupcash\bank\model\Authenticator;
 use groupcash\bank\model\RandomNumberGenerator;
 use groupcash\bank\RegisterCurrency;
 use groupcash\bank\SendCoins;
+use groupcash\bank\web\fields\AccountIdentifierField;
 use groupcash\bank\web\fields\AuthenticationField;
 use groupcash\bank\web\fields\BackerField;
 use groupcash\bank\web\fields\CurrencyIdentifierField;
@@ -155,6 +156,7 @@ class Launcher {
         $domin->fields->add(new AuthenticationField($domin->types, $domin->fields, $this->getSessionAuthentication()));
         $domin->fields->add(new CurrencyIdentifierField($domin->fields, $this->app));
         $domin->fields->add(new BackerField($domin->fields, $this->app));
+        $domin->fields->add(new AccountIdentifierField());
         $domin->fields->add(new IdentifierField());
     }
 
