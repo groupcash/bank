@@ -105,7 +105,8 @@ class Bank extends AggregateRoot {
         $this->record(new BackerAdded(
             $c->getCurrency(),
             new AccountIdentifier($this->lib->getAddress($key)),
-            $key
+            $key,
+            $c->getName()
         ));
     }
 

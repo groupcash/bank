@@ -15,13 +15,18 @@ class AddBacker implements Command {
     /** @var Authentication */
     private $issuer;
 
+    /** @var string */
+    private $name;
+
     /**
      * @param Authentication $issuer
      * @param CurrencyIdentifier $currency
+     * @param string $name
      */
-    public function __construct(Authentication $issuer, CurrencyIdentifier $currency) {
+    public function __construct(Authentication $issuer, CurrencyIdentifier $currency, $name) {
         $this->currency = $currency;
         $this->issuer = $issuer;
+        $this->name = $name;
     }
 
     /**
@@ -43,5 +48,12 @@ class AddBacker implements Command {
      */
     public function getAggregateIdentifier() {
         return BankIdentifier::singleton();
+    }
+
+    /**
+     * @return string
+     */
+    public function getName() {
+        return $this->name;
     }
 }

@@ -14,6 +14,7 @@ use groupcash\bank\DeliverCoins;
 use groupcash\bank\events\CoinsIssued;
 use groupcash\bank\events\CoinsSent;
 use groupcash\bank\events\SentCoin;
+use groupcash\bank\ListBackers;
 use groupcash\bank\ListCurrencies;
 use groupcash\bank\ListTransactions;
 use groupcash\bank\model\AccountIdentifier;
@@ -22,6 +23,7 @@ use groupcash\bank\model\Bank;
 use groupcash\bank\model\BankIdentifier;
 use groupcash\bank\model\Vault;
 use groupcash\bank\projecting\AllCurrencies;
+use groupcash\bank\projecting\CurrencyBackers;
 use groupcash\bank\projecting\TransactionHistory;
 use groupcash\php\Groupcash;
 
@@ -80,6 +82,8 @@ class Application implements Builder, DomainEventListener {
             );
         } else if ($query instanceof ListCurrencies) {
             return new AllCurrencies();
+        } else if ($query instanceof ListBackers) {
+            return new CurrencyBackers($query->getCurrency());
         }
 
         throw new \Exception('Unknown query.');

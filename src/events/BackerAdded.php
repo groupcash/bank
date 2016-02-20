@@ -16,17 +16,22 @@ class BackerAdded extends DomainEvent {
     /** @var CurrencyIdentifier */
     private $currency;
 
+    /** @var string */
+    private $name;
+
     /**
      * @param CurrencyIdentifier $currency
      * @param AccountIdentifier $backer
      * @param string $backerKey
+     * @param string $name
      */
-    public function __construct(CurrencyIdentifier $currency, AccountIdentifier $backer, $backerKey) {
+    public function __construct(CurrencyIdentifier $currency, AccountIdentifier $backer, $backerKey, $name) {
         parent::__construct();
 
         $this->backer = $backer;
         $this->backerKey = $backerKey;
         $this->currency = $currency;
+        $this->name = $name;
     }
 
     /**
@@ -48,5 +53,12 @@ class BackerAdded extends DomainEvent {
      */
     public function getCurrency() {
         return $this->currency;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName() {
+        return $this->name;
     }
 }

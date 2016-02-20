@@ -8,12 +8,14 @@ use groupcash\bank\AuthorizeIssuer;
 use groupcash\bank\CreateAccount;
 use groupcash\bank\DeclarePromise;
 use groupcash\bank\IssueCoins;
+use groupcash\bank\ListBackers;
 use groupcash\bank\ListCurrencies;
 use groupcash\bank\ListTransactions;
 use groupcash\bank\model\AccountIdentifier;
 use groupcash\bank\model\Authentication;
 use groupcash\bank\model\CurrencyIdentifier;
 use groupcash\bank\projecting\AllCurrencies;
+use groupcash\bank\projecting\CurrencyBackers;
 use groupcash\bank\projecting\Transaction;
 use groupcash\bank\projecting\TransactionHistory;
 use groupcash\bank\RegisterCurrency;
@@ -53,6 +55,9 @@ class ApplicationFixture {
 
     /** @var AllCurrencies */
     private $currencies;
+
+    /** @var CurrencyBackers */
+    private $backers;
 
     public function __construct(Assert $assert, ExceptionFixture $except) {
         $this->assert = $assert;
@@ -111,11 +116,16 @@ class ApplicationFixture {
     }
 
     public function _Adds_To($issuer, $backer, $currency) {
+        $this->_Adds_To_Named($issuer, $backer, $currency, ucfirst($backer));
+    }
+
+    public function _Adds_To_Named($issuer, $backer, $currency, $name) {
         $this->key->nextKey = $backer;
 
         $this->app->handle(new AddBacker(
             new Authentication("private $issuer"),
-            new CurrencyIdentifier($currency)
+            new CurrencyIdentifier($currency),
+            $name
         ));
     }
 
@@ -200,5 +210,21 @@ class ApplicationFixture {
         $currency = $this->currencies->getCurrencies()[$pos - 1];
         $this->assert->equals($currency->getAddress(), new CurrencyIdentifier($address));
         $this->assert->equals($currency->getName(), $name);
+    }
+
+    public function IListBackersOf($currency) {
+        $this->backers = $this->app->handle(new ListBackers(new CurrencyIdentifier($currency)));
+    }
+
+    public function thereShouldBe_Backers($int) {
+        $this->assert->size($this->backers->getBackers(), $int);
+    }
+
+    public function backer_shouldHaveTheName($pos, $name) {
+        $this->assert->equals($this->backers->getBackers()[$pos - 1]->getName(), $name);
+    }
+
+    public function backer_shouldHaveTheAddress($pos, $address) {
+        $this->assert->equals($this->backers->getBackers()[$pos - 1]->getAddress(), $address);
     }
 }
