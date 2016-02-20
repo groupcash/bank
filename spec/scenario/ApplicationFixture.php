@@ -16,7 +16,7 @@ use groupcash\bank\model\Authentication;
 use groupcash\bank\model\BackerIdentifier;
 use groupcash\bank\model\CurrencyIdentifier;
 use groupcash\bank\projecting\AllCurrencies;
-use groupcash\bank\projecting\CurrencyBackers;
+use groupcash\bank\projecting\AllBackers;
 use groupcash\bank\projecting\Transaction;
 use groupcash\bank\projecting\TransactionHistory;
 use groupcash\bank\RegisterCurrency;
@@ -57,7 +57,7 @@ class ApplicationFixture {
     /** @var AllCurrencies */
     private $currencies;
 
-    /** @var CurrencyBackers */
+    /** @var AllBackers */
     private $backers;
 
     public function __construct(Assert $assert, ExceptionFixture $except) {
@@ -217,6 +217,10 @@ class ApplicationFixture {
         $this->backers = $this->app->handle(new ListBackers(new CurrencyIdentifier($currency)));
     }
 
+    public function IListAllBackers() {
+        $this->backers = $this->app->handle(new ListBackers());
+    }
+
     public function thereShouldBe_Backers($int) {
         $this->assert->size($this->backers->getBackers(), $int);
     }
@@ -226,6 +230,10 @@ class ApplicationFixture {
     }
 
     public function backer_shouldHaveTheAddress($pos, $address) {
-        $this->assert->equals($this->backers->getBackers()[$pos - 1]->getAddress(), $address);
+        $this->assert->equals($this->backers->getBackers()[$pos - 1]->getAddress(), new BackerIdentifier($address));
+    }
+
+    public function backer_shouldHaveTheCurrency($pos, $currency) {
+        $this->assert->equals($this->backers->getBackers()[$pos - 1]->getCurrency(), new CurrencyIdentifier($currency));
     }
 }

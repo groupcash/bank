@@ -18,6 +18,7 @@ use groupcash\bank\model\RandomNumberGenerator;
 use groupcash\bank\RegisterCurrency;
 use groupcash\bank\SendCoins;
 use groupcash\bank\web\fields\AuthenticationField;
+use groupcash\bank\web\fields\BackerField;
 use groupcash\bank\web\fields\CurrencyIdentifierField;
 use groupcash\bank\web\fields\FractionField;
 use groupcash\bank\web\fields\IdentifierField;
@@ -173,6 +174,7 @@ class Launcher {
         $domin->fields->add(new FractionField());
         $domin->fields->add(new AuthenticationField($domin->types, $domin->fields, $this->getSessionAuthentication()));
         $domin->fields->add(new CurrencyIdentifierField($domin->fields, $this->app));
+        $domin->fields->add(new BackerField($domin->fields, $this->app));
         $domin->fields->add(new IdentifierField());
     }
 

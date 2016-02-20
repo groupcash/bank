@@ -23,7 +23,7 @@ use groupcash\bank\model\Bank;
 use groupcash\bank\model\BankIdentifier;
 use groupcash\bank\model\Vault;
 use groupcash\bank\projecting\AllCurrencies;
-use groupcash\bank\projecting\CurrencyBackers;
+use groupcash\bank\projecting\AllBackers;
 use groupcash\bank\projecting\TransactionHistory;
 use groupcash\php\Groupcash;
 
@@ -83,7 +83,7 @@ class Application implements Builder, DomainEventListener {
         } else if ($query instanceof ListCurrencies) {
             return new AllCurrencies();
         } else if ($query instanceof ListBackers) {
-            return new CurrencyBackers($query->getCurrency());
+            return new AllBackers($query->getCurrency());
         }
 
         throw new \Exception('Unknown query.');
