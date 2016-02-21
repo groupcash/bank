@@ -19,11 +19,12 @@ use groupcash\bank\RegisterCurrency;
 use groupcash\bank\SendCoins;
 use groupcash\bank\web\fields\AccountIdentifierField;
 use groupcash\bank\web\fields\AuthenticationField;
-use groupcash\bank\web\fields\BackerField;
+use groupcash\bank\web\fields\BackerIdentifierField;
 use groupcash\bank\web\fields\CurrencyIdentifierField;
 use groupcash\bank\web\fields\FractionField;
 use groupcash\bank\web\fields\IdentifierField;
 use groupcash\bank\web\fields\PasswordField;
+use groupcash\bank\web\renderers\CreatedAccountRenderer;
 use groupcash\php\Groupcash;
 use groupcash\php\impl\EccKeyService;
 use rtens\domin\delivery\web\adapters\curir\root\IndexResource;
@@ -89,14 +90,12 @@ class Launcher {
                 $domin->setNameAndBrand('bank');
                 $this->registerActions($domin);
                 $this->registerFields($domin);
+                $this->registerRenderers($domin);
             }, WebDelivery::init()));
     }
 
     private function registerActions(WebApplication $domin) {
-        $this->addAction($domin, CreateAccount::class)
-            ->setAfterExecute(function ($keys) use ($domin) {
-                return CreatedAccount::render($this->baseUrl . '/SendCoins', $keys);
-            });
+        $this->addAction($domin, CreateAccount::class);
         $this->addAction($domin, RegisterCurrency::class);
         $this->addAction($domin, AuthorizeIssuer::class);
         $this->addAction($domin, AddBacker::class);
@@ -155,9 +154,13 @@ class Launcher {
         $domin->fields->add(new FractionField());
         $domin->fields->add(new AuthenticationField($domin->types, $domin->fields, $this->getSessionAuthentication()));
         $domin->fields->add(new CurrencyIdentifierField($domin->fields, $this->app));
-        $domin->fields->add(new BackerField($domin->fields, $this->app));
+        $domin->fields->add(new BackerIdentifierField($domin->fields, $this->app));
         $domin->fields->add(new AccountIdentifierField());
         $domin->fields->add(new IdentifierField());
+    }
+
+    private function registerRenderers(WebApplication $domin) {
+        $domin->renderers->add(new CreatedAccountRenderer($domin->renderers, $this->baseUrl . '/SendCoins'));
     }
 
     private function getSessionAuthentication() {

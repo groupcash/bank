@@ -16,17 +16,27 @@ use watoki\reflect\type\StringType;
 
 class CurrencyIdentifierField extends MultiField {
 
-    private $currencies = [];
+    /** @var string[] */
+    private $currencies;
+
+    /** @var Application */
+    private $app;
 
     public function __construct(FieldRegistry $fields, Application $app) {
         parent::__construct($fields);
+        $this->app = $app;
+    }
 
-        /** @var AllCurrencies $allCurrencies */
-        $allCurrencies = $app->handle(new ListCurrencies());
+    private function currencies() {
+        if (!$this->currencies) {
+            /** @var AllCurrencies $allCurrencies */
+            $allCurrencies = $this->app->handle(new ListCurrencies());
 
-        foreach ($allCurrencies->getCurrencies() as $currency) {
-            $this->currencies[(string)$currency->getAddress()] = $currency->getName();
+            foreach ($allCurrencies->getCurrencies() as $currency) {
+                $this->currencies[(string)$currency->getAddress()] = $currency->getName();
+            }
         }
+        return $this->currencies;
     }
 
     public function handles(Parameter $parameter) {
@@ -36,7 +46,7 @@ class CurrencyIdentifierField extends MultiField {
     public function render(Parameter $parameter, $value) {
         if ($value) {
             $value = (string)$value;
-            if (!array_key_exists($value, $this->currencies)) {
+            if (!array_key_exists($value, $this->currencies())) {
                 $value = new AccountIdentifier($value);
             }
         }
@@ -58,7 +68,7 @@ class CurrencyIdentifierField extends MultiField {
      */
     private function getParameter(Parameter $parameter) {
         return $parameter->withType(new MultiType([
-            new EnumerationType($this->currencies, new StringType()),
+            new EnumerationType($this->currencies(), new StringType()),
             new ClassType(AccountIdentifier::class)
         ]));
     }
