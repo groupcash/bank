@@ -27,8 +27,10 @@ use groupcash\bank\web\fields\CurrencyIdentifierField;
 use groupcash\bank\web\fields\FractionField;
 use groupcash\bank\web\fields\IdentifierField;
 use groupcash\bank\web\fields\PasswordField;
+use groupcash\bank\web\renderers\CoinsRenderer;
 use groupcash\bank\web\renderers\CreatedAccountRenderer;
 use groupcash\bank\web\renderers\CurrencyRenderer;
+use groupcash\bank\WithdrawCoins;
 use groupcash\php\Groupcash;
 use groupcash\php\impl\EccKeyService;
 use rtens\domin\delivery\web\adapters\curir\root\IndexResource;
@@ -108,6 +110,7 @@ class Launcher {
         $this->addAction($domin, AddExistingBacker::class);
         $this->addAction($domin, DeclarePromise::class);
         $this->addAction($domin, IssueCoins::class);
+        $this->addAction($domin, WithdrawCoins::class);
         $this->addAction($domin, SendCoins::class);
         $this->addAction($domin, ListTransactions::class)
             ->setModifying(false)
@@ -178,6 +181,7 @@ class Launcher {
     private function registerRenderers(WebApplication $domin) {
         $domin->renderers->add(new CreatedAccountRenderer($domin->renderers, $this->baseUrl . '/SendCoins'));
         $domin->renderers->add(new CurrencyRenderer());
+        $domin->renderers->add(new CoinsRenderer());
     }
 
     private function getSessionAuthentication() {
