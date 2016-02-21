@@ -270,13 +270,35 @@ class Bank extends AggregateRoot {
             $collected
         ));
 
-        return $this->validateCoins(array_map(function (TransferredCoin $coin) {
+        return array_map(function (TransferredCoin $coin) {
             return $coin->getTransferred();
-        }, $collected));
+        }, $collected);
     }
 
     protected function applyCoinsWithdrawn(CoinsWithdrawn $e) {
         $this->subtractCoins($e->getCurrency(), $e->getAccount(), $e->getCoins());
+    }
+
+    private function validateCoin(Coin $coin) {
+        $promise = $this->extractPromise($coin);
+        $backer = $promise->getBacker();
+        $backerKey = $this->backerKeys[$backer];
+
+        return $this->lib->validateCoin($backerKey, $coin);
+    }
+
+    private function extractPromise(Coin $coin) {
+        /** @var Promise|Transference $promise */
+        $promise = $coin->getTransaction();
+        while ($promise instanceof Transference) {
+            $promise = $promise->getCoin()->getTransaction();
+        }
+
+        if ($promise instanceof Promise) {
+            return $promise;
+        }
+
+        throw new \Exception('Invalid coin.');
     }
 
     private function collectCoins(CurrencyIdentifier $currency, AccountIdentifier $owner, $ownerKey, Fraction $amount, AccountIdentifier $target) {
@@ -296,8 +318,8 @@ class Bank extends AggregateRoot {
 
             $collected[] = new TransferredCoin(
                 $coin,
-                $this->lib->transferCoin($ownerKey, $coin, (string)$target, $transferFraction),
-                $this->lib->transferCoin($ownerKey, $coin, (string)$owner, $remainFraction)
+                $this->validateCoin($this->lib->transferCoin($ownerKey, $coin, (string)$target, $transferFraction)),
+                $this->validateCoin($this->lib->transferCoin($ownerKey, $coin, (string)$owner, $remainFraction))
             );
 
             $left = $left->minus($fraction);
@@ -359,27 +381,5 @@ class Bank extends AggregateRoot {
             $array = $array[(string)$key];
         }
         return $array;
-    }
-
-    /**
-     * @param $coins
-     * @return array
-     */
-    private function validateCoins($coins) {
-        return array_map(function (Coin $coin) {
-            $promise = $coin->getTransaction();
-            while ($promise instanceof Transference) {
-                $promise = $promise->getCoin()->getTransaction();
-            }
-
-            if (!($promise instanceof Promise)) {
-                throw new \Exception('Invalid coin.');
-            }
-
-            $backer = $promise->getBacker();
-            $backerKey = $this->backerKeys[$backer];
-
-            return $this->lib->validateCoin($backerKey, $coin);
-        }, $coins);
     }
 }
