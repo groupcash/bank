@@ -25,4 +25,10 @@ class RegisterCurrencySpec {
         $this->scenario->tryThat->IRegister_As('other key', 'foo');
         $this->scenario->then->itShouldFailWith('A currency with this name is already registered.');
     }
+
+    function alreadyRegistered() {
+        $this->scenario->given->IRegister_As('public key', 'foo');
+        $this->scenario->tryThat->IRegister_As('public key', 'bar');
+        $this->scenario->then->itShouldFailWith('This currency is already registered.');
+    }
 }

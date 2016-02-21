@@ -77,13 +77,20 @@ class Bank extends AggregateRoot {
         if (array_key_exists($c->getName(), $this->currencies)) {
             throw new \Exception('A currency with this name is already registered.');
         }
+
+        $currency = new CurrencyIdentifier((string)$c->getCurrency());
+
+        if (in_array($currency, $this->currencies)) {
+            throw new \Exception('This currency is already registered.');
+        }
+
         $this->record(new CurrencyRegistered(
-            new CurrencyIdentifier((string)$c->getCurrency()),
+            $currency,
             $c->getName()));
     }
 
     protected function applyCurrencyRegistered(CurrencyRegistered $e) {
-        $this->currencies[$e->getName()] = new CurrencyIdentifier((string)$e->getCurrency());
+        $this->currencies[$e->getName()] = $e->getCurrency();
     }
 
     public function handleAuthorizeIssuer(AuthorizeIssuer $c) {
