@@ -8,6 +8,7 @@ use groupcash\bank\AuthorizeIssuer;
 use groupcash\bank\CreateAccount;
 use groupcash\bank\DeclarePromise;
 use groupcash\bank\DeliverCoins;
+use groupcash\bank\DepositCoins;
 use groupcash\bank\events\BackerAdded;
 use groupcash\bank\events\CoinsDelivered;
 use groupcash\bank\events\CoinsIssued;
@@ -22,6 +23,7 @@ use groupcash\bank\RegisterCurrency;
 use groupcash\bank\SendCoins;
 use groupcash\bank\WithdrawCoins;
 use groupcash\php\Groupcash;
+use groupcash\php\model\Authorization;
 use groupcash\php\model\Coin;
 use groupcash\php\model\Fraction;
 use groupcash\php\model\Promise;
@@ -58,6 +60,9 @@ class Bank extends AggregateRoot {
 
     /** @var string[] Names indexed by backer identifier */
     private $backerNames = [];
+
+    /** @var Authorization[][] indexed by currency */
+    private $authorizations = [];
 
     /**
      * @param Groupcash $lib
@@ -113,6 +118,7 @@ class Bank extends AggregateRoot {
 
     protected function applyIssuerAuthorized(IssuerAuthorized $e) {
         $this->issuers[(string)$e->getCurrency()][] = new AccountIdentifier($e->getAuthorization()->getIssuer());
+        $this->authorizations[(string)$e->getCurrency()][] = $e->getAuthorization();
     }
 
     public function handleAddBacker(AddBacker $c) {
@@ -279,11 +285,66 @@ class Bank extends AggregateRoot {
         $this->subtractCoins($e->getCurrency(), $e->getAccount(), $e->getCoins());
     }
 
+    protected function handleDepositCoins(DepositCoins $c) {
+        $account = $this->lib->getAddress($this->auth->getKey($c->getAccount()));
+
+        $depositedCoins = [];
+        foreach ($c->getCoins() as $i => $coin) {
+            $number = $i + 1;
+
+            if ($coin->getTransaction()->getTarget() != $account) {
+                throw new \Exception("Coin $number does not belong to account.");
+            } else if ($this->hasInAccount($coin)) {
+                throw new \Exception("Coin $number is already in account.");
+            }
+
+            try {
+                $this->validateCoin($coin);
+            } catch (\Exception $e) {
+                throw new \Exception("Could not validate coin $number: " . $e->getMessage());
+            }
+
+            $currency = $this->extractPromise($coin)->getCurrency();
+            $depositedCoins[$currency][] = $coin;
+        }
+
+        foreach ($depositedCoins as $currency => $coins) {
+            $this->record(new CoinsDelivered(
+                new CurrencyIdentifier($currency),
+                new AccountIdentifier($account),
+                $coins,
+                'Deposited'
+            ));
+        }
+    }
+
+    private function hasInAccount(Coin $coin) {
+        $account = $coin->getTransaction()->getTarget();
+        $promise = $this->extractPromise($coin);
+        $currency = $promise->getCurrency();
+
+        $coinsInAccount = $this->get($this->coins, [$currency, $account], []);
+        foreach ($coinsInAccount as $coinInAccount) {
+            if ($this->extractPromise($coinInAccount) == $promise) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private function validateCoin(Coin $coin) {
         $promise = $this->extractPromise($coin);
         $backer = $promise->getBacker();
-        $backerKey = $this->backerKeys[$backer];
+        $currency = $promise->getCurrency();
 
+        $this->guardIsBackerOfCurrency(new CurrencyIdentifier($currency), new BackerIdentifier($backer));
+
+        if (!$this->lib->verifyCoin($coin, $this->get($this->authorizations, [$currency], null))) {
+            throw new \Exception('Coin could not be verified.');
+        }
+
+        $backerKey = $this->backerKeys[$backer];
         return $this->lib->validateCoin($backerKey, $coin);
     }
 

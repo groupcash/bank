@@ -8,6 +8,7 @@ use groupcash\bank\app\sourced\domain\Time;
 use groupcash\bank\AuthorizeIssuer;
 use groupcash\bank\CreateAccount;
 use groupcash\bank\DeclarePromise;
+use groupcash\bank\DepositCoins;
 use groupcash\bank\IssueCoins;
 use groupcash\bank\ListBackers;
 use groupcash\bank\ListCurrencies;
@@ -165,7 +166,7 @@ class ApplicationFixture {
         $this->returned = $this->app->handle(new CreateAccount($password));
     }
 
-    public function isShouldReturn($value) {
+    public function itShouldReturn($value) {
         $this->assert->equals($this->returned, $value);
     }
 
@@ -201,7 +202,7 @@ class ApplicationFixture {
     }
 
     public function thereShouldBeATotalOf($amount, $currency) {
-        $this->assert->equals($this->transactionHistory->getTotals()[$currency], $this->toFraction($amount));
+        $this->assert->equals($this->transactionHistory->getTotal(new CurrencyIdentifier($currency)), $this->toFraction($amount));
     }
 
     private function toFraction($amount) {
@@ -287,5 +288,12 @@ class ApplicationFixture {
         $this->assert->equals($transference->getTarget(), $target);
         $this->assert->equals($transference->getFraction(), $this->toFraction($amount));
         $this->assert->equals($coin->getFraction(), $this->toFraction($amount));
+    }
+
+    public function _Deposits($account, $coins) {
+        $this->returned = $this->app->handle(new DepositCoins(
+            new Authentication("private $account"),
+            $coins
+        ));
     }
 }

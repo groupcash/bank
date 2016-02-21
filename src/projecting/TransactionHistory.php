@@ -46,6 +46,13 @@ class TransactionHistory extends Projection {
         return $this->transactions;
     }
 
+    public function getTotal(CurrencyIdentifier $currency) {
+        if (array_key_exists((string)$currency, $this->getTotals())) {
+            return $this->getTotals()[(string)$currency];
+        }
+        return new Fraction(0);
+    }
+
     protected function applyCoinsSent(CoinsSent $e) {
         if ($e->getOwner() == $this->account) {
             $this->addTransaction(

@@ -19,7 +19,7 @@ class CreateAccountSpec {
 
     function withoutPassword() {
         $this->scenario->when->ICreateAnAccountWithPassword(null);
-        $this->scenario->then->isShouldReturn([
+        $this->scenario->then->itShouldReturn([
             'key' => 'private key',
             'address' => 'key'
         ]);
@@ -27,7 +27,7 @@ class CreateAccountSpec {
 
     function withPassword() {
         $this->scenario->when->ICreateAnAccountWithPassword('password');
-        $this->scenario->then->isShouldReturn([
+        $this->scenario->then->itShouldReturn([
             'key' => 'private key encrypted with secretpassword',
             'address' => 'key'
         ]);
