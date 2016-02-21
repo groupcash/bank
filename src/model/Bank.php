@@ -2,6 +2,7 @@
 namespace groupcash\bank\model;
 
 use groupcash\bank\AddBacker;
+use groupcash\bank\AddExistingBacker;
 use groupcash\bank\app\sourced\domain\AggregateRoot;
 use groupcash\bank\AuthorizeIssuer;
 use groupcash\bank\CreateAccount;
@@ -47,6 +48,12 @@ class Bank extends AggregateRoot {
 
     /** @var CurrencyIdentifier[] */
     private $currencies = [];
+
+    /** @var string[] Private keys indexed by backer identifier */
+    private $backerKeys = [];
+
+    /** @var string[] Names indexed by backer identifier */
+    private $backerNames = [];
 
     /**
      * @param Groupcash $lib
@@ -101,17 +108,44 @@ class Bank extends AggregateRoot {
         $this->guardIssuerOfCurrency($c->getIssuer(), $c->getCurrency());
 
         $key = $this->lib->generateKey();
+        $address = $this->lib->getAddress($key);
 
         $this->record(new BackerAdded(
             $c->getCurrency(),
-            new BackerIdentifier($this->lib->getAddress($key)),
+            new BackerIdentifier($address),
             $key,
             $c->getName()
+        ));
+
+        return [
+            'key' => $key,
+            'address' => $address
+        ];
+    }
+
+    protected function handleAddExistingBacker(AddExistingBacker $c) {
+        $this->guardIssuerOfCurrency($c->getIssuer(), $c->getCurrency());
+
+        if (!$this->get($this->backers, [$c->getBacker()], null)) {
+            throw new \Exception('This backer does not exist.');
+        }
+
+        if ($this->contains($this->backers, $c->getBacker(), $c->getCurrency())) {
+            throw new \Exception('This backer was already added to this currency.');
+        }
+
+        $this->record(new BackerAdded(
+            $c->getCurrency(),
+            $c->getBacker(),
+            $this->backerKeys[(string)$c->getBacker()],
+            $this->backerNames[(string)$c->getBacker()]
         ));
     }
 
     protected function applyBackerAdded(BackerAdded $e) {
-        $this->backers[(string)$e->getCurrency()][] = $e->getBacker();
+        $this->backers[(string)$e->getBacker()][] = $e->getCurrency();
+        $this->backerKeys[(string)$e->getBacker()] = $e->getBackerKey();
+        $this->backerNames[(string)$e->getBacker()] = $e->getName();
     }
 
     public function handleDeclarePromise(DeclarePromise $c) {
@@ -264,7 +298,7 @@ class Bank extends AggregateRoot {
     }
 
     private function guardIsBackerOfCurrency(CurrencyIdentifier $currency, BackerIdentifier $backer) {
-        if (!$this->contains($this->backers, $currency, $backer)) {
+        if (!$this->contains($this->backers, $backer, $currency)) {
             throw new \Exception('This backer is not registered with this currency.');
         }
     }

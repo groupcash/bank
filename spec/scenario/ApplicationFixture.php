@@ -2,6 +2,7 @@
 namespace spec\groupcash\bank\scenario;
 
 use groupcash\bank\AddBacker;
+use groupcash\bank\AddExistingBacker;
 use groupcash\bank\app\Application;
 use groupcash\bank\app\sourced\domain\Time;
 use groupcash\bank\AuthorizeIssuer;
@@ -17,6 +18,7 @@ use groupcash\bank\model\BackerIdentifier;
 use groupcash\bank\model\CurrencyIdentifier;
 use groupcash\bank\projecting\AllCurrencies;
 use groupcash\bank\projecting\AllBackers;
+use groupcash\bank\projecting\Currency;
 use groupcash\bank\projecting\Transaction;
 use groupcash\bank\projecting\TransactionHistory;
 use groupcash\bank\RegisterCurrency;
@@ -130,6 +132,14 @@ class ApplicationFixture {
         ));
     }
 
+    public function _AddsExisting_To($issuer, $backer, $currency) {
+        $this->app->handle(new AddExistingBacker(
+            new Authentication("private $issuer"),
+            new CurrencyIdentifier($currency),
+            new BackerIdentifier($backer)
+        ));
+    }
+
     public function _Declares_Of_By_For($issuer, $limit, $promise, $backer, $currency) {
         $this->app->handle(new DeclarePromise(
             new Authentication("private $issuer"),
@@ -213,10 +223,6 @@ class ApplicationFixture {
         $this->assert->equals($currency->getName(), $name);
     }
 
-    public function IListBackersOf($currency) {
-        $this->backers = $this->app->handle(new ListBackers(new CurrencyIdentifier($currency)));
-    }
-
     public function IListAllBackers() {
         $this->backers = $this->app->handle(new ListBackers());
     }
@@ -233,7 +239,10 @@ class ApplicationFixture {
         $this->assert->equals($this->backers->getBackers()[$pos - 1]->getAddress(), new BackerIdentifier($address));
     }
 
-    public function backer_shouldHaveTheCurrency($pos, $currency) {
-        $this->assert->equals($this->backers->getBackers()[$pos - 1]->getCurrency(), new CurrencyIdentifier($currency));
+    public function backer_shouldHaveTheCurrencies($pos, $currencies) {
+        $currencyIdentifiers = array_map(function (Currency $currency) {
+            return (string)$currency->getAddress();
+        }, $this->backers->getBackers()[$pos - 1]->getCurrencies());
+        $this->assert->equals($currencyIdentifiers, $currencies);
     }
 }
