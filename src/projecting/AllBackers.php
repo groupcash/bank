@@ -3,6 +3,7 @@ namespace groupcash\bank\projecting;
 
 use groupcash\bank\app\sourced\domain\Projection;
 use groupcash\bank\events\BackerAdded;
+use groupcash\bank\events\BackerCreated;
 use groupcash\bank\events\CurrencyRegistered;
 use groupcash\bank\model\BackerIdentifier;
 use groupcash\bank\model\CurrencyIdentifier;
@@ -42,8 +43,11 @@ class AllBackers extends Projection {
         return $backers;
     }
 
-    protected function applyBackerAdded(BackerAdded $e) {
+    protected function applyBackerCreated(BackerCreated $e) {
         $this->backerNames[(string)$e->getBacker()] = $e->getName();
+    }
+
+    protected function applyBackerAdded(BackerAdded $e) {
         $this->backerCurrencies[(string)$e->getBacker()][] = $e->getCurrency();
     }
 

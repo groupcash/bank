@@ -10,6 +10,7 @@ use groupcash\bank\DeclarePromise;
 use groupcash\bank\DeliverCoins;
 use groupcash\bank\DepositCoins;
 use groupcash\bank\events\BackerAdded;
+use groupcash\bank\events\BackerCreated;
 use groupcash\bank\events\CoinsDelivered;
 use groupcash\bank\events\CoinsIssued;
 use groupcash\bank\events\CoinsSent;
@@ -124,14 +125,24 @@ class Bank extends AggregateRoot {
         $key = $this->lib->generateKey();
         $address = $this->lib->getAddress($key);
 
-        $this->record(new BackerAdded(
+        $this->record(new BackerCreated(
             $c->getCurrency(),
             new BackerIdentifier($address),
             $key,
             $c->getName()
         ));
 
+        $this->record(new BackerAdded(
+            $c->getCurrency(),
+            new BackerIdentifier($address)
+        ));
+
         return new CreatedAccount($address);
+    }
+
+    protected function applyBackerCreated(BackerCreated $e) {
+        $this->backerKeys[(string)$e->getBacker()] = $e->getBackerKey();
+        $this->backerNames[(string)$e->getBacker()] = $e->getName();
     }
 
     protected function handleAddExistingBacker(AddExistingBacker $c) {
@@ -147,16 +158,12 @@ class Bank extends AggregateRoot {
 
         $this->record(new BackerAdded(
             $c->getCurrency(),
-            $c->getBacker(),
-            $this->backerKeys[(string)$c->getBacker()],
-            $this->backerNames[(string)$c->getBacker()]
+            $c->getBacker()
         ));
     }
 
     protected function applyBackerAdded(BackerAdded $e) {
         $this->backers[(string)$e->getBacker()][] = $e->getCurrency();
-        $this->backerKeys[(string)$e->getBacker()] = $e->getBackerKey();
-        $this->backerNames[(string)$e->getBacker()] = $e->getName();
     }
 
     public function handleDeclarePromise(DeclarePromise $c) {
@@ -417,7 +424,7 @@ class Bank extends AggregateRoot {
 
     private function guardIsBackerOfCurrency(CurrencyIdentifier $currency, BackerIdentifier $backer) {
         if (!$this->contains($this->backers, $backer, $currency)) {
-            throw new \Exception('This backer is not registered with this currency.');
+            throw new \Exception('This backer was not added to this currency.');
         }
     }
 

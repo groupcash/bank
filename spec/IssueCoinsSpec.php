@@ -29,7 +29,7 @@ class IssueCoinsSpec {
 
     function notABacker() {
         $this->scenario->tryThat->_issues__to('issuer', 1, 'foo', 'not backer');
-        $this->scenario->then->itShouldFailWith('This backer is not registered with this currency.');
+        $this->scenario->then->itShouldFailWith('This backer was not added to this currency.');
     }
 
     function backerOfOtherCurrency() {
@@ -37,7 +37,7 @@ class IssueCoinsSpec {
         $this->scenario->given->_Adds_To('issuer', 'other backer', 'not foo');
 
         $this->scenario->tryThat->_issues__to('issuer', 1, 'foo', 'other backer');
-        $this->scenario->then->itShouldFailWith('This backer is not registered with this currency.');
+        $this->scenario->then->itShouldFailWith('This backer was not added to this currency.');
     }
 
     function noPromiseDeclared() {

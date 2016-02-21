@@ -62,7 +62,7 @@ class DepositCoinsSpec {
         $this->scenario->tryThat->_Deposits('not bart', [
             $this->_WithSerial_Promising_IssuedTo('foo', 1, 'Promise', 'not bart')
         ]);
-        $this->scenario->then->itShouldFailWith('Could not validate coin 1: This backer is not registered with this currency.');
+        $this->scenario->then->itShouldFailWith('Could not validate coin 1: This backer was not added to this currency.');
     }
 
     function depositedCoinsCanBeSent() {

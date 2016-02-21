@@ -27,14 +27,14 @@ class DeclarePromiseSpec {
 
     function notABacker() {
         $this->scenario->tryThat->_Declares_Of_By_For('issuer', 1, 'My Promise', 'not backer', 'foo');
-        $this->scenario->then->itShouldFailWith('This backer is not registered with this currency.');
+        $this->scenario->then->itShouldFailWith('This backer was not added to this currency.');
     }
 
     function backerOfOtherCurrency() {
         $this->scenario->given->_Authorizes('not foo', 'issuer');
 
         $this->scenario->tryThat->_Declares_Of_By_For('issuer', 1, 'My Promise', 'backer', 'not foo');
-        $this->scenario->then->itShouldFailWith('This backer is not registered with this currency.');
+        $this->scenario->then->itShouldFailWith('This backer was not added to this currency.');
     }
 
     function success() {
