@@ -100,7 +100,21 @@ class ListTransactionsSpec {
 
         $this->scenario->when->_ListsTheirTransactions('lisa');
 
-        $this->scenario->then->theTotalShouldBe(5.9);
+        $this->scenario->then->thereShouldBeATotalOf(5.9, 'foo');
+    }
+
+    function multipleCurrencies() {
+        $this->scenario->given->_Authorizes('bar', 'issuer');
+        $this->scenario->given->_Adds_To('issuer', 'bart', 'bar');
+        $this->scenario->given->_Declares_Of_By_For('issuer', 10, 'My Promise', 'bart', 'bar');
+        $this->scenario->given->_issues__to('issuer', 10, 'bar', 'bart');
+
+        $this->scenario->given->IRegister_As('bar', 'name of bar');
+
+        $this->scenario->when->_ListsTheirTransactions('bart');
+
+        $this->scenario->then->thereShouldBeATotalOf(10, 'foo');
+        $this->scenario->then->thereShouldBeATotalOf(10, 'name of bar');
     }
 
     function useNameOfCurrency() {

@@ -18,22 +18,25 @@ class TransactionHistory extends Projection {
     /** @var AccountIdentifier */
     private $account;
 
-    /** @var Fraction */
-    private $total;
+    /** @var Fraction[] */
+    private $totals = [];
 
     /** @var Currency[] */
     private $currencies = [];
 
     public function __construct(AccountIdentifier $account) {
         $this->account = $account;
-        $this->total = new Fraction(0);
     }
 
     /**
-     * @return Fraction
+     * @return Fraction[] indexed by name of currency
      */
-    public function getTotal() {
-        return $this->total;
+    public function getTotals() {
+        $totals = [];
+        foreach ($this->totals as $currency => $total) {
+            $totals[$this->currencies[$currency]->getName()] = $total;
+        }
+        return $totals;
     }
 
     /**
@@ -74,7 +77,11 @@ class TransactionHistory extends Projection {
             $amount,
             $subject
         );
-        $this->total = $this->total->plus($amount);
+
+        if (!array_key_exists((string)$currency, $this->totals)) {
+            $this->totals[(string)$currency] = new Fraction(0);
+        }
+        $this->totals[(string)$currency] = $this->totals[(string)$currency]->plus($amount);
     }
 
     /**

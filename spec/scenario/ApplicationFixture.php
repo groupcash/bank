@@ -200,8 +200,8 @@ class ApplicationFixture {
         $this->assert->equals($this->transactionHistory->getTransactions()[$pos - 1]->getCurrency()->getName(), $name);
     }
 
-    public function theTotalShouldBe($amount) {
-        $this->assert->equals($this->transactionHistory->getTotal(), $this->toFraction($amount));
+    public function thereShouldBeATotalOf($amount, $currency) {
+        $this->assert->equals($this->transactionHistory->getTotals()[$currency], $this->toFraction($amount));
     }
 
     private function toFraction($amount) {

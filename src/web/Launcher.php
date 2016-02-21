@@ -116,7 +116,7 @@ class Launcher {
             ->setModifying(false)
             ->setAfterExecute(function (TransactionHistory $history) use ($domin) {
                 return [
-                    new Panel('Total', $history->getTotal()),
+                    new Panel('Total', $history->getTotals()),
                     new Panel('Transactions',
                         (new ObjectTable($history->getTransactions(), $domin->types))
                             ->selectProperties(['when', 'subject', 'currency', 'amount']))
