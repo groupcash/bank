@@ -20,7 +20,7 @@ use groupcash\bank\projecting\TransactionHistory;
 use groupcash\bank\RegisterCurrency;
 use groupcash\bank\SendCoins;
 use groupcash\bank\web\fields\AccountIdentifierField;
-use groupcash\bank\web\fields\AddressCodeField;
+use groupcash\bank\web\fields\QrCodeField;
 use groupcash\bank\web\fields\AuthenticationField;
 use groupcash\bank\web\fields\BackerIdentifierField;
 use groupcash\bank\web\fields\CurrencyIdentifierField;
@@ -175,7 +175,7 @@ class Launcher {
         $domin->fields->add(new BackerIdentifierField($domin->fields, $this->app));
         $domin->fields->add(new AccountIdentifierField($domin->fields));
         $domin->fields->add(new IdentifierField());
-        $domin->fields->add(new AddressCodeField());
+        $domin->fields->add(new QrCodeField());
     }
 
     private function registerRenderers(WebApplication $domin) {

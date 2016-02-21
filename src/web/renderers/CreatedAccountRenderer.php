@@ -39,16 +39,11 @@ class CreatedAccountRenderer extends ListRenderer {
     public function render($keys) {
         return parent::render([
             $this->keyPanel('Private Key', $keys['key']),
+            $this->codePanel('Private Code', 'This code contains your private key. Handle with care.', $keys['key']),
             $this->keyPanel('Public Address', $keys['address']),
-            new Panel('Send Coins', [
-                new Element('p', [], [
-                    'You can use this QR code to send coins to the created account.'
-                ]),
-                new Element('img', [
-                    'src' => 'https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl=' .
-                        urlencode($this->sendCoinsUrl . '?target='. $keys['address'])
-                ])
-            ])
+            $this->codePanel('Send Coins',
+                'You can use this QR code to send coins to the created account.',
+                $this->sendCoinsUrl . '?target='. $keys['address'])
         ]);
     }
 
@@ -67,6 +62,17 @@ class CreatedAccountRenderer extends ListRenderer {
                 'target' => '_blank'
             ], [
                 'Save as File'
+            ])
+        ]);
+    }
+
+    private function codePanel($heading, $description, $content) {
+        return new Panel($heading, [
+            new Element('p', [], [
+                $description
+            ]),
+            new Element('img', [
+                'src' => 'https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl=' . urlencode($content)
             ])
         ]);
     }

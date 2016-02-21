@@ -7,7 +7,7 @@ use rtens\domin\parameters\File;
 class WebAuthentication extends Authentication {
 
     /**
-     * @param File|string $key
+     * @param File|QrCode|string $key
      * @param null|string $password
      */
     public function __construct($key, $password) {
@@ -15,7 +15,7 @@ class WebAuthentication extends Authentication {
     }
 
     /**
-     * @return File|string
+     * @return File|QrCode|string
      */
     public function getKey() {
         return parent::getKey();

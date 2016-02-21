@@ -1,42 +1,34 @@
 <?php
 namespace groupcash\bank\web\fields;
 
-use groupcash\bank\model\AccountIdentifier;
 use rtens\domin\delivery\web\Element;
 use rtens\domin\delivery\web\HeadElements;
 use rtens\domin\delivery\web\WebField;
 use rtens\domin\Parameter;
 use watoki\reflect\type\ClassType;
 
-class AddressCodeField implements WebField {
-
+class QrCodeField implements WebField {
 
     /**
      * @param Parameter $parameter
      * @return bool
      */
     public function handles(Parameter $parameter) {
-        return $parameter->getType() == new ClassType(AddressCode::class);
+        return $parameter->getType() == new ClassType(QrCode::class);
     }
 
     /**
      * @param Parameter $parameter
      * @param string $serialized
      * @return mixed
-     * @throws \Exception
      */
     public function inflate(Parameter $parameter, $serialized) {
-        $matches = [];
-        if (preg_match('/target=(.*)$/', $serialized, $matches)) {
-            return new AccountIdentifier($matches[1]);
-        }
-
-        throw new \Exception('Could not find address in code.');
+        return new QrCode($serialized);
     }
 
     /**
      * @param Parameter $parameter
-     * @param mixed $value
+     * @param null|QrCode $value
      * @return string
      */
     public function render(Parameter $parameter, $value) {
@@ -47,7 +39,6 @@ class AddressCodeField implements WebField {
                 'class' => 'form-control',
                 'type' => 'text',
                 'name' => $parameter->getName(),
-                'value' => $value,
                 'id' => "$id-value"
             ], $parameter->isRequired() ? [
                 'required' => 'required'
