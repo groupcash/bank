@@ -300,13 +300,13 @@ class Bank extends AggregateRoot {
             }
 
             try {
-                $this->validateCoin($coin);
+                $validated = $this->validateCoin($coin);
             } catch (\Exception $e) {
                 throw new \Exception("Could not validate coin $number: " . $e->getMessage());
             }
 
             $currency = $this->extractPromise($coin)->getCurrency();
-            $depositedCoins[$currency][] = $coin;
+            $depositedCoins[$currency][] = $validated;
         }
 
         foreach ($depositedCoins as $currency => $coins) {
@@ -325,13 +325,7 @@ class Bank extends AggregateRoot {
         $currency = $promise->getCurrency();
 
         $coinsInAccount = $this->get($this->coins, [$currency, $account], []);
-        foreach ($coinsInAccount as $coinInAccount) {
-            if ($this->extractPromise($coinInAccount) == $promise) {
-                return true;
-            }
-        }
-
-        return false;
+        return in_array($coin, $coinsInAccount);
     }
 
     private function validateCoin(Coin $coin) {
