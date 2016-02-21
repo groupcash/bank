@@ -3,7 +3,7 @@ namespace groupcash\bank\events;
 
 use groupcash\php\model\Coin;
 
-class SentCoin {
+class TransferredCoin {
 
     /** @var Coin */
     private $coin;

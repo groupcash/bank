@@ -16,15 +16,19 @@ use groupcash\bank\model\AccountIdentifier;
 use groupcash\bank\model\Authentication;
 use groupcash\bank\model\BackerIdentifier;
 use groupcash\bank\model\CurrencyIdentifier;
-use groupcash\bank\projecting\AllCurrencies;
 use groupcash\bank\projecting\AllBackers;
+use groupcash\bank\projecting\AllCurrencies;
 use groupcash\bank\projecting\Currency;
 use groupcash\bank\projecting\Transaction;
 use groupcash\bank\projecting\TransactionHistory;
 use groupcash\bank\RegisterCurrency;
 use groupcash\bank\SendCoins;
+use groupcash\bank\WithdrawCoins;
 use groupcash\php\Groupcash;
+use groupcash\php\model\Coin;
 use groupcash\php\model\Fraction;
+use groupcash\php\model\Promise;
+use groupcash\php\model\Transference;
 use rtens\scrut\Assert;
 use rtens\scrut\fixtures\ExceptionFixture;
 use spec\groupcash\bank\fakes\FakeCryptography;
@@ -61,6 +65,9 @@ class ApplicationFixture {
 
     /** @var AllBackers */
     private $backers;
+
+    /** @var Coin[] */
+    private $coins;
 
     public function __construct(Assert $assert, ExceptionFixture $except) {
         $this->assert = $assert;
@@ -248,5 +255,37 @@ class ApplicationFixture {
             return (string)$currency->getAddress();
         }, $this->backers->getBackers()[$pos - 1]->getCurrencies());
         $this->assert->equals($currencyIdentifiers, $currencies);
+    }
+
+    public function _Withdraws($account, $amount, $currency) {
+        $this->coins = $this->app->handle(new WithdrawCoins(
+            new Authentication("private $account"),
+            new CurrencyIdentifier($currency),
+            is_null($amount) ? null : $this->toFraction($amount)
+        ));
+    }
+
+    public function thereShouldBe_Coins($int) {
+        $this->assert->size($this->coins, $int);
+    }
+
+    public function coin_ShouldBe__Promising__By_TransferredTo($pos, $amount, $currency, $promise, $serial, $backer, $target) {
+        $coin = $this->coins[$pos - 1];
+
+        $transference = $coin->getTransaction();
+        if (!($transference instanceof Transference)) {
+            $this->assert->fail("Not a transference");
+        }
+
+        $this->assert->equals($transference->getCoin()->getTransaction(), new Promise(
+            $currency,
+            $backer,
+            $promise,
+            $serial
+        ));
+
+        $this->assert->equals($transference->getTarget(), $target);
+        $this->assert->equals($transference->getFraction(), $this->toFraction($amount));
+        $this->assert->equals($coin->getFraction(), $this->toFraction($amount));
     }
 }

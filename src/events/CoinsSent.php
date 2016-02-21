@@ -7,7 +7,7 @@ use groupcash\bank\model\CurrencyIdentifier;
 
 class CoinsSent extends DomainEvent {
 
-    /** @var SentCoin[] */
+    /** @var TransferredCoin[] */
     private $sentCoins;
 
     /** @var AccountIdentifier */
@@ -24,24 +24,24 @@ class CoinsSent extends DomainEvent {
 
     /**
      * @param CurrencyIdentifier $currency
-     * @param AccountIdentifier $owner
+     * @param AccountIdentifier $account
      * @param AccountIdentifier $target
-     * @param SentCoin[] $sentCoins
+     * @param TransferredCoin[] $sentCoins
      * @param null|string $subject
      */
-    public function __construct(CurrencyIdentifier $currency, AccountIdentifier $owner, AccountIdentifier $target,
+    public function __construct(CurrencyIdentifier $currency, AccountIdentifier $account, AccountIdentifier $target,
                                 $sentCoins, $subject = null) {
         parent::__construct();
 
         $this->sentCoins = $sentCoins;
-        $this->owner = $owner;
+        $this->owner = $account;
         $this->currency = $currency;
         $this->target = $target;
         $this->subject = $subject;
     }
 
     /**
-     * @return SentCoin[]
+     * @return TransferredCoin[]
      */
     public function getSentCoins() {
         return $this->sentCoins;

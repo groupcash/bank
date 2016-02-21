@@ -13,7 +13,7 @@ use groupcash\bank\app\sourced\messaging\Query;
 use groupcash\bank\DeliverCoins;
 use groupcash\bank\events\CoinsIssued;
 use groupcash\bank\events\CoinsSent;
-use groupcash\bank\events\SentCoin;
+use groupcash\bank\events\TransferredCoin;
 use groupcash\bank\ListBackers;
 use groupcash\bank\ListCurrencies;
 use groupcash\bank\ListTransactions;
@@ -119,7 +119,7 @@ class Application implements Builder, DomainEventListener {
         $this->handler->handle(new DeliverCoins(
             $e->getCurrency(),
             $e->getTarget(),
-            array_map(function (SentCoin $sentCoin) {
+            array_map(function (TransferredCoin $sentCoin) {
                 return $sentCoin->getTransferred();
             }, $e->getSentCoins()),
             $e->getSubject()));

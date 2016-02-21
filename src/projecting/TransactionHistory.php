@@ -5,7 +5,7 @@ use groupcash\bank\app\sourced\domain\Projection;
 use groupcash\bank\events\CoinsDelivered;
 use groupcash\bank\events\CoinsSent;
 use groupcash\bank\events\CurrencyRegistered;
-use groupcash\bank\events\SentCoin;
+use groupcash\bank\events\TransferredCoin;
 use groupcash\bank\model\AccountIdentifier;
 use groupcash\bank\model\CurrencyIdentifier;
 use groupcash\php\model\Coin;
@@ -78,13 +78,13 @@ class TransactionHistory extends Projection {
     }
 
     /**
-     * @param Coin[]|SentCoin[] $coins
+     * @param Coin[]|TransferredCoin[] $coins
      * @return Fraction
      */
     private function sum($coins) {
         $sum = new Fraction(0);
         foreach ($coins as $coin) {
-            if ($coin instanceof SentCoin) {
+            if ($coin instanceof TransferredCoin) {
                 $coin = $coin->getTransferred();
             }
             $sum = $sum->plus($coin->getFraction());
