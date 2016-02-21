@@ -180,13 +180,17 @@ class ApplicationFixture {
         $this->assert->equals($this->transactionHistory->getTransactions()[$pos - 1],
             new Transaction(
                 new \DateTimeImmutable($when),
-                new CurrencyIdentifier($currency),
+                new Currency(new CurrencyIdentifier($currency)),
                 $this->toFraction($amount)
             ));
     }
 
     public function transaction_ShouldHaveTheSubject($pos, $subject) {
         $this->assert->equals($this->transactionHistory->getTransactions()[$pos - 1]->getSubject(), $subject);
+    }
+
+    public function transaction_ShouldHaveTheCurrencyName($pos, $name) {
+        $this->assert->equals($this->transactionHistory->getTransactions()[$pos - 1]->getCurrency()->getName(), $name);
     }
 
     public function theTotalShouldBe($amount) {

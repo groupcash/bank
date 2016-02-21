@@ -29,7 +29,7 @@ class AllBackers extends Projection {
                 if (array_key_exists((string)$currency, $this->registeredCurrencies)) {
                     $currencies[] = $this->registeredCurrencies[(string)$currency];
                 } else {
-                    $currencies[] = new Currency($currency, substr($currency, 0, 6));
+                    $currencies[] = new Currency($currency);
                 }
             }
 

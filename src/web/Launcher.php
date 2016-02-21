@@ -16,6 +16,7 @@ use groupcash\bank\ListTransactions;
 use groupcash\bank\model\Authentication;
 use groupcash\bank\model\Authenticator;
 use groupcash\bank\model\RandomNumberGenerator;
+use groupcash\bank\projecting\TransactionHistory;
 use groupcash\bank\RegisterCurrency;
 use groupcash\bank\SendCoins;
 use groupcash\bank\web\fields\AccountIdentifierField;
@@ -27,10 +28,13 @@ use groupcash\bank\web\fields\FractionField;
 use groupcash\bank\web\fields\IdentifierField;
 use groupcash\bank\web\fields\PasswordField;
 use groupcash\bank\web\renderers\CreatedAccountRenderer;
+use groupcash\bank\web\renderers\CurrencyRenderer;
 use groupcash\php\Groupcash;
 use groupcash\php\impl\EccKeyService;
 use rtens\domin\delivery\web\adapters\curir\root\IndexResource;
 use rtens\domin\delivery\web\menu\ActionMenuItem;
+use rtens\domin\delivery\web\renderers\dashboard\types\Panel;
+use rtens\domin\delivery\web\renderers\tables\types\ObjectTable;
 use rtens\domin\delivery\web\WebApplication;
 use rtens\domin\execution\RedirectResult;
 use rtens\domin\parameters\File;
@@ -106,7 +110,15 @@ class Launcher {
         $this->addAction($domin, IssueCoins::class);
         $this->addAction($domin, SendCoins::class);
         $this->addAction($domin, ListTransactions::class)
-            ->setModifying(false);
+            ->setModifying(false)
+            ->setAfterExecute(function (TransactionHistory $history) use ($domin) {
+                return [
+                    new Panel('Total', $history->getTotal()),
+                    new Panel('Transactions',
+                        (new ObjectTable($history->getTransactions(), $domin->types))
+                            ->selectProperties(['when', 'subject', 'currency', 'amount']))
+                ];
+            });
         $this->registerSessionManagement($domin);
     }
 
@@ -165,6 +177,7 @@ class Launcher {
 
     private function registerRenderers(WebApplication $domin) {
         $domin->renderers->add(new CreatedAccountRenderer($domin->renderers, $this->baseUrl . '/SendCoins'));
+        $domin->renderers->add(new CurrencyRenderer());
     }
 
     private function getSessionAuthentication() {

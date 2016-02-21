@@ -1,7 +1,6 @@
 <?php
 namespace groupcash\bank\projecting;
 
-use groupcash\bank\model\CurrencyIdentifier;
 use groupcash\php\model\Fraction;
 
 class Transaction {
@@ -9,7 +8,7 @@ class Transaction {
     /** @var Fraction */
     private $amount;
 
-    /** @var CurrencyIdentifier */
+    /** @var Currency */
     private $currency;
 
     /** @var \DateTimeImmutable */
@@ -20,11 +19,11 @@ class Transaction {
 
     /**
      * @param \DateTimeImmutable $when
-     * @param CurrencyIdentifier $currency
+     * @param Currency $currency
      * @param Fraction $amount
      * @param null|string $subject
      */
-    public function __construct(\DateTimeImmutable $when, CurrencyIdentifier $currency, Fraction $amount, $subject = null) {
+    public function __construct(\DateTimeImmutable $when, Currency $currency, Fraction $amount, $subject = null) {
         $this->amount = $amount;
         $this->currency = $currency;
         $this->when = $when;
@@ -39,7 +38,7 @@ class Transaction {
     }
 
     /**
-     * @return CurrencyIdentifier
+     * @return Currency
      */
     public function getCurrency() {
         return $this->currency;

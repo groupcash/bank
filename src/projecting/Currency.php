@@ -8,14 +8,14 @@ class Currency {
     /** @var CurrencyIdentifier */
     private $address;
 
-    /** @var string */
+    /** @var null|string */
     private $name;
 
     /**
      * @param CurrencyIdentifier $address
-     * @param string $name
+     * @param null|string $name
      */
-    public function __construct(CurrencyIdentifier $address, $name) {
+    public function __construct(CurrencyIdentifier $address, $name = null) {
         $this->address = $address;
         $this->name = $name;
     }
@@ -25,6 +25,13 @@ class Currency {
     }
 
     public function getName() {
-        return $this->name;
+        return $this->name ?: substr((string)$this->address, 0, 6);
+    }
+
+    /**
+     * @param string $name
+     */
+    public function setName($name) {
+        $this->name = $name;
     }
 }

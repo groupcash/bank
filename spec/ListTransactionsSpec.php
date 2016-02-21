@@ -102,4 +102,14 @@ class ListTransactionsSpec {
 
         $this->scenario->then->theTotalShouldBe(5.9);
     }
+
+    function useNameOfCurrency() {
+        $this->scenario->given->_Sends__To('bart', 1, 'foo', 'lisa');
+        $this->scenario->given->IRegister_As('foo', 'name of foo');
+
+        $this->scenario->when->_ListsTheirTransactions('lisa');
+
+        $this->scenario->then->thereShouldBe_Transactions(1);
+        $this->scenario->then->transaction_ShouldHaveTheCurrencyName(1, 'name of foo');
+    }
 }

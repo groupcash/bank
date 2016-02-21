@@ -4,8 +4,10 @@ namespace groupcash\bank\projecting;
 use groupcash\bank\app\sourced\domain\Projection;
 use groupcash\bank\events\CoinsDelivered;
 use groupcash\bank\events\CoinsSent;
+use groupcash\bank\events\CurrencyRegistered;
 use groupcash\bank\events\SentCoin;
 use groupcash\bank\model\AccountIdentifier;
+use groupcash\bank\model\CurrencyIdentifier;
 use groupcash\php\model\Coin;
 use groupcash\php\model\Fraction;
 
@@ -18,6 +20,9 @@ class TransactionHistory extends Projection {
 
     /** @var Fraction */
     private $total;
+
+    /** @var Currency[] */
+    private $currencies = [];
 
     public function __construct(AccountIdentifier $account) {
         $this->account = $account;
@@ -40,29 +45,36 @@ class TransactionHistory extends Projection {
 
     protected function applyCoinsSent(CoinsSent $e) {
         if ($e->getOwner() == $this->account) {
-            $sum = $this->sum($e->getSentCoins());
-            $this->transactions[] = new Transaction(
+            $this->addTransaction(
                 $e->getWhen(),
                 $e->getCurrency(),
-                $sum->negative(),
-                $e->getSubject()
-            );
-            $this->total = $this->total->minus($sum);
+                $this->sum($e->getSentCoins())->negative(),
+                $e->getSubject());
         }
     }
 
     protected function applyCoinsDelivered(CoinsDelivered $e) {
         if ($e->getTarget() == $this->account) {
-            $sum = $this->sum($e->getCoins());
-            $this->transactions[] = new Transaction(
+            $this->addTransaction(
                 $e->getWhen(),
                 $e->getCurrency(),
-                $sum,
-                $e->getSubject()
-            );
-            $this->total = $this->total->plus($sum);
-
+                $this->sum($e->getCoins()),
+                $e->getSubject());
         }
+    }
+
+    protected function applyCurrencyRegistered(CurrencyRegistered $e) {
+        $this->getCurrency($e->getCurrency())->setName($e->getName());
+    }
+
+    private function addTransaction(\DateTimeImmutable $when, CurrencyIdentifier $currency, Fraction $amount, $subject) {
+        $this->transactions[] = new Transaction(
+            $when,
+            $this->getCurrency($currency),
+            $amount,
+            $subject
+        );
+        $this->total = $this->total->plus($amount);
     }
 
     /**
@@ -78,5 +90,12 @@ class TransactionHistory extends Projection {
             $sum = $sum->plus($coin->getFraction());
         }
         return $sum;
+    }
+
+    private function getCurrency(CurrencyIdentifier $currency) {
+        if (!array_key_exists((string)$currency, $this->currencies)) {
+            $this->currencies[(string)$currency] = new Currency($currency);
+        }
+        return $this->currencies[(string)$currency];
     }
 }
