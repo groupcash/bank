@@ -3,6 +3,7 @@ namespace spec\groupcash\bank;
 
 use groupcash\bank\model\Authentication;
 use groupcash\bank\model\Authenticator;
+use groupcash\bank\model\CreatedAccount;
 use rtens\scrut\Assert;
 use spec\groupcash\bank\fakes\FakeCryptography;
 use spec\groupcash\bank\fakes\FakeRandomNumberGenerator;
@@ -19,18 +20,12 @@ class CreateAccountSpec {
 
     function withoutPassword() {
         $this->scenario->when->ICreateAnAccountWithPassword(null);
-        $this->scenario->then->itShouldReturn([
-            'key' => 'private key',
-            'address' => 'key'
-        ]);
+        $this->scenario->then->itShouldReturn(new CreatedAccount('key', 'private key'));
     }
 
     function withPassword() {
         $this->scenario->when->ICreateAnAccountWithPassword('password');
-        $this->scenario->then->itShouldReturn([
-            'key' => 'private key encrypted with secretpassword',
-            'address' => 'key'
-        ]);
+        $this->scenario->then->itShouldReturn(new CreatedAccount('key', 'private key encrypted with secretpassword'));
     }
 
     function authenticate() {

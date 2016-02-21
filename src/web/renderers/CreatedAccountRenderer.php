@@ -1,6 +1,7 @@
 <?php
 namespace groupcash\bank\web\renderers;
 
+use groupcash\bank\model\CreatedAccount;
 use rtens\domin\ActionRegistry;
 use rtens\domin\delivery\RendererRegistry;
 use rtens\domin\delivery\web\Element;
@@ -29,22 +30,29 @@ class CreatedAccountRenderer extends ListRenderer {
      * @return bool
      */
     public function handles($value) {
-        return is_array($value) && array_keys($value) == ['key', 'address'];
+        return $value instanceof CreatedAccount;
     }
 
     /**
-     * @param array $keys
+     * @param CreatedAccount $createdAccount
      * @return mixed
      */
-    public function render($keys) {
-        return parent::render([
-            $this->keyPanel('Private Key', $keys['key']),
-            $this->codePanel('Private Code', 'This code contains your private key. Handle with care.', $keys['key']),
-            $this->keyPanel('Public Address', $keys['address']),
+    public function render($createdAccount) {
+        $panels = [
+            $this->keyPanel('Public Address', $createdAccount->getAddress()),
             $this->codePanel('Send Coins',
                 'You can use this QR code to send coins to the created account.',
-                $this->sendCoinsUrl . '?target='. $keys['address'])
-        ]);
+                $this->sendCoinsUrl . '?target=' . $createdAccount->getAddress())
+        ];
+
+        if ($createdAccount->getKey()) {
+            $panels[] = $this->keyPanel('Private Key', $createdAccount->getKey());
+            $panels[] = $this->codePanel('Private Code',
+                'This code contains your private key. Handle with care.',
+                $createdAccount->getKey());
+        }
+
+        return parent::render($panels);
     }
 
     private function keyPanel($heading, $content) {

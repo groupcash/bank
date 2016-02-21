@@ -76,10 +76,7 @@ class Bank extends AggregateRoot {
     public function handleCreateAccount(CreateAccount $c) {
         $key = $this->lib->generateKey();
 
-        return [
-            'key' => $this->auth->encrypt($key, $c->getPassword()),
-            'address' => $this->lib->getAddress($key)
-        ];
+        return new CreatedAccount($this->lib->getAddress($key), $this->auth->encrypt($key, $c->getPassword()));
     }
 
     public function handleRegisterCurrency(RegisterCurrency $c) {
@@ -134,10 +131,7 @@ class Bank extends AggregateRoot {
             $c->getName()
         ));
 
-        return [
-            'key' => $key,
-            'address' => $address
-        ];
+        return new CreatedAccount($address);
     }
 
     protected function handleAddExistingBacker(AddExistingBacker $c) {
