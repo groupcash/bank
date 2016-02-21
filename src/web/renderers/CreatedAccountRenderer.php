@@ -62,7 +62,7 @@ class CreatedAccountRenderer extends ListRenderer {
             ]),
             new Element('a', [
                 'class' => 'btn btn-success',
-                'download' => str_replace(' ', '_', strtolower($heading)) . '_' . substr(md5($content), -6),
+                'download' => str_replace(' ', '_', strtolower($heading)) . '_' . date('YmdHis'),
                 'href' => 'data:text/plain;base64,' . base64_encode($content),
                 'target' => '_blank'
             ], [
