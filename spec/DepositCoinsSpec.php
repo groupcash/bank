@@ -88,12 +88,6 @@ class DepositCoinsSpec {
         $this->scenario->then->itShouldFailWith('Could not validate coin 1: Coin could not be verified.');
     }
 
-    function doubleSpentCoin() {
-    }
-
-    function doubleSpentFraction() {
-    }
-
     private function _WithSerial_Promising_IssuedTo($currency, $serial, $promise, $backer) {
         return Coin::issue(new Promise(
             $currency,
