@@ -1,12 +1,14 @@
 <?php
 namespace groupcash\bank;
 
-use groupcash\bank\app\sourced\messaging\Command;
+use groupcash\bank\app\ApplicationCommand;
+use groupcash\bank\app\sourced\domain\AggregateIdentifier;
 use groupcash\bank\model\Authentication;
+use groupcash\bank\model\Authenticator;
 use groupcash\bank\model\BackerIdentifier;
 use groupcash\bank\model\CurrencyIdentifier;
 
-class DeclarePromise implements Command{
+class DeclarePromise implements ApplicationCommand {
 
     /** @var Authentication */
     private $issuer;
@@ -81,5 +83,13 @@ class DeclarePromise implements Command{
      */
     public function getLimit() {
         return $this->limit;
+    }
+
+    /**
+     * @param Authenticator $authenticator
+     * @return AggregateIdentifier
+     */
+    public function getAggregateIdentifier(Authenticator $authenticator) {
+        return $this->backer;
     }
 }

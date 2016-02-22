@@ -1,11 +1,13 @@
 <?php
-namespace spec\groupcash\bank;
+namespace spec\groupcash\bank\basic;
 
 use groupcash\bank\model\Authentication;
 use groupcash\bank\model\Authenticator;
 use groupcash\bank\model\CreatedAccount;
+use groupcash\php\Groupcash;
 use rtens\scrut\Assert;
 use spec\groupcash\bank\fakes\FakeCryptography;
+use spec\groupcash\bank\fakes\FakeKeyService;
 use spec\groupcash\bank\fakes\FakeRandomNumberGenerator;
 use spec\groupcash\bank\fakes\FakeVault;
 use spec\groupcash\bank\scenario\Scenario;
@@ -29,7 +31,10 @@ class CreateAccountSpec {
     }
 
     function authenticate() {
-        $auth = new Authenticator(new FakeCryptography(), new FakeVault(new FakeRandomNumberGenerator('secret ')));
+        $auth = new Authenticator(
+            new FakeCryptography(),
+            new FakeVault(new FakeRandomNumberGenerator('secret ')),
+            new Groupcash(new FakeKeyService()));
 
         $this->assert->equals($auth->getKey(new Authentication('key')), 'key');
         $this->assert->equals($auth->getKey(new Authentication('key encrypted with secret password', 'password')), 'key');

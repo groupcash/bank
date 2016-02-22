@@ -1,6 +1,8 @@
 <?php
 namespace groupcash\bank\model;
 
-class BackerIdentifier extends Identifier {
+use groupcash\bank\app\sourced\domain\AggregateIdentifier;
+
+class BackerIdentifier extends Identifier implements AggregateIdentifier {
 
 }

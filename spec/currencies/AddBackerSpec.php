@@ -1,5 +1,5 @@
 <?php
-namespace spec\groupcash\bank;
+namespace spec\groupcash\bank\currencies;
 use spec\groupcash\bank\scenario\Scenario;
 
 /**
@@ -7,7 +7,7 @@ use spec\groupcash\bank\scenario\Scenario;
  *
  * @property Scenario scenario <-
  */
-class AddBackerToCurrencySpec {
+class AddBackerSpec {
 
     function before() {
         $this->scenario->given->_Authorizes('foo', 'issuer');
@@ -26,8 +26,8 @@ class AddBackerToCurrencySpec {
     }
 
     function backerDoesNotExist() {
-        $this->scenario->tryThat->_Adds_To('issuer', 'not backer', 'foo');
-        $this->scenario->then->itShouldFailWith('This backer does not exist.');
+        $this->scenario->when->_Adds_To('issuer', 'not backer', 'foo');
+        $this->scenario->then->allShouldBeFine();
     }
 
     function success() {

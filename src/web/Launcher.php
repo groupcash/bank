@@ -1,8 +1,7 @@
 <?php
 namespace groupcash\bank\web;
 
-use groupcash\bank\CreateBacker;
-use groupcash\bank\AddBacker;
+use groupcash\bank\AddBackerToCurrency;
 use groupcash\bank\app\Application;
 use groupcash\bank\app\McryptCryptography;
 use groupcash\bank\app\OpenSslRandomNumberGenerator;
@@ -10,6 +9,7 @@ use groupcash\bank\app\PersistentVault;
 use groupcash\bank\app\sourced\store\PersistentEventStore;
 use groupcash\bank\AuthorizeIssuer;
 use groupcash\bank\CreateAccount;
+use groupcash\bank\CreateBacker;
 use groupcash\bank\DeclarePromise;
 use groupcash\bank\IssueCoins;
 use groupcash\bank\ListTransactions;
@@ -20,17 +20,16 @@ use groupcash\bank\projecting\TransactionHistory;
 use groupcash\bank\RegisterCurrency;
 use groupcash\bank\SendCoins;
 use groupcash\bank\web\fields\AccountIdentifierField;
-use groupcash\bank\web\fields\QrCodeField;
 use groupcash\bank\web\fields\AuthenticationField;
 use groupcash\bank\web\fields\BackerIdentifierField;
 use groupcash\bank\web\fields\CurrencyIdentifierField;
 use groupcash\bank\web\fields\FractionField;
 use groupcash\bank\web\fields\IdentifierField;
 use groupcash\bank\web\fields\PasswordField;
+use groupcash\bank\web\fields\QrCodeField;
 use groupcash\bank\web\renderers\CoinsRenderer;
 use groupcash\bank\web\renderers\CreatedAccountRenderer;
 use groupcash\bank\web\renderers\CurrencyRenderer;
-use groupcash\bank\WithdrawCoins;
 use groupcash\php\Groupcash;
 use groupcash\php\impl\EccKeyService;
 use rtens\domin\delivery\web\adapters\curir\root\IndexResource;
@@ -77,9 +76,9 @@ class Launcher {
         $vault = new PersistentVault($this->random, $rootDir . '/user');
         $crypto = new McryptCryptography();
 
-        $this->authenticator = new Authenticator($crypto, $vault);
-
         $this->lib = new Groupcash(new EccKeyService());
+        $this->authenticator = new Authenticator($crypto, $vault, $this->lib);
+
         $this->app = new Application(
             new PersistentEventStore($rootDir . '/user/data'),
             $crypto,
@@ -107,10 +106,9 @@ class Launcher {
         $this->addAction($domin, RegisterCurrency::class);
         $this->addAction($domin, AuthorizeIssuer::class);
         $this->addAction($domin, CreateBacker::class);
-        $this->addAction($domin, AddBacker::class);
+        $this->addAction($domin, AddBackerToCurrency::class);
         $this->addAction($domin, DeclarePromise::class);
         $this->addAction($domin, IssueCoins::class);
-        $this->addAction($domin, WithdrawCoins::class);
         $this->addAction($domin, SendCoins::class);
         $this->addAction($domin, ListTransactions::class)
             ->setModifying(false)

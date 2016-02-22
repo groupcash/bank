@@ -16,18 +16,29 @@ class CoinsIssued extends DomainEvent {
 
     /** @var Coin[] */
     private $coins;
+    /** @var string */
+    private $promise;
 
     /**
      * @param CurrencyIdentifier $currency
      * @param BackerIdentifier $backer
+     * @param string $promise
      * @param Coin[] $coins
      */
-    public function __construct(CurrencyIdentifier $currency, BackerIdentifier $backer, array $coins) {
+    public function __construct(CurrencyIdentifier $currency, BackerIdentifier $backer, $promise, array $coins) {
         parent::__construct();
 
         $this->coins = $coins;
         $this->currency = $currency;
         $this->backer = $backer;
+        $this->promise = $promise;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPromise() {
+        return $this->promise;
     }
 
     /**

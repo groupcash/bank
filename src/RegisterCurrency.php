@@ -1,10 +1,13 @@
 <?php
 namespace groupcash\bank;
 
-use groupcash\bank\app\sourced\messaging\Command;
+use groupcash\bank\app\ApplicationCommand;
+use groupcash\bank\app\sourced\domain\AggregateIdentifier;
 use groupcash\bank\model\AccountIdentifier;
+use groupcash\bank\model\Authenticator;
+use groupcash\bank\model\BankIdentifier;
 
-class RegisterCurrency implements Command {
+class RegisterCurrency implements ApplicationCommand {
 
     /** @var AccountIdentifier */
     private $currency;
@@ -38,5 +41,13 @@ class RegisterCurrency implements Command {
      */
     public function getName() {
         return $this->name;
+    }
+
+    /**
+     * @param Authenticator $authenticator
+     * @return AggregateIdentifier
+     */
+    public function getAggregateIdentifier(Authenticator $authenticator) {
+        return BankIdentifier::singleton();
     }
 }

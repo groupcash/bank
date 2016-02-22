@@ -1,5 +1,5 @@
 <?php
-namespace spec\groupcash\bank;
+namespace spec\groupcash\bank\trading;
 
 use spec\groupcash\bank\scenario\Scenario;
 
@@ -19,7 +19,7 @@ class SendCoinsSpec {
 
     function noCoins() {
         $this->scenario->tryThat->_Sends__To('bart', 1, 'foo', 'lisa');
-        $this->scenario->then->itShouldFailWith('Not sufficient coins of this currency available in account.');
+        $this->scenario->then->itShouldFailWith('No coins of this currency available in account.');
     }
 
     function notEnoughCoins() {

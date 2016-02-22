@@ -1,5 +1,6 @@
 <?php
-namespace spec\groupcash\bank;
+namespace spec\groupcash\bank\trading;
+
 use spec\groupcash\bank\scenario\Scenario;
 
 /**
@@ -10,6 +11,8 @@ use spec\groupcash\bank\scenario\Scenario;
 class AvoidDoubleSpendingSpec {
 
     function before() {
+        $this->scenario->blockedBy('Confirmation');
+
         $this->scenario->given->_Authorizes('foo', 'issuer');
         $this->scenario->given->ICreateABacker('backer');
         $this->scenario->given->_Adds_To('issuer', 'backer', 'foo');

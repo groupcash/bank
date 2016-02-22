@@ -1,11 +1,13 @@
 <?php
 namespace groupcash\bank;
 
-use groupcash\bank\app\sourced\messaging\Command;
+use groupcash\bank\app\ApplicationCommand;
+use groupcash\bank\app\sourced\domain\AggregateIdentifier;
 use groupcash\bank\model\AccountIdentifier;
+use groupcash\bank\model\Authenticator;
 use groupcash\php\model\Coin;
 
-class DepositCoins implements Command {
+class DepositCoins implements ApplicationCommand {
 
     /** @var Coin[] */
     private $coins;
@@ -34,5 +36,13 @@ class DepositCoins implements Command {
      */
     public function getCoins() {
         return $this->coins;
+    }
+
+    /**
+     * @param Authenticator $authenticator
+     * @return AggregateIdentifier
+     */
+    public function getAggregateIdentifier(Authenticator $authenticator) {
+        return $this->account;
     }
 }

@@ -1,6 +1,8 @@
 <?php
 namespace groupcash\bank\model;
 
-class CurrencyIdentifier extends Identifier {
+use groupcash\bank\app\sourced\domain\AggregateIdentifier;
+
+class CurrencyIdentifier extends Identifier implements AggregateIdentifier {
 
 }

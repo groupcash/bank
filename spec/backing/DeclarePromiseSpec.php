@@ -1,5 +1,5 @@
 <?php
-namespace spec\groupcash\bank;
+namespace spec\groupcash\bank\backing;
 
 use spec\groupcash\bank\scenario\Scenario;
 
@@ -16,16 +16,6 @@ class DeclarePromiseSpec {
         $this->scenario->given->_Adds_To('issuer', 'backer', 'foo');
     }
 
-    function notAnIssuer() {
-        $this->scenario->tryThat->_Declares_Of_By_For('not issuer', 1, 'My Promise', 'backer', 'foo');
-        $this->scenario->then->itShouldFailWith('This is not an issuer of this currency.');
-    }
-
-    function issuerOfOtherCurrency() {
-        $this->scenario->tryThat->_Declares_Of_By_For('issuer', 1, 'My Promise', 'backer', 'not foo');
-        $this->scenario->then->itShouldFailWith('This is not an issuer of this currency.');
-    }
-
     function notABacker() {
         $this->scenario->tryThat->_Declares_Of_By_For('issuer', 1, 'My Promise', 'not backer', 'foo');
         $this->scenario->then->itShouldFailWith('This backer was not added to this currency.');
@@ -36,6 +26,18 @@ class DeclarePromiseSpec {
 
         $this->scenario->tryThat->_Declares_Of_By_For('issuer', 1, 'My Promise', 'backer', 'not foo');
         $this->scenario->then->itShouldFailWith('This backer was not added to this currency.');
+    }
+
+    function notAnIssuer() {
+        $this->scenario->tryThat->_Declares_Of_By_For('not issuer', 1, 'My Promise', 'backer', 'foo');
+        $this->scenario->then->itShouldFailWith('This is not an issuer of this currency.');
+    }
+
+    function issuerOfOtherCurrency() {
+        $this->scenario->given->_Authorizes('not foo', 'not issuer');
+        $this->scenario->given->_Adds_To('not issuer', 'backer', 'not foo');
+        $this->scenario->tryThat->_Declares_Of_By_For('issuer', 1, 'My Promise', 'backer', 'not foo');
+        $this->scenario->then->itShouldFailWith('This is not an issuer of this currency.');
     }
 
     function success() {

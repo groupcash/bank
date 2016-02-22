@@ -6,7 +6,7 @@ use groupcash\bank\model\AccountIdentifier;
 use groupcash\bank\model\BackerIdentifier;
 use groupcash\bank\model\CurrencyIdentifier;
 
-class BackerAdded extends DomainEvent {
+class CurrencyAdded extends DomainEvent {
 
     /** @var BackerIdentifier */
     private $backer;
@@ -18,11 +18,11 @@ class BackerAdded extends DomainEvent {
     private $issuer;
 
     /**
-     * @param AccountIdentifier $issuer
-     * @param CurrencyIdentifier $currency
      * @param BackerIdentifier $backer
+     * @param CurrencyIdentifier $currency
+     * @param AccountIdentifier $issuer
      */
-    public function __construct(AccountIdentifier $issuer, CurrencyIdentifier $currency, BackerIdentifier $backer) {
+    public function __construct(BackerIdentifier $backer, CurrencyIdentifier $currency, AccountIdentifier $issuer) {
         parent::__construct();
 
         $this->backer = $backer;

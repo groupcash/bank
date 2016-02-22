@@ -1,5 +1,5 @@
 <?php
-namespace spec\groupcash\bank;
+namespace spec\groupcash\bank\basic;
 
 use spec\groupcash\bank\scenario\Scenario;
 

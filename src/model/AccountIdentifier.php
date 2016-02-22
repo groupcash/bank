@@ -1,6 +1,8 @@
 <?php
 namespace groupcash\bank\model;
 
-class AccountIdentifier extends Identifier {
+use groupcash\bank\app\sourced\domain\AggregateIdentifier;
+
+class AccountIdentifier extends Identifier implements AggregateIdentifier{
 
 }

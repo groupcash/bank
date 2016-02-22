@@ -1,12 +1,14 @@
 <?php
 namespace groupcash\bank;
 
-use groupcash\bank\app\sourced\messaging\Command;
+use groupcash\bank\app\ApplicationCommand;
+use groupcash\bank\app\sourced\domain\AggregateIdentifier;
 use groupcash\bank\model\Authentication;
+use groupcash\bank\model\Authenticator;
 use groupcash\bank\model\BackerIdentifier;
 use groupcash\bank\model\CurrencyIdentifier;
 
-class AddBacker implements Command {
+class AddBackerToCurrency implements ApplicationCommand {
 
     /** @var BackerIdentifier */
     private $backer;
@@ -47,5 +49,13 @@ class AddBacker implements Command {
      */
     public function getIssuer() {
         return $this->issuer;
+    }
+
+    /**
+     * @param Authenticator $authenticator
+     * @return AggregateIdentifier
+     */
+    public function getAggregateIdentifier(Authenticator $authenticator) {
+        return $this->currency;
     }
 }
