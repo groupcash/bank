@@ -12,6 +12,7 @@ class IssueCoinsSpec {
 
     function before() {
         $this->scenario->given->_Authorizes('foo', 'issuer');
+        $this->scenario->given->ICreateABacker('backer');
         $this->scenario->given->_Adds_To('issuer', 'backer', 'foo');
         $this->scenario->given->_Declares_Of_By_For('issuer', 3, 'My Promise', 'backer', 'foo');
     }
@@ -34,14 +35,16 @@ class IssueCoinsSpec {
 
     function backerOfOtherCurrency() {
         $this->scenario->given->_Authorizes('not foo', 'issuer');
-        $this->scenario->given->_Adds_To('issuer', 'other backer', 'not foo');
+        $this->scenario->given->ICreateABacker('other backer');
 
         $this->scenario->tryThat->_issues__to('issuer', 1, 'foo', 'other backer');
         $this->scenario->then->itShouldFailWith('This backer was not added to this currency.');
     }
 
     function noPromiseDeclared() {
+        $this->scenario->given->ICreateABacker('other backer');
         $this->scenario->given->_Adds_To('issuer', 'other backer', 'foo');
+
         $this->scenario->tryThat->_issues__to('issuer', 1, 'foo', 'other backer');
         $this->scenario->then->itShouldFailWith('This backer has declared no promise.');
     }

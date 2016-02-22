@@ -12,6 +12,7 @@ class SendCoinsSpec {
 
     function before() {
         $this->scenario->given->_Authorizes('foo', 'issuer');
+        $this->scenario->given->ICreateABacker('bart');
         $this->scenario->given->_Adds_To('issuer', 'bart', 'foo');
         $this->scenario->given->_Declares_Of_By_For('issuer', 5, 'My Promise', 'bart', 'foo');
     }

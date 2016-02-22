@@ -19,20 +19,20 @@ class ListBackersSpec {
     }
 
     function oneBacker() {
-        $this->scenario->given->_Adds_To_Named('issuer', 'backer', 'foo', 'The Backer');
+        $this->scenario->given->ICreateABacker_Named('backer', 'The Backer');
 
         $this->scenario->when->IListAllBackers();
         $this->scenario->then->thereShouldBe_Backers(1);
 
-        $this->scenario->then->backer_shouldHaveTheCurrencies(1, ['foo']);
+        $this->scenario->then->backer_shouldHaveTheCurrencies(1, []);
         $this->scenario->then->backer_shouldHaveTheName(1, 'The Backer');
         $this->scenario->then->backer_shouldHaveTheAddress(1, 'backer');
     }
 
     function sortByName() {
-        $this->scenario->given->_Adds_To_Named('issuer', 'backer foo', 'foo', 'B');
-        $this->scenario->given->_Adds_To_Named('issuer', 'backer bar', 'foo', 'A');
-        $this->scenario->given->_Adds_To_Named('issuer', 'backer baz', 'foo', 'C');
+        $this->scenario->given->ICreateABacker_Named('backer foo', 'B');
+        $this->scenario->given->ICreateABacker_Named('backer bar', 'A');
+        $this->scenario->given->ICreateABacker_Named('backer baz', 'C');
 
         $this->scenario->when->IListAllBackers();
 
@@ -42,9 +42,22 @@ class ListBackersSpec {
         $this->scenario->then->backer_shouldHaveTheName(3, 'C');
     }
 
-    function multipleCurrencies() {
+    function oneCurrency() {
+        $this->scenario->given->ICreateABacker_Named('backer', 'The Backer');
         $this->scenario->given->_Adds_To('issuer', 'backer', 'foo');
-        $this->scenario->given->_AddsExisting_To('issuer', 'backer', 'bar');
+
+        $this->scenario->when->IListAllBackers();
+        $this->scenario->then->thereShouldBe_Backers(1);
+
+        $this->scenario->then->backer_shouldHaveTheCurrencies(1, ['foo']);
+        $this->scenario->then->backer_shouldHaveTheName(1, 'The Backer');
+        $this->scenario->then->backer_shouldHaveTheAddress(1, 'backer');
+    }
+
+    function multipleCurrencies() {
+        $this->scenario->given->ICreateABacker('backer');
+        $this->scenario->given->_Adds_To('issuer', 'backer', 'foo');
+        $this->scenario->given->_Adds_To('issuer', 'backer', 'bar');
 
         $this->scenario->when->IListAllBackers();
 

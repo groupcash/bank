@@ -12,6 +12,7 @@ class DeclarePromiseSpec {
 
     function before() {
         $this->scenario->given->_Authorizes('foo', 'issuer');
+        $this->scenario->given->ICreateABacker('backer');
         $this->scenario->given->_Adds_To('issuer', 'backer', 'foo');
     }
 

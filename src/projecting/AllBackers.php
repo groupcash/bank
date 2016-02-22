@@ -26,11 +26,13 @@ class AllBackers extends Projection {
         $backers = [];
         foreach ($this->backerNames as $backer => $name) {
             $currencies = [];
-            foreach ($this->backerCurrencies[$backer] as $currency) {
-                if (array_key_exists((string)$currency, $this->registeredCurrencies)) {
-                    $currencies[] = $this->registeredCurrencies[(string)$currency];
-                } else {
-                    $currencies[] = new Currency($currency);
+            if (array_key_exists($backer, $this->backerCurrencies)) {
+                foreach ($this->backerCurrencies[$backer] as $currency) {
+                    if (array_key_exists((string)$currency, $this->registeredCurrencies)) {
+                        $currencies[] = $this->registeredCurrencies[(string)$currency];
+                    } else {
+                        $currencies[] = new Currency($currency);
+                    }
                 }
             }
 

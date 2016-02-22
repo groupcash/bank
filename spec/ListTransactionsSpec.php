@@ -13,6 +13,7 @@ class ListTransactionsSpec {
     function before() {
         $this->scenario->given->nowIs('2010-11-12');
         $this->scenario->given->_Authorizes('foo', 'issuer');
+        $this->scenario->given->ICreateABacker('bart');
         $this->scenario->given->_Adds_To('issuer', 'bart', 'foo');
         $this->scenario->given->_Declares_Of_By_For('issuer', 10, 'My Promise', 'bart', 'foo');
         $this->scenario->given->_issues__to('issuer', 10, 'foo', 'bart');
@@ -57,7 +58,9 @@ class ListTransactionsSpec {
     }
 
     function issuedCoins() {
+        $this->scenario->given->ICreateABacker('apu');
         $this->scenario->given->_Adds_To('issuer', 'apu', 'foo');
+
         $this->scenario->given->_Declares_Of_By_For('issuer', 10, 'My Promise', 'apu', 'foo');
 
         $this->scenario->given->nowIs('2010-11-12');

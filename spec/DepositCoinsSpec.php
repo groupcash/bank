@@ -16,6 +16,7 @@ class DepositCoinsSpec {
 
     function before() {
         $this->scenario->given->_Authorizes('foo', 'issuer');
+        $this->scenario->given->ICreateABacker('bart');
         $this->scenario->given->_Adds_To('issuer', 'bart', 'foo');
     }
 

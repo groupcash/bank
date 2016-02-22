@@ -3,9 +3,13 @@ namespace groupcash\bank;
 
 use groupcash\bank\app\sourced\messaging\Command;
 use groupcash\bank\model\Authentication;
+use groupcash\bank\model\BackerIdentifier;
 use groupcash\bank\model\CurrencyIdentifier;
 
 class AddBacker implements Command {
+
+    /** @var BackerIdentifier */
+    private $backer;
 
     /** @var CurrencyIdentifier */
     private $currency;
@@ -13,18 +17,22 @@ class AddBacker implements Command {
     /** @var Authentication */
     private $issuer;
 
-    /** @var string */
-    private $name;
-
     /**
      * @param Authentication $issuer
      * @param CurrencyIdentifier $currency
-     * @param string $name
+     * @param BackerIdentifier $backer
      */
-    public function __construct(Authentication $issuer, CurrencyIdentifier $currency, $name) {
+    public function __construct(Authentication $issuer, CurrencyIdentifier $currency, BackerIdentifier $backer) {
+        $this->backer = $backer;
         $this->currency = $currency;
         $this->issuer = $issuer;
-        $this->name = $name;
+    }
+
+    /**
+     * @return BackerIdentifier
+     */
+    public function getBacker() {
+        return $this->backer;
     }
 
     /**
@@ -39,12 +47,5 @@ class AddBacker implements Command {
      */
     public function getIssuer() {
         return $this->issuer;
-    }
-
-    /**
-     * @return string
-     */
-    public function getName() {
-        return $this->name;
     }
 }

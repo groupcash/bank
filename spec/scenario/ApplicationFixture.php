@@ -1,8 +1,8 @@
 <?php
 namespace spec\groupcash\bank\scenario;
 
+use groupcash\bank\CreateBacker;
 use groupcash\bank\AddBacker;
-use groupcash\bank\AddExistingBacker;
 use groupcash\bank\app\Application;
 use groupcash\bank\app\sourced\domain\Time;
 use groupcash\bank\AuthorizeIssuer;
@@ -130,22 +130,20 @@ class ApplicationFixture {
         ));
     }
 
-    public function _Adds_To($issuer, $backer, $currency) {
-        $this->_Adds_To_Named($issuer, $backer, $currency, ucfirst($backer));
+    public function ICreateABacker($backer) {
+        $this->ICreateABacker_Named($backer, "name of $backer");
     }
 
-    public function _Adds_To_Named($issuer, $backer, $currency, $name) {
+    public function ICreateABacker_Named($backer, $name) {
         $this->key->nextKey = $backer;
 
-        $this->app->handle(new AddBacker(
-            new Authentication("private $issuer"),
-            new CurrencyIdentifier($currency),
+        $this->app->handle(new CreateBacker(
             $name
         ));
     }
 
-    public function _AddsExisting_To($issuer, $backer, $currency) {
-        $this->app->handle(new AddExistingBacker(
+    public function _Adds_To($issuer, $backer, $currency) {
+        $this->app->handle(new AddBacker(
             new Authentication("private $issuer"),
             new CurrencyIdentifier($currency),
             new BackerIdentifier($backer)

@@ -11,6 +11,7 @@ class AvoidDoubleSpendingSpec {
 
     function before() {
         $this->scenario->given->_Authorizes('foo', 'issuer');
+        $this->scenario->given->ICreateABacker('backer');
         $this->scenario->given->_Adds_To('issuer', 'backer', 'foo');
         $this->scenario->given->_Declares_Of_By_For('issuer', 1, 'Promise', 'backer', 'foo');
         $this->scenario->given->_issues__to('issuer', 1, 'foo', 'backer');

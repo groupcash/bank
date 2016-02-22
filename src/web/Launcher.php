@@ -1,8 +1,8 @@
 <?php
 namespace groupcash\bank\web;
 
+use groupcash\bank\CreateBacker;
 use groupcash\bank\AddBacker;
-use groupcash\bank\AddExistingBacker;
 use groupcash\bank\app\Application;
 use groupcash\bank\app\McryptCryptography;
 use groupcash\bank\app\OpenSslRandomNumberGenerator;
@@ -106,8 +106,8 @@ class Launcher {
         $this->addAction($domin, CreateAccount::class);
         $this->addAction($domin, RegisterCurrency::class);
         $this->addAction($domin, AuthorizeIssuer::class);
+        $this->addAction($domin, CreateBacker::class);
         $this->addAction($domin, AddBacker::class);
-        $this->addAction($domin, AddExistingBacker::class);
         $this->addAction($domin, DeclarePromise::class);
         $this->addAction($domin, IssueCoins::class);
         $this->addAction($domin, WithdrawCoins::class);

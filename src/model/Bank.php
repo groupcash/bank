@@ -1,8 +1,8 @@
 <?php
 namespace groupcash\bank\model;
 
+use groupcash\bank\CreateBacker;
 use groupcash\bank\AddBacker;
-use groupcash\bank\AddExistingBacker;
 use groupcash\bank\app\sourced\domain\AggregateRoot;
 use groupcash\bank\AuthorizeIssuer;
 use groupcash\bank\CreateAccount;
@@ -65,6 +65,9 @@ class Bank extends AggregateRoot {
     /** @var Authorization[][] indexed by currency */
     private $authorizations = [];
 
+    /** @var string[] */
+    private $takenBackerNames = [];
+
     /**
      * @param Groupcash $lib
      * @param Authenticator $auth
@@ -119,22 +122,18 @@ class Bank extends AggregateRoot {
         $this->authorizations[(string)$e->getCurrency()][] = $e->getAuthorization();
     }
 
-    public function handleAddBacker(AddBacker $c) {
-        $this->guardIssuerOfCurrency($c->getIssuer(), $c->getCurrency());
-
+    public function handleCreateBacker(CreateBacker $c) {
         $key = $this->lib->generateKey();
         $address = $this->lib->getAddress($key);
 
+        if (in_array($c->getName(), $this->takenBackerNames)) {
+            throw new \Exception('A backer with this name already exists.');
+        }
+
         $this->record(new BackerCreated(
-            $c->getCurrency(),
             new BackerIdentifier($address),
             $key,
             $c->getName()
-        ));
-
-        $this->record(new BackerAdded(
-            $c->getCurrency(),
-            new BackerIdentifier($address)
         ));
 
         return new CreatedAccount($address);
@@ -143,12 +142,13 @@ class Bank extends AggregateRoot {
     protected function applyBackerCreated(BackerCreated $e) {
         $this->backerKeys[(string)$e->getBacker()] = $e->getBackerKey();
         $this->backerNames[(string)$e->getBacker()] = $e->getName();
+        $this->takenBackerNames[] = $e->getName();
     }
 
-    protected function handleAddExistingBacker(AddExistingBacker $c) {
+    protected function handleAddBacker(AddBacker $c) {
         $this->guardIssuerOfCurrency($c->getIssuer(), $c->getCurrency());
 
-        if (!$this->get($this->backers, [$c->getBacker()], null)) {
+        if (!$this->get($this->backerNames, [$c->getBacker()], null)) {
             throw new \Exception('This backer does not exist.');
         }
 
