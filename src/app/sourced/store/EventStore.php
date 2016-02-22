@@ -1,8 +1,8 @@
 <?php
 namespace groupcash\bank\app\sourced\store;
 
+use groupcash\bank\app\sourced\domain\AggregateIdentifier;
 use groupcash\bank\app\sourced\domain\EventStream;
-use groupcash\bank\app\sourced\messaging\Identifier;
 
 interface EventStore {
 
@@ -12,21 +12,21 @@ interface EventStore {
     public function readAll();
 
     /**
-     * @param Identifier $aggregateIdentifier
+     * @param AggregateIdentifier $aggregateIdentifier
      * @return EventStream
      */
-    public function read(Identifier $aggregateIdentifier);
+    public function read(AggregateIdentifier $aggregateIdentifier);
 
     /**
-     * @param Identifier $aggregateIdentifier
+     * @param AggregateIdentifier $aggregateIdentifier
      * @param EventStream $stream
      * @return
      */
-    public function save(Identifier $aggregateIdentifier, EventStream $stream);
+    public function save(AggregateIdentifier $aggregateIdentifier, EventStream $stream);
 
     /**
-     * @param Identifier $aggregateIdentifier
+     * @param AggregateIdentifier $aggregateIdentifier
      * @return boolean
      */
-    public function has(Identifier $aggregateIdentifier);
+    public function has(AggregateIdentifier $aggregateIdentifier);
 }

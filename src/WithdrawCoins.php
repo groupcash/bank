@@ -2,9 +2,7 @@
 namespace groupcash\bank;
 
 use groupcash\bank\app\sourced\messaging\Command;
-use groupcash\bank\app\sourced\messaging\Identifier;
 use groupcash\bank\model\Authentication;
-use groupcash\bank\model\BankIdentifier;
 use groupcash\bank\model\CurrencyIdentifier;
 use groupcash\php\model\Fraction;
 
@@ -49,12 +47,5 @@ class WithdrawCoins implements Command {
      */
     public function getCurrency() {
         return $this->currency;
-    }
-
-    /**
-     * @return Identifier
-     */
-    public function getAggregateIdentifier() {
-        return BankIdentifier::singleton();
     }
 }

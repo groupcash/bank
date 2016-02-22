@@ -2,9 +2,7 @@
 namespace groupcash\bank;
 
 use groupcash\bank\app\sourced\messaging\Command;
-use groupcash\bank\app\sourced\messaging\Identifier;
 use groupcash\bank\model\AccountIdentifier;
-use groupcash\bank\model\BankIdentifier;
 
 class RegisterCurrency implements Command {
 
@@ -40,12 +38,5 @@ class RegisterCurrency implements Command {
      */
     public function getName() {
         return $this->name;
-    }
-
-    /**
-     * @return Identifier
-     */
-    public function getAggregateIdentifier() {
-        return BankIdentifier::singleton();
     }
 }

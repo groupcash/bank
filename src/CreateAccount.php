@@ -2,8 +2,6 @@
 namespace groupcash\bank;
 
 use groupcash\bank\app\sourced\messaging\Command;
-use groupcash\bank\app\sourced\messaging\Identifier;
-use groupcash\bank\model\BankIdentifier;
 
 class CreateAccount implements Command {
 
@@ -22,12 +20,5 @@ class CreateAccount implements Command {
      */
     public function getPassword() {
         return $this->password;
-    }
-
-    /**
-     * @return Identifier
-     */
-    public function getAggregateIdentifier() {
-        return BankIdentifier::singleton();
     }
 }

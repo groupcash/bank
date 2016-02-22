@@ -1,6 +1,7 @@
 <?php
 namespace groupcash\bank\app;
 
+use groupcash\bank\app\sourced\domain\AggregateIdentifier;
 use groupcash\bank\app\sourced\domain\AggregateRoot;
 use groupcash\bank\app\sourced\Builder;
 use groupcash\bank\app\sourced\messaging\Command;
@@ -57,12 +58,18 @@ class Application implements Builder, DomainEventListener {
 
     /**
      * @param Command $command
+     * @return AggregateIdentifier
+     */
+    public function getAggregateIdentifier(Command $command) {
+        return BankIdentifier::singleton();
+    }
+
+    /**
+     * @param AggregateIdentifier $identifier
      * @return AggregateRoot
      * @throws \Exception
      */
-    public function buildAggregateRoot(Command $command) {
-        $identifier = $command->getAggregateIdentifier();
-
+    public function buildAggregateRoot(AggregateIdentifier $identifier) {
         if ($identifier instanceof BankIdentifier) {
             return new Bank($this->lib, $this->auth);
         }

@@ -1,8 +1,8 @@
 <?php
 namespace groupcash\bank\app\sourced\store;
 
+use groupcash\bank\app\sourced\domain\AggregateIdentifier;
 use groupcash\bank\app\sourced\domain\EventStream;
-use groupcash\bank\app\sourced\messaging\Identifier;
 use watoki\stores\file\FileStore;
 use watoki\stores\Store;
 
@@ -16,10 +16,10 @@ class PersistentEventStore implements EventStore {
     }
 
     /**
-     * @param Identifier $aggregateIdentifier
+     * @param AggregateIdentifier $aggregateIdentifier
      * @return EventStream
      */
-    public function read(Identifier $aggregateIdentifier) {
+    public function read(AggregateIdentifier $aggregateIdentifier) {
         $id = (string)$aggregateIdentifier;
         if (!$this->has($aggregateIdentifier)) {
             $this->store->create(new EventStream(), $id);
@@ -28,18 +28,18 @@ class PersistentEventStore implements EventStore {
     }
 
     /**
-     * @param Identifier $aggregateIdentifier
+     * @param AggregateIdentifier $aggregateIdentifier
      * @param EventStream $stream
      */
-    public function save(Identifier $aggregateIdentifier, EventStream $stream) {
+    public function save(AggregateIdentifier $aggregateIdentifier, EventStream $stream) {
         $this->store->update($stream);
     }
 
     /**
-     * @param Identifier $aggregateIdentifier
+     * @param AggregateIdentifier $aggregateIdentifier
      * @return boolean
      */
-    public function has(Identifier $aggregateIdentifier) {
+    public function has(AggregateIdentifier $aggregateIdentifier) {
         return $this->store->hasKey((string)$aggregateIdentifier);
     }
 

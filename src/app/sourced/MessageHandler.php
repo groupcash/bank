@@ -41,11 +41,11 @@ class MessageHandler {
     }
 
     private function handleCommand(Command $command) {
-        $identifier = $command->getAggregateIdentifier();
+        $identifier = $this->builder->getAggregateIdentifier($command);
 
         $stream = $this->store->read($identifier);
 
-        $aggregate = $this->builder->buildAggregateRoot($command);
+        $aggregate = $this->builder->buildAggregateRoot($identifier);
         $aggregate->reconstitute($stream);
 
         $returned = $aggregate->handle($command);

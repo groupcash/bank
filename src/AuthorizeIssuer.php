@@ -2,10 +2,8 @@
 namespace groupcash\bank;
 
 use groupcash\bank\app\sourced\messaging\Command;
-use groupcash\bank\app\sourced\messaging\Identifier;
 use groupcash\bank\model\AccountIdentifier;
 use groupcash\bank\model\Authentication;
-use groupcash\bank\model\BankIdentifier;
 
 class AuthorizeIssuer implements Command {
 
@@ -36,12 +34,5 @@ class AuthorizeIssuer implements Command {
      */
     public function getIssuer() {
         return $this->issuer;
-    }
-
-    /**
-     * @return Identifier
-     */
-    public function getAggregateIdentifier() {
-        return BankIdentifier::singleton();
     }
 }

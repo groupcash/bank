@@ -1,7 +1,7 @@
 <?php
 namespace groupcash\bank\web\fields;
 
-use groupcash\bank\app\sourced\messaging\Identifier;
+use groupcash\bank\model\Identifier;
 use rtens\domin\delivery\web\fields\StringField;
 use rtens\domin\Parameter;
 use watoki\reflect\type\ClassType;

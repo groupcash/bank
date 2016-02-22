@@ -2,9 +2,7 @@
 namespace groupcash\bank;
 
 use groupcash\bank\app\sourced\messaging\Command;
-use groupcash\bank\app\sourced\messaging\Identifier;
 use groupcash\bank\model\AccountIdentifier;
-use groupcash\bank\model\BankIdentifier;
 use groupcash\bank\model\CurrencyIdentifier;
 use groupcash\php\model\Coin;
 
@@ -61,12 +59,5 @@ class DeliverCoins implements Command {
      */
     public function getSubject() {
         return $this->subject;
-    }
-
-    /**
-     * @return Identifier
-     */
-    public function getAggregateIdentifier() {
-        return BankIdentifier::singleton();
     }
 }

@@ -2,9 +2,7 @@
 namespace groupcash\bank;
 
 use groupcash\bank\app\sourced\messaging\Command;
-use groupcash\bank\app\sourced\messaging\Identifier;
 use groupcash\bank\model\AccountIdentifier;
-use groupcash\bank\model\BankIdentifier;
 use groupcash\php\model\Coin;
 
 class DepositCoins implements Command {
@@ -36,12 +34,5 @@ class DepositCoins implements Command {
      */
     public function getCoins() {
         return $this->coins;
-    }
-
-    /**
-     * @return Identifier
-     */
-    public function getAggregateIdentifier() {
-        return BankIdentifier::singleton();
     }
 }
