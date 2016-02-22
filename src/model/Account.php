@@ -3,13 +3,18 @@ namespace groupcash\bank\model;
 
 use groupcash\bank\app\sourced\domain\AggregateRoot;
 use groupcash\bank\DeliverCoins;
+use groupcash\bank\DepositCoins;
 use groupcash\bank\events\CoinsDelivered;
 use groupcash\bank\events\CoinsSent;
+use groupcash\bank\events\CoinsWithdrawn;
 use groupcash\bank\events\TransferredCoin;
 use groupcash\bank\SendCoins;
+use groupcash\bank\WithdrawCoins;
 use groupcash\php\Groupcash;
 use groupcash\php\model\Coin;
 use groupcash\php\model\Fraction;
+use groupcash\php\model\Promise;
+use groupcash\php\model\Transference;
 
 class Account extends AggregateRoot {
 
@@ -20,6 +25,9 @@ class Account extends AggregateRoot {
     protected $auth;
 
     /** @var Coin[][] grouped by currency */
+    private $coinsOfCurrency = [];
+
+    /** @var Coin[] */
     private $coins = [];
 
     /**
@@ -41,7 +49,8 @@ class Account extends AggregateRoot {
 
     protected function applyCoinsDelivered(CoinsDelivered $e) {
         foreach ($e->getCoins() as $coin) {
-            $this->coins[(string)$e->getCurrency()][] = $coin;
+            $this->coinsOfCurrency[(string)$e->getCurrency()][] = $coin;
+            $this->coins[] = $coin;
         }
     }
 
@@ -62,13 +71,13 @@ class Account extends AggregateRoot {
     }
 
     private function collectCoins(CurrencyIdentifier $currency, AccountIdentifier $owner, $ownerKey, Fraction $amount, AccountIdentifier $target) {
-        if (!array_key_exists((string)$currency, $this->coins)) {
+        if (!array_key_exists((string)$currency, $this->coinsOfCurrency)) {
             throw new \Exception('No coins of this currency available in account.');
         }
 
         $collected = [];
         $left = $amount;
-        foreach ($this->coins[(string)$currency] as $coin) {
+        foreach ($this->coinsOfCurrency[(string)$currency] as $coin) {
             $fraction = $coin->getFraction();
 
             if ($left->toFloat() < $fraction->toFloat()) {
@@ -98,7 +107,7 @@ class Account extends AggregateRoot {
      * @internal param AccountIdentifier $owner
      */
     private function subtractCoins(CurrencyIdentifier $currency, array $transferredCoins) {
-        if (!array_key_exists((string)$currency, $this->coins)) {
+        if (!array_key_exists((string)$currency, $this->coinsOfCurrency)) {
             return;
         }
 
@@ -109,87 +118,71 @@ class Account extends AggregateRoot {
                 $replacement = [$transferredCoin->getRemaining()];
             }
 
-            $coinPos = array_search($transferredCoin->getCoin(), $this->coins[(string)$currency]);
-            array_splice($this->coins[(string)$currency], $coinPos, 1, $replacement);
+            $coinPos = array_search($transferredCoin->getCoin(), $this->coinsOfCurrency[(string)$currency]);
+            array_splice($this->coinsOfCurrency[(string)$currency], $coinPos, 1, $replacement);
+
+            $coinPos = array_search($transferredCoin->getCoin(), $this->coins);
+            array_splice($this->coins, $coinPos, 1, $replacement);
         }
     }
 
-//    protected function handleWithdrawCoins(WithdrawCoins $c) {
-//        $ownerKey = $this->auth->getKey($c->getAccount());
-//        $owner = new AccountIdentifier($this->lib->getAddress($ownerKey));
-//
-//        $collected = $this->collectCoins($c->getCurrency(), $owner, $ownerKey, $c->getAmount(), $owner);
-//
-//        $this->record(new CoinsWithdrawn(
-//            $c->getCurrency(),
-//            $owner,
-//            $collected
-//        ));
-//
-//        return array_map(function (TransferredCoin $coin) {
-//            return $coin->getTransferred();
-//        }, $collected);
-//    }
-//
-//    protected function applyCoinsWithdrawn(CoinsWithdrawn $e) {
-//        $this->subtractCoins($e->getCurrency(), $e->getAccount(), $e->getCoins());
-//    }
-//
-//    protected function handleDepositCoins(DepositCoins $c) {
-//        $depositedCoins = [];
-//        foreach ($c->getCoins() as $i => $coin) {
-//            $number = $i + 1;
-//
-//            if ($coin->getTransaction()->getTarget() != (string)$c->getAccount()) {
-//                throw new \Exception("Coin $number does not belong to account.");
-//            } else if ($this->hasInAccount($coin)) {
-//                throw new \Exception("Coin $number is already in account.");
-//            }
-//
-//            $promise = $this->extractPromise($coin);
-//            $backer = $promise->getBacker();
-//            $currency = $promise->getCurrency();
-//
-//            $this->guardIsBackerOfCurrency(new CurrencyIdentifier($currency), new BackerIdentifier($backer));
-//
-//            $inconsistency = $this->lib->findInconsistencies($coin, $this->get($this->authorizations, [$currency], null));
-//            if ($inconsistency) {
-//                throw new \Exception($inconsistency);
-//            }
-//
-//            $depositedCoins[$currency][] = $coin;
-//        }
-//
-//        foreach ($depositedCoins as $currency => $coins) {
-//            $this->record(new CoinsDelivered(
-//                new CurrencyIdentifier($currency),
-//                $c->getAccount(),
-//                $coins,
-//                'Deposited'
-//            ));
-//        }
-//    }
-//
-//    private function hasInAccount(Coin $coin) {
-//        $account = $coin->getTransaction()->getTarget();
-//        $promise = $this->extractPromise($coin);
-//        $currency = $promise->getCurrency();
-//
-//        $coinsInAccount = $this->get($this->coins, [$currency, $account], []);
-//        return in_array($coin, $coinsInAccount);
-//    }
-//
-//    private function extractPromise(Coin $coin) {
-//        /** @var Promise|Transference $promise */
-//        $promise = $coin->getTransaction();
-//        while ($promise instanceof Transference) {
-//            $promise = $promise->getCoin()->getTransaction();
-//        }
-//
-//        if ($promise instanceof Promise) {
-//            return $promise;
-//        }
-//
-//        throw new \Exception('Invalid coin.');
-//    }
+    protected function handleWithdrawCoins(WithdrawCoins $c) {
+        $ownerKey = $this->auth->getKey($c->getAccount());
+        $owner = new AccountIdentifier($this->lib->getAddress($ownerKey));
+
+        $collected = $this->collectCoins($c->getCurrency(), $owner, $ownerKey, $c->getAmount(), $owner);
+
+        $this->record(new CoinsWithdrawn(
+            $c->getCurrency(),
+            $owner,
+            $collected
+        ));
+
+        return array_map(function (TransferredCoin $coin) {
+            return $coin->getTransferred();
+        }, $collected);
+    }
+
+    protected function applyCoinsWithdrawn(CoinsWithdrawn $e) {
+        $this->subtractCoins($e->getCurrency(), $e->getCoins());
+    }
+
+    protected function handleDepositCoins(DepositCoins $c) {
+        $depositedCoins = [];
+        foreach ($c->getCoins() as $i => $coin) {
+            if ($coin->getTransaction()->getTarget() != (string)$c->getAccount()) {
+                throw new \Exception("Coin was not transferred to this account.");
+            } else if (in_array($coin, $this->coins)) {
+                throw new \Exception("Coin is already in account.");
+            }
+
+            $promise = $this->extractPromise($coin);
+            $currency = $promise->getCurrency();
+
+            $depositedCoins[$currency][] = $coin;
+        }
+
+        foreach ($depositedCoins as $currency => $coins) {
+            $this->record(new CoinsDelivered(
+                new CurrencyIdentifier($currency),
+                $c->getAccount(),
+                $coins,
+                'Deposited'
+            ));
+        }
+    }
+
+    private function extractPromise(Coin $coin) {
+        /** @var Promise|Transference $promise */
+        $promise = $coin->getTransaction();
+        while ($promise instanceof Transference) {
+            $promise = $promise->getCoin()->getTransaction();
+        }
+
+        if ($promise instanceof Promise) {
+            return $promise;
+        }
+
+        throw new \Exception('Invalid coin.');
+    }
 }

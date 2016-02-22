@@ -11,8 +11,6 @@ use spec\groupcash\bank\scenario\Scenario;
 class WithdrawCoinsSpec {
 
     function before() {
-        $this->scenario->blockedBy('Confirmation');
-
         $this->scenario->given->_Authorizes('foo', 'issuer');
         $this->scenario->given->ICreateABacker('bart');
         $this->scenario->given->_Adds_To('issuer', 'bart', 'foo');
@@ -22,7 +20,7 @@ class WithdrawCoinsSpec {
 
     function noCoinsAvailable() {
         $this->scenario->tryThat->_Withdraws('lisa', 1, 'foo');
-        $this->scenario->then->itShouldFailWith('Not sufficient coins of this currency available in account.');
+        $this->scenario->then->itShouldFailWith('No coins of this currency available in account.');
     }
 
     function notEnoughCoinsAvailable() {

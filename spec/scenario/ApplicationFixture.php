@@ -272,27 +272,26 @@ class ApplicationFixture {
         $this->assert->size($this->coins, $int);
     }
 
-    public function coin_ShouldBe__Promising__By_TransferredTo($pos, $amount, $currency, $promise, $serial, $backer, $target) {
+    public function coin_ShouldBe__Promising__By_TransferredTo($pos, $amount, $currency, $promised, $serial, $backer, $target) {
         $coin = $this->coins[$pos - 1];
 
-        $transference = $coin->getTransaction();
-        if (!($transference instanceof Transference)) {
-            $this->assert->fail("Not a transference");
+        $promise = $coin->getTransaction();
+        while ($promise instanceof Transference) {
+            $promise = $promise->getCoin()->getTransaction();
         }
 
-        $this->assert->equals($transference->getCoin()->getTransaction(), new Promise(
+        $this->assert->equals($promise, new Promise(
             $currency,
             $backer,
-            $promise,
+            $promised,
             $serial
         ));
 
-        $this->assert->equals($transference->getTarget(), $target);
-        $this->assert->equals($transference->getFraction(), $this->toFraction($amount));
+        $this->assert->equals($coin->getTransaction()->getTarget(), $target);
         $this->assert->equals($coin->getFraction(), $this->toFraction($amount));
     }
 
-    public function Deposit_To($coins, $account) {
+    public function IDeposit_To($coins, $account) {
         $this->returned = $this->app->handle(new DepositCoins(
             new AccountIdentifier($account),
             $coins
@@ -313,7 +312,11 @@ class ApplicationFixture {
     }
 
     public function IDepositCoin_To($coin, $account) {
-        $this->Deposit_To([$this->thoseCoins[$coin]], $account);
+        $this->IDeposit_To([$this->thoseCoins[$coin]], $account);
+    }
+
+    public function IDepositNoCoinsTo($account) {
+        $this->IDeposit_To([], $account);
     }
 
     public function _WithdrawsOne_As($account, $currency, $coin) {

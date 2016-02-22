@@ -4,11 +4,11 @@ namespace spec\groupcash\bank\trading;
 use spec\groupcash\bank\scenario\Scenario;
 
 /**
- * A deposited coin must be checked to make sure it has not been already deposited.
+ * Deposited coins are confirmed by their backers to avoid double-spending.
  *
  * @property Scenario scenario <-
  */
-class AvoidDoubleSpendingSpec {
+class ConfirmCoinsSpec {
 
     function before() {
         $this->scenario->blockedBy('Confirmation');
@@ -19,6 +19,30 @@ class AvoidDoubleSpendingSpec {
         $this->scenario->given->_Declares_Of_By_For('issuer', 1, 'Promise', 'backer', 'foo');
         $this->scenario->given->_issues__to('issuer', 1, 'foo', 'backer');
         $this->scenario->given->_Sends__To('backer', 1, 'foo', 'bart');
+    }
+
+    function withdrawnCoinsAreConfirmed() {
+    }
+
+    function notABacker() {
+        $this->scenario->tryThat->IDeposit_To([
+            // Coin backed by another backer
+        ], 'not bart');
+        $this->scenario->then->itShouldFailWith('This backer was not added to this currency.');
+    }
+
+    function notAnIssuer() {
+        $this->scenario->tryThat->IDeposit_To([
+            // Coin issued by another issuer
+        ], 'bart');
+        $this->scenario->then->itShouldFailWith('The issuer is not authorized.');
+    }
+
+    function inconsistentCoin() {
+        $this->scenario->tryThat->IDeposit_To([
+            // Coin with broken transference chain
+        ], 'lisa');
+        $this->scenario->then->itShouldFailWith('Signed by non-owner [not bart].');
     }
 
     function alreadyTransferred() {
