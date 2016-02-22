@@ -65,12 +65,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/groupcash/php.git",
-                "reference": "2c3e75109dcb838f7c3ccf4fb1fb432341ee363d"
+                "reference": "924037bfd135aa3f30f0a90efbe98f79fcccfc7c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/groupcash/php/zipball/2c3e75109dcb838f7c3ccf4fb1fb432341ee363d",
-                "reference": "2c3e75109dcb838f7c3ccf4fb1fb432341ee363d",
+                "url": "https://api.github.com/repos/groupcash/php/zipball/924037bfd135aa3f30f0a90efbe98f79fcccfc7c",
+                "reference": "924037bfd135aa3f30f0a90efbe98f79fcccfc7c",
                 "shasum": ""
             },
             "require": {
@@ -98,7 +98,7 @@
                 }
             ],
             "description": "PHP implementation of the groupcash protocol",
-            "time": "2016-02-17 17:20:06"
+            "time": "2016-02-22 05:11:29"
         },
         {
             "name": "mdanter/ecc",
@@ -214,7 +214,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rtens/domin/zipball/24d718a866a1cd1a6f4a65f97f976c0c814988a3",
+                "url": "https://api.github.com/repos/rtens/domin/zipball/898500541859e37e5325da8eff5a13bf8310033f",
                 "reference": "24d718a866a1cd1a6f4a65f97f976c0c814988a3",
                 "shasum": ""
             },

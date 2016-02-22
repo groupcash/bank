@@ -299,14 +299,18 @@ class Bank extends AggregateRoot {
                 throw new \Exception("Coin $number is already in account.");
             }
 
-            try {
-                $validated = $this->validateCoin($coin);
-            } catch (\Exception $e) {
-                throw new \Exception("Could not validate coin $number: " . $e->getMessage());
+            $promise = $this->extractPromise($coin);
+            $backer = $promise->getBacker();
+            $currency = $promise->getCurrency();
+
+            $this->guardIsBackerOfCurrency(new CurrencyIdentifier($currency), new BackerIdentifier($backer));
+
+            $inconsistency = $this->lib->findInconsistencies($coin, $this->get($this->authorizations, [$currency], null));
+            if ($inconsistency) {
+                throw new \Exception($inconsistency);
             }
 
-            $currency = $this->extractPromise($coin)->getCurrency();
-            $depositedCoins[$currency][] = $validated;
+            $depositedCoins[$currency][] = $coin;
         }
 
         foreach ($depositedCoins as $currency => $coins) {
@@ -326,21 +330,6 @@ class Bank extends AggregateRoot {
 
         $coinsInAccount = $this->get($this->coins, [$currency, $account], []);
         return in_array($coin, $coinsInAccount);
-    }
-
-    private function validateCoin(Coin $coin) {
-        $promise = $this->extractPromise($coin);
-        $backer = $promise->getBacker();
-        $currency = $promise->getCurrency();
-
-        $this->guardIsBackerOfCurrency(new CurrencyIdentifier($currency), new BackerIdentifier($backer));
-
-        if (!$this->lib->verifyCoin($coin, $this->get($this->authorizations, [$currency], null))) {
-            throw new \Exception('Coin could not be verified.');
-        }
-
-        $backerKey = $this->backerKeys[$backer];
-        return $this->lib->validateCoin($backerKey, $coin);
     }
 
     private function extractPromise(Coin $coin) {
@@ -364,6 +353,8 @@ class Bank extends AggregateRoot {
         $collected = [];
         $left = $amount;
         foreach ($coins as $coin) {
+            $backerKey = $this->backerKeys[$this->extractPromise($coin)->getBacker()];
+
             $fraction = $coin->getFraction();
 
             if ($left->toFloat() < $fraction->toFloat()) {
@@ -374,8 +365,8 @@ class Bank extends AggregateRoot {
 
             $collected[] = new TransferredCoin(
                 $coin,
-                $this->validateCoin($this->lib->transferCoin($ownerKey, $coin, (string)$target, $transferFraction)),
-                $this->validateCoin($this->lib->transferCoin($ownerKey, $coin, (string)$owner, $remainFraction))
+                $this->lib->accountCoin($backerKey, $this->lib->transferCoin($ownerKey, $coin, (string)$target, $transferFraction)),
+                $this->lib->accountCoin($backerKey, $this->lib->transferCoin($ownerKey, $coin, (string)$owner, $remainFraction))
             );
 
             $left = $left->minus($fraction);

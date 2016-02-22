@@ -62,7 +62,7 @@ class DepositCoinsSpec {
         $this->scenario->tryThat->_Deposits('not bart', [
             $this->_WithSerial_Promising_IssuedTo('foo', 1, 'Promise', 'not bart')
         ]);
-        $this->scenario->then->itShouldFailWith('Could not validate coin 1: This backer was not added to this currency.');
+        $this->scenario->then->itShouldFailWith('This backer was not added to this currency.');
     }
 
     function depositedCoinsCanBeSent() {
@@ -77,7 +77,7 @@ class DepositCoinsSpec {
         $this->scenario->tryThat->_Deposits('bart', [
             Coin::issue(new Promise('foo', 'bart', 'Promise', 1), new Signer(new FakeKeyService(), 'private not issuer'))
         ]);
-        $this->scenario->then->itShouldFailWith('Could not validate coin 1: Coin could not be verified.');
+        $this->scenario->then->itShouldFailWith('The issuer is not authorized.');
     }
 
     function inconsistentCoin() {
@@ -85,7 +85,7 @@ class DepositCoinsSpec {
             $this->_WithSerial_Promising_IssuedTo('foo', 1, 'Promise', 'bart')
                 ->transfer('lisa', new Signer(new FakeKeyService(), 'private not bart'))
         ]);
-        $this->scenario->then->itShouldFailWith('Could not validate coin 1: Coin could not be verified.');
+        $this->scenario->then->itShouldFailWith('Signed by non-owner [not bart].');
     }
 
     private function _WithSerial_Promising_IssuedTo($currency, $serial, $promise, $backer) {

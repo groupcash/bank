@@ -29,6 +29,7 @@ use groupcash\php\Groupcash;
 use groupcash\php\model\Coin;
 use groupcash\php\model\Fraction;
 use groupcash\php\model\Promise;
+use groupcash\php\model\Signer;
 use groupcash\php\model\Transference;
 use rtens\scrut\Assert;
 use rtens\scrut\fixtures\ExceptionFixture;
@@ -69,6 +70,9 @@ class ApplicationFixture {
 
     /** @var Coin[] */
     private $coins;
+
+    /** @var Coin[] */
+    private $thoseCoins = [];
 
     public function __construct(Assert $assert, ExceptionFixture $except) {
         $this->assert = $assert;
@@ -259,7 +263,7 @@ class ApplicationFixture {
     }
 
     public function _Withdraws($account, $amount, $currency) {
-        $this->coins = $this->app->handle(new WithdrawCoins(
+        return $this->coins = $this->app->handle(new WithdrawCoins(
             new Authentication("private $account"),
             new CurrencyIdentifier($currency),
             is_null($amount) ? null : $this->toFraction($amount)
@@ -295,5 +299,26 @@ class ApplicationFixture {
             new Authentication("private $account"),
             $coins
         ));
+    }
+
+    public function aCoin_Of_WithSerial_Promising_By_IssuedBy($coin, $currency, $serial, $promise, $backer, $issuer) {
+        $this->thoseCoins[$coin] = Coin::issue(new Promise($currency, $backer, $promise, $serial), new Signer($this->key, "private $issuer"));
+    }
+
+    public function _TransfersCoin_To_As($owner, $coin, $target, $newCoin) {
+        $this->_Transfers_OfCoin_To_As($owner, 1, $coin, $target, $newCoin);
+    }
+
+    public function _Transfers_OfCoin_To_As($owner, $amount, $coin, $target, $newCoin) {
+        $this->thoseCoins[$newCoin] = $this->thoseCoins[$coin]
+            ->transfer($target, new Signer($this->key, "private $owner"), $this->toFraction($amount));
+    }
+
+    public function _DepositsCoin($account, $coin) {
+        $this->_Deposits($account, [$this->thoseCoins[$coin]]);
+    }
+
+    public function _WithdrawsOne_As($account, $currency, $coin) {
+        $this->thoseCoins[$coin] = $this->_Withdraws($account, 1, $currency)[0];
     }
 }
