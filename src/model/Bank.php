@@ -287,13 +287,11 @@ class Bank extends AggregateRoot {
     }
 
     protected function handleDepositCoins(DepositCoins $c) {
-        $account = $this->lib->getAddress($this->auth->getKey($c->getAccount()));
-
         $depositedCoins = [];
         foreach ($c->getCoins() as $i => $coin) {
             $number = $i + 1;
 
-            if ($coin->getTransaction()->getTarget() != $account) {
+            if ($coin->getTransaction()->getTarget() != (string)$c->getAccount()) {
                 throw new \Exception("Coin $number does not belong to account.");
             } else if ($this->hasInAccount($coin)) {
                 throw new \Exception("Coin $number is already in account.");
@@ -316,7 +314,7 @@ class Bank extends AggregateRoot {
         foreach ($depositedCoins as $currency => $coins) {
             $this->record(new CoinsDelivered(
                 new CurrencyIdentifier($currency),
-                new AccountIdentifier($account),
+                $c->getAccount(),
                 $coins,
                 'Deposited'
             ));

@@ -24,8 +24,8 @@ class AvoidDoubleSpendingSpec {
         $this->scenario->given->_TransfersCoin_To_As('bart', 'of bart', 'homer', 'of homer');
         $this->scenario->given->_TransfersCoin_To_As('bart', 'of bart', 'marge', 'of marge');
 
-        $this->scenario->given->_DepositsCoin('homer', 'of homer');
-        $this->scenario->tryThat->_DepositsCoin('marge', 'of marge');
+        $this->scenario->given->IDepositCoin_To('of homer', 'homer');
+        $this->scenario->tryThat->IDepositCoin_To('of marge', 'marge');
         $this->scenario->then->itShouldFailWith('Could not validate coin 1: This coin was already transferred.');
     }
 
@@ -35,10 +35,10 @@ class AvoidDoubleSpendingSpec {
         $this->scenario->given->_TransfersCoin_To_As('bart', 'issued', 'lisa', 'of lisa');
         $this->scenario->given->_TransfersCoin_To_As('lisa', 'of lisa', 'homer', 'of homer');
 
-        $this->scenario->given->_DepositsCoin('homer', 'of homer');
+        $this->scenario->given->IDepositCoin_To('of homer', 'homer');
 
         $this->scenario->given->_TransfersCoin_To_As('homer', 'of homer', 'marge', 'of marge');
-        $this->scenario->tryThat->_DepositsCoin('marge', 'of marge');
+        $this->scenario->tryThat->IDepositCoin_To('of marge', 'marge');
 
         $this->scenario->then->itShouldFailWith('Could not validate coin 1: This coin was already transferred.');
     }
@@ -49,11 +49,11 @@ class AvoidDoubleSpendingSpec {
         $this->scenario->given->_TransfersCoin_To_As('bart', 'issued', 'lisa', 'of lisa');
         $this->scenario->given->_TransfersCoin_To_As('lisa', 'of lisa', 'homer', 'of homer');
 
-        $this->scenario->given->_DepositsCoin('homer', 'of homer');
+        $this->scenario->given->IDepositCoin_To('of homer', 'homer');
 
         $this->scenario->given->_WithdrawsOne_As('homer', 'foo', 'withdrawn by homer');
         $this->scenario->given->_TransfersCoin_To_As('homer', 'withdrawn by homer', 'marge', 'of marge');
-        $this->scenario->when->_DepositsCoin('marge', 'of marge');
+        $this->scenario->when->IDepositCoin_To('of marge', 'marge');
 
         $this->scenario->then->allShouldBeFine();
     }
@@ -63,9 +63,9 @@ class AvoidDoubleSpendingSpec {
 
         $this->scenario->given->_Transfers_OfCoin_To_As('bart', .5, 'issued', 'lisa', 'of lisa');
 
-        $this->scenario->given->_DepositsCoin('lisa', 'of lisa');
-        $this->scenario->given->_DepositsCoin('lisa', 'of lisa');
-        $this->scenario->tryThat->_DepositsCoin('lisa', 'of lisa');
+        $this->scenario->given->IDepositCoin_To('of lisa', 'lisa');
+        $this->scenario->given->IDepositCoin_To('of lisa', 'lisa');
+        $this->scenario->tryThat->IDepositCoin_To('of lisa', 'lisa');
 
         $this->scenario->then->itShouldFailWith('Could not validate coin 1: This coin was already transferred.');
     }

@@ -294,9 +294,9 @@ class ApplicationFixture {
         $this->assert->equals($coin->getFraction(), $this->toFraction($amount));
     }
 
-    public function _Deposits($account, $coins) {
+    public function Deposit_To($coins, $account) {
         $this->returned = $this->app->handle(new DepositCoins(
-            new Authentication("private $account"),
+            new AccountIdentifier($account),
             $coins
         ));
     }
@@ -314,8 +314,8 @@ class ApplicationFixture {
             ->transfer($target, new Signer($this->key, "private $owner"), $this->toFraction($amount));
     }
 
-    public function _DepositsCoin($account, $coin) {
-        $this->_Deposits($account, [$this->thoseCoins[$coin]]);
+    public function IDepositCoin_To($coin, $account) {
+        $this->Deposit_To([$this->thoseCoins[$coin]], $account);
     }
 
     public function _WithdrawsOne_As($account, $currency, $coin) {

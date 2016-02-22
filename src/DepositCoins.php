@@ -3,7 +3,7 @@ namespace groupcash\bank;
 
 use groupcash\bank\app\sourced\messaging\Command;
 use groupcash\bank\app\sourced\messaging\Identifier;
-use groupcash\bank\model\Authentication;
+use groupcash\bank\model\AccountIdentifier;
 use groupcash\bank\model\BankIdentifier;
 use groupcash\php\model\Coin;
 
@@ -12,20 +12,20 @@ class DepositCoins implements Command {
     /** @var Coin[] */
     private $coins;
 
-    /** @var Authentication */
+    /** @var AccountIdentifier */
     private $account;
 
     /**
-     * @param Authentication $account
+     * @param AccountIdentifier $account
      * @param Coin[] $coins
      */
-    public function __construct(Authentication $account, array $coins) {
+    public function __construct(AccountIdentifier $account, array $coins) {
         $this->coins = $coins;
         $this->account = $account;
     }
 
     /**
-     * @return Authentication
+     * @return AccountIdentifier
      */
     public function getAccount() {
         return $this->account;

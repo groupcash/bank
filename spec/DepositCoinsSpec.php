@@ -20,31 +20,31 @@ class DepositCoinsSpec {
     }
 
     function noCoins() {
-        $this->scenario->when->_Deposits('bart', []);
+        $this->scenario->when->Deposit_To([], 'bart');
         $this->scenario->then->allShouldBeFine();
     }
 
     function notTarget() {
-        $this->scenario->tryThat->_Deposits('lisa', [
+        $this->scenario->tryThat->Deposit_To([
             $this->_WithSerial_Promising_IssuedTo('foo', 1, 'Promise', 'not lisa')
-        ]);
+        ], 'lisa');
         $this->scenario->then->itShouldFailWith('Coin 1 does not belong to account.');
     }
 
     function success() {
-        $this->scenario->when->_Deposits('bart', [
+        $this->scenario->when->Deposit_To([
             $this->_WithSerial_Promising_IssuedTo('foo', 1, 'Promise', 'bart')
-        ]);
+        ], 'bart');
         $this->scenario->then->allShouldBeFine();
     }
 
     function alreadyDeposited() {
-        $this->scenario->given->_Deposits('bart', [
+        $this->scenario->given->Deposit_To([
             $this->_WithSerial_Promising_IssuedTo('foo', 1, 'Promise', 'bart')
-        ]);
-        $this->scenario->tryThat->_Deposits('bart', [
+        ], 'bart');
+        $this->scenario->tryThat->Deposit_To([
             $this->_WithSerial_Promising_IssuedTo('foo', 1, 'Promise', 'bart')
-        ]);
+        ], 'bart');
         $this->scenario->then->itShouldFailWith('Coin 1 is already in account.');
     }
 
@@ -52,39 +52,39 @@ class DepositCoinsSpec {
         $this->scenario->given->_Declares_Of_By_For('issuer', 1, 'Promise', 'bart', 'foo');
         $this->scenario->given->_issues__to('issuer', 1, 'foo', 'bart');
 
-        $this->scenario->tryThat->_Deposits('bart', [
+        $this->scenario->tryThat->Deposit_To([
             $this->_WithSerial_Promising_IssuedTo('foo', 1, 'Promise', 'bart')
-        ]);
+        ], 'bart');
         $this->scenario->then->itShouldFailWith('Coin 1 is already in account.');
     }
 
     function notABacker() {
-        $this->scenario->tryThat->_Deposits('not bart', [
+        $this->scenario->tryThat->Deposit_To([
             $this->_WithSerial_Promising_IssuedTo('foo', 1, 'Promise', 'not bart')
-        ]);
+        ], 'not bart');
         $this->scenario->then->itShouldFailWith('This backer was not added to this currency.');
     }
 
     function depositedCoinsCanBeSent() {
-        $this->scenario->given->_Deposits('bart', [
+        $this->scenario->given->Deposit_To([
             $this->_WithSerial_Promising_IssuedTo('foo', 1, 'Promise', 'bart')
-        ]);
+        ], 'bart');
         $this->scenario->when->_Sends__To('bart', 1, 'foo', 'lisa');
         $this->scenario->then->allShouldBeFine();
     }
 
     function notAnIssuer() {
-        $this->scenario->tryThat->_Deposits('bart', [
+        $this->scenario->tryThat->Deposit_To([
             Coin::issue(new Promise('foo', 'bart', 'Promise', 1), new Signer(new FakeKeyService(), 'private not issuer'))
-        ]);
+        ], 'bart');
         $this->scenario->then->itShouldFailWith('The issuer is not authorized.');
     }
 
     function inconsistentCoin() {
-        $this->scenario->tryThat->_Deposits('lisa', [
+        $this->scenario->tryThat->Deposit_To([
             $this->_WithSerial_Promising_IssuedTo('foo', 1, 'Promise', 'bart')
                 ->transfer('lisa', new Signer(new FakeKeyService(), 'private not bart'))
-        ]);
+        ], 'lisa');
         $this->scenario->then->itShouldFailWith('Signed by non-owner [not bart].');
     }
 
