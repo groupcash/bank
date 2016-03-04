@@ -17,7 +17,7 @@ use watoki\reflect\type\StringType;
 class CurrencyIdentifierField extends MultiField {
 
     /** @var string[] */
-    private $currencies;
+    private $currencies = [];
 
     /** @var Application */
     private $app;
@@ -54,7 +54,10 @@ class CurrencyIdentifierField extends MultiField {
     }
 
     public function inflate(Parameter $parameter, $serialized) {
-        $serialized = parent::inflate($this->getParameter($parameter), $serialized);
+        if (!is_string($serialized)) {
+            $serialized = parent::inflate($this->getParameter($parameter), $serialized);
+        }
+
         return new CurrencyIdentifier((string)$serialized);
     }
 

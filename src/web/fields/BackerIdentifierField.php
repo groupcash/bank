@@ -16,7 +16,7 @@ use watoki\reflect\type\StringType;
 class BackerIdentifierField extends EnumerationField {
 
     /** @var string[] names indexed by address */
-    private $backers;
+    private $backers = [];
 
     /** @var Application */
     private $app;

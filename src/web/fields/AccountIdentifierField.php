@@ -27,6 +27,10 @@ class AccountIdentifierField extends MultiField {
      * @throws \Exception
      */
     public function inflate(Parameter $parameter, $serialized) {
+        if (is_string($serialized)) {
+            return new AccountIdentifier($serialized);
+        }
+
         $inflated = parent::inflate($this->getParameter($parameter), $serialized);
 
         if ($inflated instanceof File) {
