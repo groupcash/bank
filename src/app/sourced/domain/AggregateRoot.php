@@ -9,7 +9,14 @@ abstract class AggregateRoot {
     private $recordedEvents = [];
 
     public function handle(Command $command) {
-        $handleMethod = 'handle' . (new \ReflectionClass($command))->getShortName();
+        $commandName = (new \ReflectionClass($command))->getShortName();
+        $handleMethod = 'handle' . $commandName;
+
+        if (!method_exists($this, $handleMethod)) {
+            throw new \Exception("Missing method in " . (new \ReflectionClass($this))->getFileName() . "\n" .
+                "\t\tprotected function $handleMethod($commandName \$c) {}");
+        }
+
         return call_user_func([$this, $handleMethod], $command);
     }
 

@@ -2,36 +2,38 @@
 namespace spec\groupcash\bank\scenario;
 
 use groupcash\bank\app\sourced\domain\Time;
+use groupcash\bank\app\sourced\store\FakeEventStore;
 use rtens\scrut\Fixture;
 use rtens\scrut\fixtures\ExceptionFixture;
 
 class Scenario extends Fixture {
 
-    /** @var ApplicationFixture */
+    /** @var ApplicationCapabilities */
     public $tryThat;
 
-    /** @var ApplicationFixture */
+    /** @var ApplicationContext */
     public $given;
 
-    /** @var ApplicationFixture */
+    /** @var ApplicationCapabilities */
     public $when;
 
-    /** @var ApplicationFixture */
+    /** @var ApplicationOutcome */
     public $then;
 
     public function before() {
-        Time::$frozen = new \DateTimeImmutable();
-
         $except = new ExceptionFixture($this->assert);
-        $app = new ApplicationFixture($this->assert, $except);
+        Time::$frozen = new \DateTimeImmutable();
+        $returned = new ReturnValue();
 
-        $this->tryThat = new ExceptionScenario($app, $except);
-        $this->given = $app;
-        $this->when = $app;
-        $this->then = $app;
+        $events = new FakeEventStore();
+
+        $this->given = new ApplicationContext($events);
+        $this->when = new ApplicationCapabilities($returned, $events);
+        $this->then = new ApplicationOutcome($this->assert, $except, $returned, $events);
+        $this->tryThat = new ExceptionScenario($this->when, $except);
     }
 
-    public function blockedBy($capability) {
-        $this->assert->incomplete("Blocked by $capability");
+    public function blockedBy($reason) {
+        $this->assert->incomplete("Blocked by $reason");
     }
 }

@@ -11,16 +11,25 @@ use groupcash\bank\app\sourced\MessageHandler;
 use groupcash\bank\app\sourced\messaging\Command;
 use groupcash\bank\app\sourced\messaging\Query;
 use groupcash\bank\app\sourced\store\EventStore;
+use groupcash\bank\model\Bank;
+use groupcash\bank\model\BankIdentifier;
+use groupcash\php\Groupcash;
 
 class Application implements Builder, DomainEventListener {
 
     /** @var MessageHandler */
     private $handler;
 
+    /** @var Groupcash */
+    private $library;
+
     /**
      * @param EventStore $events
+     * @param Groupcash $library
      */
-    public function __construct(EventStore $events) {
+    public function __construct(EventStore $events, Groupcash $library) {
+        $this->library = $library;
+
         $this->handler = new MessageHandler($events, $this);
         $this->handler->addListener($this);
     }
@@ -35,6 +44,10 @@ class Application implements Builder, DomainEventListener {
      * @throws \Exception
      */
     public function getAggregateIdentifier(Command $command) {
+        if ($command instanceof ApplicationCommand) {
+            return $command->getAggregateIdentifier();
+        }
+
         throw new \Exception("Not an application command.");
     }
 
@@ -44,7 +57,11 @@ class Application implements Builder, DomainEventListener {
      * @throws \Exception
      */
     public function buildAggregateRoot(AggregateIdentifier $identifier) {
-        throw new \Exception('Unknown command.');
+        if ($identifier instanceof BankIdentifier) {
+            return new Bank($this->library);
+        }
+
+        throw new \Exception('Unknown aggregate.');
     }
 
     /**

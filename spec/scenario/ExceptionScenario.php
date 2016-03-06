@@ -5,13 +5,13 @@ use rtens\scrut\fixtures\ExceptionFixture;
 
 class ExceptionScenario {
 
-    /** @var ApplicationFixture */
+    /** @var ApplicationCapabilities */
     private $app;
 
     /** @var ExceptionFixture */
     private $except;
 
-    public function __construct(ApplicationFixture $app, ExceptionFixture $except) {
+    public function __construct(ApplicationCapabilities $app, ExceptionFixture $except) {
         $this->app = $app;
         $this->except = $except;
     }
