@@ -1,7 +1,6 @@
 <?php
 namespace groupcash\bank\app;
 
-use groupcash\bank\AddCurrencyToBacker;
 use groupcash\bank\app\sourced\Builder;
 use groupcash\bank\app\sourced\domain\AggregateIdentifier;
 use groupcash\bank\app\sourced\domain\AggregateRoot;
@@ -12,49 +11,16 @@ use groupcash\bank\app\sourced\MessageHandler;
 use groupcash\bank\app\sourced\messaging\Command;
 use groupcash\bank\app\sourced\messaging\Query;
 use groupcash\bank\app\sourced\store\EventStore;
-use groupcash\bank\DeliverCoins;
-use groupcash\bank\events\BackerAdded;
-use groupcash\bank\events\CoinsIssued;
-use groupcash\bank\events\CoinsSent;
-use groupcash\bank\events\TransferredCoin;
-use groupcash\bank\ListBackers;
-use groupcash\bank\ListCurrencies;
-use groupcash\bank\ListTransactions;
-use groupcash\bank\model\Account;
-use groupcash\bank\model\AccountIdentifier;
-use groupcash\bank\model\Authenticator;
-use groupcash\bank\model\Backer;
-use groupcash\bank\model\BackerIdentifier;
-use groupcash\bank\model\Bank;
-use groupcash\bank\model\BankIdentifier;
-use groupcash\bank\model\Currency;
-use groupcash\bank\model\CurrencyIdentifier;
-use groupcash\bank\model\Vault;
-use groupcash\bank\projecting\AllBackers;
-use groupcash\bank\projecting\AllCurrencies;
-use groupcash\bank\projecting\TransactionHistory;
-use groupcash\php\Groupcash;
 
 class Application implements Builder, DomainEventListener {
-
-    /** @var Groupcash */
-    private $lib;
-
-    /** @var Authenticator */
-    private $auth;
 
     /** @var MessageHandler */
     private $handler;
 
     /**
      * @param EventStore $events
-     * @param Cryptography $crypto
-     * @param Groupcash $lib
-     * @param Vault $vault
      */
-    public function __construct(EventStore $events, Cryptography $crypto, Groupcash $lib, Vault $vault) {
-        $this->lib = $lib;
-        $this->auth = new Authenticator($crypto, $vault, $lib);
+    public function __construct(EventStore $events) {
         $this->handler = new MessageHandler($events, $this);
         $this->handler->addListener($this);
     }
@@ -69,10 +35,6 @@ class Application implements Builder, DomainEventListener {
      * @throws \Exception
      */
     public function getAggregateIdentifier(Command $command) {
-        if ($command instanceof ApplicationCommand) {
-            return $command->getAggregateIdentifier($this->auth);
-        }
-
         throw new \Exception("Not an application command.");
     }
 
@@ -82,16 +44,6 @@ class Application implements Builder, DomainEventListener {
      * @throws \Exception
      */
     public function buildAggregateRoot(AggregateIdentifier $identifier) {
-        if ($identifier instanceof BankIdentifier) {
-            return new Bank($this->lib, $this->auth);
-        } else if ($identifier instanceof CurrencyIdentifier) {
-            return new Currency($this->lib, $this->auth);
-        } else if ($identifier instanceof BackerIdentifier) {
-            return new Backer($this->lib, $this->auth);
-        } else if ($identifier instanceof AccountIdentifier) {
-            return new Account($this->lib, $this->auth);
-        }
-
         throw new \Exception('Unknown command.');
     }
 
@@ -101,16 +53,6 @@ class Application implements Builder, DomainEventListener {
      * @throws \Exception
      */
     public function buildProjection(Query $query) {
-        if ($query instanceof ListTransactions) {
-            return new TransactionHistory(
-                new AccountIdentifier($this->lib->getAddress($this->auth->getKey($query->getAccount())))
-            );
-        } else if ($query instanceof ListCurrencies) {
-            return new AllCurrencies();
-        } else if ($query instanceof ListBackers) {
-            return new AllBackers($query->getCurrency());
-        }
-
         throw new \Exception('Unknown query.');
     }
 
@@ -130,32 +72,5 @@ class Application implements Builder, DomainEventListener {
     public function on(DomainEvent $event) {
         $method = 'on' . (new \ReflectionClass($event))->getShortName();
         call_user_func([$this, $method], $event);
-    }
-
-    protected function onCoinsIssued(CoinsIssued $e) {
-        $this->handler->handle(new DeliverCoins(
-            $e->getCurrency(),
-            new AccountIdentifier((string)$e->getBacker()),
-            $e->getCoins(),
-            'Issued'
-        ));
-    }
-
-    protected function onCoinsSent(CoinsSent $e) {
-        $this->handler->handle(new DeliverCoins(
-            $e->getCurrency(),
-            $e->getTarget(),
-            array_map(function (TransferredCoin $sentCoin) {
-                return $sentCoin->getTransferred();
-            }, $e->getSentCoins()),
-            $e->getSubject()));
-    }
-
-    protected function onBackerAdded(BackerAdded $e) {
-        $this->handler->handle(new AddCurrencyToBacker(
-            $e->getBacker(),
-            $e->getCurrency(),
-            $e->getIssuer()
-        ));
     }
 }

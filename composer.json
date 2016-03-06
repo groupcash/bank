@@ -13,7 +13,6 @@
   "require": {
     "php": ">=5.5",
     "ext-mcrypt": "*",
-    "ext-openssl": "*",
     "groupcash/php": "dev-master",
     "watoki/stores": "dev-master",
     "rtens/domin": "dev-master",

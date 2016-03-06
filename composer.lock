@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "b9b9745ef228b7cfc99cce69f2cf0c2e",
-    "content-hash": "7a208995366b308609801ee536fcddce",
+    "hash": "e9ff7cf37405bc9d95f39809d8f0e580",
+    "content-hash": "ba86ebf0a3ca2bbb1c720761b7c2ecf5",
     "packages": [
         {
             "name": "fgrosse/phpasn1",
@@ -65,21 +65,20 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/groupcash/php.git",
-                "reference": "924037bfd135aa3f30f0a90efbe98f79fcccfc7c"
+                "reference": "b705b8326b99837f7db4d92e6eb362a90d4ee250"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/groupcash/php/zipball/924037bfd135aa3f30f0a90efbe98f79fcccfc7c",
-                "reference": "924037bfd135aa3f30f0a90efbe98f79fcccfc7c",
+                "url": "https://api.github.com/repos/groupcash/php/zipball/b705b8326b99837f7db4d92e6eb362a90d4ee250",
+                "reference": "b705b8326b99837f7db4d92e6eb362a90d4ee250",
                 "shasum": ""
             },
             "require": {
                 "mdanter/ecc": "^0.3.0",
-                "php": ">=5.5",
-                "rtens/domin": "dev-master"
+                "php": ">=5.5"
             },
             "require-dev": {
-                "rtens/scrut": "dev-master"
+                "rtens/scrut": "^1.1"
             },
             "type": "library",
             "autoload": {
@@ -97,8 +96,8 @@
                     "email": "Nikolas.M@rtens.org"
                 }
             ],
-            "description": "PHP implementation of the groupcash protocol",
-            "time": "2016-02-22 05:11:29"
+            "description": "PHP implementation of groupcash algorithms",
+            "time": "2016-03-04 12:30:57"
         },
         {
             "name": "mdanter/ecc",
@@ -210,12 +209,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/rtens/domin.git",
-                "reference": "24d718a866a1cd1a6f4a65f97f976c0c814988a3"
+                "reference": "1f7de47e1eb4bbd9c86511b18738e98f885e0360"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rtens/domin/zipball/898500541859e37e5325da8eff5a13bf8310033f",
-                "reference": "24d718a866a1cd1a6f4a65f97f976c0c814988a3",
+                "url": "https://api.github.com/repos/rtens/domin/zipball/1f7de47e1eb4bbd9c86511b18738e98f885e0360",
+                "reference": "1f7de47e1eb4bbd9c86511b18738e98f885e0360",
                 "shasum": ""
             },
             "require": {
@@ -259,7 +258,7 @@
                 "ddd",
                 "domain model"
             ],
-            "time": "2016-02-17 17:28:44"
+            "time": "2016-03-04 08:55:01"
         },
         {
             "name": "symfony/console",
@@ -267,12 +266,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/console.git",
-                "reference": "02930f823b232f4a6d7371464240896cca28560a"
+                "reference": "79e3a4fd9006cd6d6b9ced7fd9d42c4c31d9b8f6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/console/zipball/02930f823b232f4a6d7371464240896cca28560a",
-                "reference": "02930f823b232f4a6d7371464240896cca28560a",
+                "url": "https://api.github.com/repos/symfony/console/zipball/79e3a4fd9006cd6d6b9ced7fd9d42c4c31d9b8f6",
+                "reference": "79e3a4fd9006cd6d6b9ced7fd9d42c4c31d9b8f6",
                 "shasum": ""
             },
             "require": {
@@ -319,7 +318,7 @@
             ],
             "description": "Symfony Console Component",
             "homepage": "https://symfony.com",
-            "time": "2016-02-17 06:14:28"
+            "time": "2016-03-04 07:54:35"
         },
         {
             "name": "symfony/polyfill-mbstring",
@@ -785,8 +784,7 @@
     "prefer-lowest": false,
     "platform": {
         "php": ">=5.5",
-        "ext-mcrypt": "*",
-        "ext-openssl": "*"
+        "ext-mcrypt": "*"
     },
     "platform-dev": []
 }
