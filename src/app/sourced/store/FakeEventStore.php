@@ -2,6 +2,7 @@
 namespace groupcash\bank\app\sourced\store;
 
 use groupcash\bank\app\sourced\domain\AggregateIdentifier;
+use groupcash\bank\app\sourced\domain\DomainEvent;
 use groupcash\bank\app\sourced\domain\EventStream;
 
 class FakeEventStore implements EventStore {
@@ -47,5 +48,14 @@ class FakeEventStore implements EventStore {
             }
         }
         return $all;
+    }
+
+    /**
+     * @param AggregateIdentifier $aggregateIdentifier
+     * @param DomainEvent $event
+     * @return void
+     */
+    public function add(AggregateIdentifier $aggregateIdentifier, DomainEvent $event) {
+        $this->read($aggregateIdentifier)->add($event);
     }
 }

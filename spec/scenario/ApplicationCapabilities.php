@@ -5,8 +5,11 @@ use groupcash\bank\app\Application;
 use groupcash\bank\app\crypto\FakeCryptography;
 use groupcash\bank\app\sourced\store\EventStore;
 use groupcash\bank\CreateAccount;
+use groupcash\bank\EstablishCurrency;
+use groupcash\bank\model\Authentication;
 use groupcash\php\algorithms\FakeAlgorithm;
 use groupcash\php\Groupcash;
+use groupcash\php\model\signing\Binary;
 
 class ApplicationCapabilities {
 
@@ -40,5 +43,13 @@ class ApplicationCapabilities {
 
     public function ICreateAnAccountWithThePassword($password) {
         $this->handle(new CreateAccount($password));
+    }
+
+    public function _EstablishesACurrencyWithTheRules($key, $rules) {
+        $this->handle(new EstablishCurrency(new Authentication(new Binary($key)), $rules));
+    }
+
+    public function _EstablishesACurrencyWithTheRules_UnderTheName($key, $rules, $name) {
+        $this->handle(new EstablishCurrency(new Authentication(new Binary($key)), $rules, $name));
     }
 }

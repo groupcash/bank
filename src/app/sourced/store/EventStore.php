@@ -2,6 +2,7 @@
 namespace groupcash\bank\app\sourced\store;
 
 use groupcash\bank\app\sourced\domain\AggregateIdentifier;
+use groupcash\bank\app\sourced\domain\DomainEvent;
 use groupcash\bank\app\sourced\domain\EventStream;
 
 interface EventStore {
@@ -16,6 +17,13 @@ interface EventStore {
      * @return EventStream
      */
     public function read(AggregateIdentifier $aggregateIdentifier);
+
+    /**
+     * @param AggregateIdentifier $aggregateIdentifier
+     * @param DomainEvent $event
+     * @return void
+     */
+    public function add(AggregateIdentifier $aggregateIdentifier, DomainEvent $event);
 
     /**
      * @param AggregateIdentifier $aggregateIdentifier
