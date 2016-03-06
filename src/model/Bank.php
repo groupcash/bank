@@ -45,7 +45,7 @@ class Bank extends AggregateRoot {
         $key = $this->lib->generateKey();
         $address = $this->lib->getAddress($key);
 
-        $this->record(new AccountCreated($address));
+        $this->record(new AccountCreated(AccountIdentifier::fromBinary($address)));
 
         if ($c->getPassword()) {
             $key = new Binary($this->crypto->encrypt($key->getData(), $c->getPassword()));
@@ -63,8 +63,8 @@ class Bank extends AggregateRoot {
             throw new \Exception('A currency is already registered under this name.');
         }
 
-        $address = $this->auth->getAddress($c->getCurrency());
-        $this->record(new CurrencyRegistered($address, $c->getName()));
+        $currency = CurrencyIdentifier::fromBinary($this->auth->getAddress($c->getCurrency()));
+        $this->record(new CurrencyRegistered($currency, $c->getName()));
     }
 
     protected function applyCurrencyRegistered(CurrencyRegistered $e) {
@@ -73,19 +73,18 @@ class Bank extends AggregateRoot {
 
     protected function handleCreateBacker(CreateBacker $c) {
         $key = $this->lib->generateKey();
-        $this->record(new BackerCreated($key));
-
-        $address = $this->lib->getAddress($key);
+        $backer = BackerIdentifier::fromBinary($this->lib->getAddress($key));
+        $this->record(new BackerCreated($backer, $key));
 
         if ($c->getName()) {
             if (in_array($c->getName(), $this->registeredBackers)) {
                 throw new \Exception('A backer with this name is already registered.');
             }
-            $this->record(new BackerRegistered($address, $c->getName()));
+            $this->record(new BackerRegistered($backer, $c->getName()));
         }
 
         if ($c->getDetails()) {
-            $this->record(new BackerDetailsChanged($address, $c->getDetails()));
+            $this->record(new BackerDetailsChanged($backer, $c->getDetails()));
         }
     }
 

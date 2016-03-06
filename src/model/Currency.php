@@ -8,7 +8,6 @@ use groupcash\bank\EstablishCurrency;
 use groupcash\bank\events\CurrencyEstablished;
 use groupcash\bank\events\IssuerAuthorized;
 use groupcash\php\Groupcash;
-use groupcash\php\model\signing\Binary;
 
 class Currency extends AggregateRoot {
 
@@ -24,7 +23,7 @@ class Currency extends AggregateRoot {
     /** @var bool */
     private $established = false;
 
-    /** @var Binary[] */
+    /** @var AccountIdentifier[] */
     private $authorizedIssuers = [];
 
     /**
@@ -47,8 +46,9 @@ class Currency extends AggregateRoot {
             throw new \Exception("This currency is already established.");
         }
 
+        $currency = CurrencyIdentifier::fromBinary($this->lib->getAddress($key));
         $rules = $this->lib->signCurrencyRules($key, $c->getRules());
-        $this->record(new CurrencyEstablished($rules));
+        $this->record(new CurrencyEstablished($currency, $rules));
     }
 
     protected function applyCurrencyEstablished() {
@@ -64,11 +64,16 @@ class Currency extends AggregateRoot {
             throw new \Exception('This issuer is already authorized.');
         }
 
-        $authorization = $this->lib->authorizeIssuer($this->auth->getKey($c->getCurrency()), $c->getIssuer());
-        $this->record(new IssuerAuthorized($authorization));
+        $currencyKey = $this->auth->getKey($c->getCurrency());
+        $currency = CurrencyIdentifier::fromBinary($this->lib->getAddress($currencyKey));
+        $issuerAddress = $c->getIssuer()->toBinary();
+        $issuer = AccountIdentifier::fromBinary($issuerAddress);
+
+        $authorization = $this->lib->authorizeIssuer($currencyKey, $issuerAddress);
+        $this->record(new IssuerAuthorized($currency, $issuer, $authorization));
     }
 
     protected function applyIssuerAuthorized(IssuerAuthorized $e) {
-        $this->authorizedIssuers[] = $e->getAuthorization()->getIssuerAddress();
+        $this->authorizedIssuers[] = $e->getIssuer();
     }
 }

@@ -6,6 +6,8 @@ use groupcash\bank\events\BackerRegistered;
 use groupcash\bank\events\CurrencyEstablished;
 use groupcash\bank\events\CurrencyRegistered;
 use groupcash\bank\events\IssuerAuthorized;
+use groupcash\bank\model\AccountIdentifier;
+use groupcash\bank\model\BackerIdentifier;
 use groupcash\bank\model\BankIdentifier;
 use groupcash\bank\model\CurrencyIdentifier;
 use groupcash\php\model\Authorization;
@@ -24,20 +26,26 @@ class ApplicationContext {
         $this->events = $events;
     }
 
-    public function TheCurrency_WasEstablished($address) {
-        $this->events->add(new CurrencyIdentifier((string)new Binary($address)),
-            new CurrencyEstablished(new CurrencyRules(
-                new Binary($address),
-                'whatever',
-                null,
-                'signed by me'
-            )));
+    private function enc($data) {
+        return base64_encode($data);
+    }
+
+    public function TheCurrency_WasEstablished($currency) {
+        $this->events->add(new CurrencyIdentifier($this->enc($currency)),
+            new CurrencyEstablished(
+                new CurrencyIdentifier($this->enc($currency)),
+                new CurrencyRules(
+                    new Binary($currency),
+                    'whatever',
+                    null,
+                    'signed by me'
+                )));
     }
 
     public function ACurrencyWasRegisteredUnder($name) {
         $this->events->add(BankIdentifier::singleton(),
             new CurrencyRegistered(
-                new Binary('foo'),
+                new CurrencyIdentifier('foo'),
                 $name
             ));
     }
@@ -45,14 +53,16 @@ class ApplicationContext {
     public function ABackerWasRegisteredUnder($name) {
         $this->events->add(BankIdentifier::singleton(),
             new BackerRegistered(
-                new Binary('foo'),
+                new BackerIdentifier('foo'),
                 $name
             ));
     }
 
     public function _HasAuthorized($currency, $issuer) {
-        $this->events->add(new CurrencyIdentifier((string)new Binary($currency)),
+        $this->events->add(new CurrencyIdentifier($this->enc($currency)),
             new IssuerAuthorized(
+                new CurrencyIdentifier($this->enc($currency)),
+                new AccountIdentifier(base64_encode($issuer)),
                 new Authorization(
                     new Binary($issuer),
                     new Binary($currency),

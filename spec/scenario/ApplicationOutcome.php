@@ -10,7 +10,10 @@ use groupcash\bank\events\BackerRegistered;
 use groupcash\bank\events\CurrencyEstablished;
 use groupcash\bank\events\CurrencyRegistered;
 use groupcash\bank\events\IssuerAuthorized;
+use groupcash\bank\model\AccountIdentifier;
+use groupcash\bank\model\BackerIdentifier;
 use groupcash\bank\model\CreatedAccount;
+use groupcash\bank\model\CurrencyIdentifier;
 use groupcash\php\model\Authorization;
 use groupcash\php\model\CurrencyRules;
 use groupcash\php\model\signing\Binary;
@@ -44,42 +47,12 @@ class ApplicationOutcome {
         $this->events = $events;
     }
 
-    public function ItShouldReturnANewAccountWithTheKey_AndTheAddress($key, $address) {
-        $this->assert->equals($this->return->value,
-            new CreatedAccount(new Binary($key), new Binary($address)));
-    }
-
-    public function AnAccountWithTheAddress_ShouldBeCreated($address) {
-        $this->shouldHaveRecorded(new AccountCreated(new Binary($address)));
+    private function enc($data) {
+        return base64_encode($data);
     }
 
     private function shouldHaveRecorded(DomainEvent $event) {
         $this->assert->contains($this->events->readAll()->getEvents(), $event);
-    }
-
-    public function ItShouldFailWith($message) {
-        $this->except->thenTheException_ShouldBeThrown($message);
-    }
-
-    public function ACurrency_WithTheRules_ShouldBeEstablished($address, $rules) {
-        $this->shouldHaveRecorded(
-            new CurrencyEstablished(new CurrencyRules(
-                new Binary($address),
-                $rules,
-                null,
-                "$address\0$rules\0 signed with $address key"
-            )));
-    }
-
-    public function TheCurrency_ShouldBeRegisteredAs($address, $name) {
-        $this->shouldHaveRecorded(new CurrencyRegistered(
-            new Binary($address),
-            $name
-        ));
-    }
-
-    public function NoCurrencyShouldBeRegistered() {
-        $this->shouldNotHaveRecorded(CurrencyRegistered::class);
     }
 
     private function shouldNotHaveRecorded($class) {
@@ -89,28 +62,67 @@ class ApplicationOutcome {
             }));
     }
 
-    public function ANewBacker_ShouldBeCreated($address) {
-        $this->shouldHaveRecorded(new BackerCreated(
-            new Binary("$address key")
-        ));
+    public function ItShouldReturnANewAccountWithTheKey_AndTheAddress($key, $address) {
+        $this->assert->equals($this->return->value,
+            new CreatedAccount(new Binary($key), new Binary($address)));
     }
 
-    public function TheBacker_ShouldBeRegisteredUnder($address, $name) {
-        $this->shouldHaveRecorded(new BackerRegistered(
-            new Binary($address),
+    public function AnAccount_ShouldBeCreated($account) {
+        $this->shouldHaveRecorded(new AccountCreated(new AccountIdentifier(base64_encode($account))));
+    }
+
+    public function ItShouldFailWith($message) {
+        $this->except->thenTheException_ShouldBeThrown($message);
+    }
+
+    public function ACurrency_WithTheRules_ShouldBeEstablished($currency, $rules) {
+        $this->shouldHaveRecorded(
+            new CurrencyEstablished(
+                new CurrencyIdentifier($this->enc($currency)),
+                new CurrencyRules(
+                    new Binary($currency),
+                    $rules,
+                    null,
+                    "$currency\0$rules\0 signed with $currency key"
+                )));
+    }
+
+    public function TheCurrency_ShouldBeRegisteredAs($currency, $name) {
+        $this->shouldHaveRecorded(new CurrencyRegistered(
+            new CurrencyIdentifier($this->enc($currency)),
             $name
         ));
     }
 
-    public function TheDetailsOfBacker_ShouldBeChangedTo($address, $details) {
+    public function NoCurrencyShouldBeRegistered() {
+        $this->shouldNotHaveRecorded(CurrencyRegistered::class);
+    }
+
+    public function ANewBacker_ShouldBeCreated($backer) {
+        $this->shouldHaveRecorded(new BackerCreated(
+            new BackerIdentifier(base64_encode($backer)),
+            new Binary("$backer key")
+        ));
+    }
+
+    public function TheBacker_ShouldBeRegisteredUnder($backer, $name) {
+        $this->shouldHaveRecorded(new BackerRegistered(
+            new BackerIdentifier(base64_encode($backer)),
+            $name
+        ));
+    }
+
+    public function TheDetailsOfBacker_ShouldBeChangedTo($backer, $details) {
         $this->shouldHaveRecorded(new BackerDetailsChanged(
-            new Binary($address),
+            new BackerIdentifier(base64_encode($backer)),
             $details
         ));
     }
 
     public function TheIssuer_ShouldBeAuthorizedBy($issuer, $currency) {
         $this->shouldHaveRecorded(new IssuerAuthorized(
+            new CurrencyIdentifier(base64_encode($currency)),
+            new AccountIdentifier(base64_encode($issuer)),
             new Authorization(
                 new Binary($issuer),
                 new Binary($currency),

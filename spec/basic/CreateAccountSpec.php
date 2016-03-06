@@ -13,13 +13,13 @@ class CreateAccountSpec {
     function withoutPassword() {
         $this->scenario->when->ICreateAnAccount();
         $this->scenario->then->ItShouldReturnANewAccountWithTheKey_AndTheAddress('fake key', 'fake');
-        $this->scenario->then->AnAccountWithTheAddress_ShouldBeCreated('fake');
+        $this->scenario->then->AnAccount_ShouldBeCreated('fake');
     }
 
     function withPassword() {
         $this->scenario->when->ICreateAnAccountWithThePassword('foo');
         $this->scenario->then->ItShouldReturnANewAccountWithTheKey_AndTheAddress('fake key encrypted with foo', 'fake');
-        $this->scenario->then->AnAccountWithTheAddress_ShouldBeCreated('fake');
+        $this->scenario->then->AnAccount_ShouldBeCreated('fake');
     }
 
     function emptyPassword() {

@@ -7,6 +7,7 @@ use groupcash\bank\model\Authenticator;
 use groupcash\bank\model\BankIdentifier;
 
 class CreateBacker implements ApplicationCommand {
+
     /** @var null|string */
     private $name;
 

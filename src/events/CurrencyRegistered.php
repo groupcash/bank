@@ -2,32 +2,32 @@
 namespace groupcash\bank\events;
 
 use groupcash\bank\app\sourced\domain\DomainEvent;
-use groupcash\php\model\signing\Binary;
+use groupcash\bank\model\CurrencyIdentifier;
 
 class CurrencyRegistered extends DomainEvent {
 
-    /** @var Binary */
-    private $address;
+    /** @var CurrencyIdentifier */
+    private $currency;
 
     /** @var string */
     private $name;
 
     /**
-     * @param Binary $address
+     * @param CurrencyIdentifier $currency
      * @param string $name
      */
-    public function __construct(Binary $address, $name) {
+    public function __construct(CurrencyIdentifier $currency, $name) {
         parent::__construct();
 
-        $this->address = $address;
+        $this->currency = $currency;
         $this->name = $name;
     }
 
     /**
-     * @return Binary
+     * @return CurrencyIdentifier
      */
-    public function getAddress() {
-        return $this->address;
+    public function getCurrency() {
+        return $this->currency;
     }
 
     /**

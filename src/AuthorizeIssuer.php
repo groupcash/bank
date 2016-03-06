@@ -3,24 +3,24 @@ namespace groupcash\bank;
 
 use groupcash\bank\app\ApplicationCommand;
 use groupcash\bank\app\sourced\domain\AggregateIdentifier;
+use groupcash\bank\model\AccountIdentifier;
 use groupcash\bank\model\Authentication;
 use groupcash\bank\model\Authenticator;
 use groupcash\bank\model\CurrencyIdentifier;
-use groupcash\php\model\signing\Binary;
 
 class AuthorizeIssuer implements ApplicationCommand {
 
     /** @var Authentication */
     private $currency;
 
-    /** @var Binary */
+    /** @var AccountIdentifier */
     private $issuer;
 
     /**
      * @param Authentication $currency
-     * @param Binary $issuer
+     * @param AccountIdentifier $issuer
      */
-    public function __construct(Authentication $currency, Binary $issuer) {
+    public function __construct(Authentication $currency, AccountIdentifier $issuer) {
         $this->currency = $currency;
         $this->issuer = $issuer;
     }
@@ -33,7 +33,7 @@ class AuthorizeIssuer implements ApplicationCommand {
     }
 
     /**
-     * @return Binary
+     * @return AccountIdentifier
      */
     public function getIssuer() {
         return $this->issuer;

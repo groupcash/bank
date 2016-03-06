@@ -8,6 +8,7 @@ use groupcash\bank\AuthorizeIssuer;
 use groupcash\bank\CreateAccount;
 use groupcash\bank\CreateBacker;
 use groupcash\bank\EstablishCurrency;
+use groupcash\bank\model\AccountIdentifier;
 use groupcash\bank\model\Authentication;
 use groupcash\bank\RegisterCurrency;
 use groupcash\php\algorithms\FakeAlgorithm;
@@ -75,7 +76,7 @@ class ApplicationCapabilities {
     public function _Authorizes($currency, $issuer) {
         $this->handle(new AuthorizeIssuer(
             $this->auth($currency),
-            new Binary($issuer)
+            new AccountIdentifier(base64_encode($issuer))
         ));
     }
 

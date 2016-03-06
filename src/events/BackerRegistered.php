@@ -2,32 +2,32 @@
 namespace groupcash\bank\events;
 
 use groupcash\bank\app\sourced\domain\DomainEvent;
-use groupcash\php\model\signing\Binary;
+use groupcash\bank\model\BackerIdentifier;
 
 class BackerRegistered extends DomainEvent {
 
-    /** @var Binary */
-    private $address;
+    /** @var BackerIdentifier */
+    private $backer;
 
     /** @var string */
     private $name;
 
     /**
-     * @param Binary $address
+     * @param BackerIdentifier $backer
      * @param string $name
      */
-    public function __construct(Binary $address, $name) {
+    public function __construct(BackerIdentifier $backer, $name) {
         parent::__construct();
 
-        $this->address = $address;
+        $this->backer = $backer;
         $this->name = $name;
     }
 
     /**
-     * @return Binary
+     * @return BackerIdentifier
      */
-    public function getAddress() {
-        return $this->address;
+    public function getBacker() {
+        return $this->backer;
     }
 
     /**
