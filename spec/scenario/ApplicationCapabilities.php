@@ -4,10 +4,12 @@ namespace spec\groupcash\bank\scenario;
 use groupcash\bank\app\Application;
 use groupcash\bank\app\crypto\FakeCryptography;
 use groupcash\bank\app\sourced\store\EventStore;
+use groupcash\bank\AuthorizeIssuer;
 use groupcash\bank\CreateAccount;
 use groupcash\bank\CreateBacker;
 use groupcash\bank\EstablishCurrency;
 use groupcash\bank\model\Authentication;
+use groupcash\bank\RegisterCurrency;
 use groupcash\php\algorithms\FakeAlgorithm;
 use groupcash\php\Groupcash;
 use groupcash\php\model\signing\Binary;
@@ -47,11 +49,15 @@ class ApplicationCapabilities {
     }
 
     public function _EstablishesACurrencyWithTheRules($key, $rules) {
-        $this->handle(new EstablishCurrency(new Authentication(new Binary($key)), $rules));
+        $this->handle(new EstablishCurrency(
+            new Authentication(new Binary($key)),
+            $rules));
     }
 
-    public function _EstablishesACurrencyWithTheRules_UnderTheName($key, $rules, $name) {
-        $this->handle(new EstablishCurrency(new Authentication(new Binary($key)), $rules, $name));
+    public function _RegistersTheCurrencyUnderTheName($key, $name) {
+        $this->handle(new RegisterCurrency(
+            new Authentication(new Binary($key)),
+            $name));
     }
 
     public function ICreateANewBacker() {
@@ -64,5 +70,12 @@ class ApplicationCapabilities {
 
     public function ICreateANewBackerWithTheDetails($details) {
         $this->handle(new CreateBacker(null, $details));
+    }
+
+    public function _Authorizes($currencyKey, $issuerAddress) {
+        $this->handle(new AuthorizeIssuer(
+            new Authentication(new Binary($currencyKey)),
+            new Binary($issuerAddress)
+        ));
     }
 }

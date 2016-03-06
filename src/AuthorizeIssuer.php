@@ -6,22 +6,23 @@ use groupcash\bank\app\sourced\domain\AggregateIdentifier;
 use groupcash\bank\model\Authentication;
 use groupcash\bank\model\Authenticator;
 use groupcash\bank\model\CurrencyIdentifier;
+use groupcash\php\model\signing\Binary;
 
-class EstablishCurrency implements ApplicationCommand {
+class AuthorizeIssuer implements ApplicationCommand {
 
     /** @var Authentication */
     private $currency;
 
-    /** @var string */
-    private $rules;
+    /** @var Binary */
+    private $issuer;
 
     /**
      * @param Authentication $currency
-     * @param string $rules
+     * @param Binary $issuer
      */
-    public function __construct(Authentication $currency, $rules) {
+    public function __construct(Authentication $currency, Binary $issuer) {
         $this->currency = $currency;
-        $this->rules = $rules;
+        $this->issuer = $issuer;
     }
 
     /**
@@ -32,10 +33,10 @@ class EstablishCurrency implements ApplicationCommand {
     }
 
     /**
-     * @return string
+     * @return Binary
      */
-    public function getRules() {
-        return $this->rules;
+    public function getIssuer() {
+        return $this->issuer;
     }
 
     /**

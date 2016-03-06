@@ -5,23 +5,23 @@ use groupcash\bank\app\ApplicationCommand;
 use groupcash\bank\app\sourced\domain\AggregateIdentifier;
 use groupcash\bank\model\Authentication;
 use groupcash\bank\model\Authenticator;
-use groupcash\bank\model\CurrencyIdentifier;
+use groupcash\bank\model\BankIdentifier;
 
-class EstablishCurrency implements ApplicationCommand {
+class RegisterCurrency implements ApplicationCommand {
 
     /** @var Authentication */
     private $currency;
 
     /** @var string */
-    private $rules;
+    private $name;
 
     /**
      * @param Authentication $currency
-     * @param string $rules
+     * @param string $name
      */
-    public function __construct(Authentication $currency, $rules) {
+    public function __construct(Authentication $currency, $name) {
         $this->currency = $currency;
-        $this->rules = $rules;
+        $this->name = $name;
     }
 
     /**
@@ -34,8 +34,8 @@ class EstablishCurrency implements ApplicationCommand {
     /**
      * @return string
      */
-    public function getRules() {
-        return $this->rules;
+    public function getName() {
+        return $this->name;
     }
 
     /**
@@ -43,6 +43,6 @@ class EstablishCurrency implements ApplicationCommand {
      * @return AggregateIdentifier
      */
     public function getAggregateIdentifier(Authenticator $auth) {
-        return new CurrencyIdentifier((string)$auth->getAddress($this->currency));
+        return BankIdentifier::singleton();
     }
 }

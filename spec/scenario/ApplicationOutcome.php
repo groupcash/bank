@@ -9,7 +9,9 @@ use groupcash\bank\events\BackerDetailsChanged;
 use groupcash\bank\events\BackerRegistered;
 use groupcash\bank\events\CurrencyEstablished;
 use groupcash\bank\events\CurrencyRegistered;
+use groupcash\bank\events\IssuerAuthorized;
 use groupcash\bank\model\CreatedAccount;
+use groupcash\php\model\Authorization;
 use groupcash\php\model\CurrencyRules;
 use groupcash\php\model\signing\Binary;
 use rtens\scrut\Assert;
@@ -103,6 +105,16 @@ class ApplicationOutcome {
         $this->shouldHaveRecorded(new BackerDetailsChanged(
             new Binary($address),
             $details
+        ));
+    }
+
+    public function TheIssuer_ShouldBeAuthorizedBy($issuer, $currency) {
+        $this->shouldHaveRecorded(new IssuerAuthorized(
+            new Authorization(
+                new Binary($issuer),
+                new Binary($currency),
+                "$issuer signed with $currency key"
+            )
         ));
     }
 }

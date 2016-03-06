@@ -11,8 +11,11 @@ use groupcash\bank\app\sourced\MessageHandler;
 use groupcash\bank\app\sourced\messaging\Command;
 use groupcash\bank\app\sourced\messaging\Query;
 use groupcash\bank\app\sourced\store\EventStore;
+use groupcash\bank\model\Authenticator;
 use groupcash\bank\model\Bank;
 use groupcash\bank\model\BankIdentifier;
+use groupcash\bank\model\Currency;
+use groupcash\bank\model\CurrencyIdentifier;
 use groupcash\php\Groupcash;
 
 class Application implements Builder, DomainEventListener {
@@ -26,6 +29,9 @@ class Application implements Builder, DomainEventListener {
     /** @var Cryptography */
     private $crypto;
 
+    /** @var Authenticator */
+    private $auth;
+
     /**
      * @param EventStore $events
      * @param Groupcash $library
@@ -34,6 +40,7 @@ class Application implements Builder, DomainEventListener {
     public function __construct(EventStore $events, Groupcash $library, Cryptography $crypto) {
         $this->library = $library;
         $this->crypto = $crypto;
+        $this->auth = new Authenticator($crypto, $library);
 
         $this->handler = new MessageHandler($events, $this);
         $this->handler->addListener($this);
@@ -50,7 +57,7 @@ class Application implements Builder, DomainEventListener {
      */
     public function getAggregateIdentifier(Command $command) {
         if ($command instanceof ApplicationCommand) {
-            return $command->getAggregateIdentifier();
+            return $command->getAggregateIdentifier($this->auth);
         }
 
         throw new \Exception("Not an application command.");
@@ -64,6 +71,8 @@ class Application implements Builder, DomainEventListener {
     public function buildAggregateRoot(AggregateIdentifier $identifier) {
         if ($identifier instanceof BankIdentifier) {
             return new Bank($this->library, $this->crypto);
+        } else if ($identifier instanceof CurrencyIdentifier) {
+            return new Currency($this->library, $this->crypto);
         }
 
         throw new \Exception('Unknown aggregate.');

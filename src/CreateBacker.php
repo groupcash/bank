@@ -3,6 +3,7 @@ namespace groupcash\bank;
 
 use groupcash\bank\app\ApplicationCommand;
 use groupcash\bank\app\sourced\domain\AggregateIdentifier;
+use groupcash\bank\model\Authenticator;
 use groupcash\bank\model\BankIdentifier;
 
 class CreateBacker implements ApplicationCommand {
@@ -36,9 +37,10 @@ class CreateBacker implements ApplicationCommand {
     }
 
     /**
+     * @param Authenticator $auth
      * @return AggregateIdentifier
      */
-    public function getAggregateIdentifier() {
+    public function getAggregateIdentifier(Authenticator $auth) {
         return BankIdentifier::singleton();
     }
 }

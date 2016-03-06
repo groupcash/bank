@@ -27,13 +27,18 @@ class EstablishCurrencySpec {
     }
 
     function withName() {
-        $this->scenario->when->_EstablishesACurrencyWithTheRules_UnderTheName('foo key', 'Foo!', 'bar');
+        $this->scenario->when->_RegistersTheCurrencyUnderTheName('foo key', 'bar');
         $this->scenario->then->TheCurrency_ShouldBeRegisteredAs('foo', 'bar');
+    }
+
+    function emptyName() {
+        $this->scenario->tryThat->_RegistersTheCurrencyUnderTheName('foo key', "\t  ");
+        $this->scenario->then->ItShouldFailWith('The name cannot be empty.');
     }
 
     function nameAlreadyTaken() {
         $this->scenario->given->ACurrencyWasRegisteredUnder('bar');
-        $this->scenario->tryThat->_EstablishesACurrencyWithTheRules_UnderTheName('foo key', 'Foo!', 'bar');
+        $this->scenario->tryThat->_RegistersTheCurrencyUnderTheName('foo key', 'bar');
         $this->scenario->then->ItShouldFailWith('A currency is already registered under this name.');
     }
 }

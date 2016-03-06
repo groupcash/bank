@@ -5,13 +5,12 @@ use groupcash\bank\app\Cryptography;
 use groupcash\bank\app\sourced\domain\AggregateRoot;
 use groupcash\bank\CreateAccount;
 use groupcash\bank\CreateBacker;
-use groupcash\bank\EstablishCurrency;
 use groupcash\bank\events\AccountCreated;
 use groupcash\bank\events\BackerCreated;
 use groupcash\bank\events\BackerDetailsChanged;
 use groupcash\bank\events\BackerRegistered;
-use groupcash\bank\events\CurrencyEstablished;
 use groupcash\bank\events\CurrencyRegistered;
+use groupcash\bank\RegisterCurrency;
 use groupcash\php\Groupcash;
 use groupcash\php\model\signing\Binary;
 
@@ -26,9 +25,6 @@ class Bank extends AggregateRoot {
     /** @var Authenticator */
     private $auth;
 
-    /** @var Binary[] */
-    private $establishedCurrencies = [];
-
     /** @var string[] */
     private $registeredCurrencies = [];
 
@@ -42,7 +38,7 @@ class Bank extends AggregateRoot {
     public function __construct(Groupcash $lib, Cryptography $crypto) {
         $this->lib = $lib;
         $this->crypto = $crypto;
-        $this->auth = new Authenticator($crypto);
+        $this->auth = new Authenticator($crypto, $lib);
     }
 
     protected function handleCreateAccount(CreateAccount $c) {
@@ -58,31 +54,17 @@ class Bank extends AggregateRoot {
         return new CreatedAccount($key, $address);
     }
 
-    protected function handleEstablishCurrency(EstablishCurrency $c) {
-        if (!trim($c->getRules())) {
-            throw new \Exception("The rules cannot be empty.");
+    protected function handleRegisterCurrency(RegisterCurrency $c) {
+        if (!trim($c->getName())) {
+            throw new \Exception('The name cannot be empty.');
         }
 
         if (in_array($c->getName(), $this->registeredCurrencies)) {
             throw new \Exception('A currency is already registered under this name.');
         }
 
-        $key = $this->auth->getKey($c->getCurrency());
-        $address = $this->lib->getAddress($key);
-        if (in_array($address, $this->establishedCurrencies)) {
-            throw new \Exception("This currency is already established.");
-        }
-
-        $rules = $this->lib->signCurrencyRules($key, $c->getRules());
-        $this->record(new CurrencyEstablished($rules));
-
-        if ($c->getName()) {
-            $this->record(new CurrencyRegistered($address, $c->getName()));
-        }
-    }
-
-    protected function applyCurrencyEstablished(CurrencyEstablished $e) {
-        $this->establishedCurrencies[] = $e->getRules()->getCurrencyAddress();
+        $address = $this->auth->getAddress($c->getCurrency());
+        $this->record(new CurrencyRegistered($address, $c->getName()));
     }
 
     protected function applyCurrencyRegistered(CurrencyRegistered $e) {

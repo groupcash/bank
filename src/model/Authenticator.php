@@ -2,6 +2,7 @@
 namespace groupcash\bank\model;
 
 use groupcash\bank\app\Cryptography;
+use groupcash\php\Groupcash;
 use groupcash\php\model\signing\Binary;
 
 class Authenticator {
@@ -9,11 +10,16 @@ class Authenticator {
     /** @var Cryptography */
     private $crypto;
 
+    /** @var Groupcash */
+    private $lib;
+
     /**
      * @param Cryptography $crypto
+     * @param Groupcash $lib
      */
-    public function __construct(Cryptography $crypto) {
+    public function __construct(Cryptography $crypto, Groupcash $lib) {
         $this->crypto = $crypto;
+        $this->lib = $lib;
     }
 
     /**
@@ -28,5 +34,9 @@ class Authenticator {
         return new Binary($this->crypto->decrypt(
             $authentication->getKey()->getData(),
             $authentication->getPassword()));
+    }
+
+    public function getAddress(Authentication $authentication) {
+        return $this->lib->getAddress($authentication->getKey());
     }
 }
