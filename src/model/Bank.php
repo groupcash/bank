@@ -4,8 +4,12 @@ namespace groupcash\bank\model;
 use groupcash\bank\app\Cryptography;
 use groupcash\bank\app\sourced\domain\AggregateRoot;
 use groupcash\bank\CreateAccount;
+use groupcash\bank\CreateBacker;
 use groupcash\bank\EstablishCurrency;
 use groupcash\bank\events\AccountCreated;
+use groupcash\bank\events\BackerCreated;
+use groupcash\bank\events\BackerDetailsChanged;
+use groupcash\bank\events\BackerRegistered;
 use groupcash\bank\events\CurrencyEstablished;
 use groupcash\bank\events\CurrencyRegistered;
 use groupcash\php\Groupcash;
@@ -27,6 +31,9 @@ class Bank extends AggregateRoot {
 
     /** @var string[] */
     private $registeredCurrencies = [];
+
+    /** @var string[] */
+    private $registeredBackers = [];
 
     /**
      * @param Groupcash $lib
@@ -80,5 +87,27 @@ class Bank extends AggregateRoot {
 
     protected function applyCurrencyRegistered(CurrencyRegistered $e) {
         $this->registeredCurrencies[] = $e->getName();
+    }
+
+    protected function handleCreateBacker(CreateBacker $c) {
+        $key = $this->lib->generateKey();
+        $this->record(new BackerCreated($key));
+
+        $address = $this->lib->getAddress($key);
+
+        if ($c->getName()) {
+            if (in_array($c->getName(), $this->registeredBackers)) {
+                throw new \Exception('A backer with this name is already registered.');
+            }
+            $this->record(new BackerRegistered($address, $c->getName()));
+        }
+
+        if ($c->getDetails()) {
+            $this->record(new BackerDetailsChanged($address, $c->getDetails()));
+        }
+    }
+
+    protected function applyBackerRegistered(BackerRegistered $e) {
+        $this->registeredBackers[] = $e->getName();
     }
 }

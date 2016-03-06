@@ -5,6 +5,7 @@ use groupcash\bank\app\Application;
 use groupcash\bank\app\crypto\FakeCryptography;
 use groupcash\bank\app\sourced\store\EventStore;
 use groupcash\bank\CreateAccount;
+use groupcash\bank\CreateBacker;
 use groupcash\bank\EstablishCurrency;
 use groupcash\bank\model\Authentication;
 use groupcash\php\algorithms\FakeAlgorithm;
@@ -51,5 +52,17 @@ class ApplicationCapabilities {
 
     public function _EstablishesACurrencyWithTheRules_UnderTheName($key, $rules, $name) {
         $this->handle(new EstablishCurrency(new Authentication(new Binary($key)), $rules, $name));
+    }
+
+    public function ICreateANewBacker() {
+        $this->handle(new CreateBacker());
+    }
+
+    public function ICreateANewBackerWithTheName($name) {
+        $this->handle(new CreateBacker($name));
+    }
+
+    public function ICreateANewBackerWithTheDetails($details) {
+        $this->handle(new CreateBacker(null, $details));
     }
 }

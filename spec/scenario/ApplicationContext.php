@@ -2,6 +2,7 @@
 namespace spec\groupcash\bank\scenario;
 
 use groupcash\bank\app\sourced\store\EventStore;
+use groupcash\bank\events\BackerRegistered;
 use groupcash\bank\events\CurrencyEstablished;
 use groupcash\bank\events\CurrencyRegistered;
 use groupcash\bank\model\BankIdentifier;
@@ -33,6 +34,14 @@ class ApplicationContext {
     public function ACurrencyWasRegisteredUnder($name) {
         $this->events->add(BankIdentifier::singleton(),
             new CurrencyRegistered(
+                new Binary('foo'),
+                $name
+            ));
+    }
+
+    public function ABackerWasRegisteredUnder($name) {
+        $this->events->add(BankIdentifier::singleton(),
+            new BackerRegistered(
                 new Binary('foo'),
                 $name
             ));

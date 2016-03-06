@@ -4,6 +4,9 @@ namespace spec\groupcash\bank\scenario;
 use groupcash\bank\app\sourced\domain\DomainEvent;
 use groupcash\bank\events\AccountCreated;
 use groupcash\bank\app\sourced\store\EventStore;
+use groupcash\bank\events\BackerCreated;
+use groupcash\bank\events\BackerDetailsChanged;
+use groupcash\bank\events\BackerRegistered;
 use groupcash\bank\events\CurrencyEstablished;
 use groupcash\bank\events\CurrencyRegistered;
 use groupcash\bank\model\CreatedAccount;
@@ -81,5 +84,25 @@ class ApplicationOutcome {
             function (DomainEvent $event) use ($class) {
                 return is_a($event, $class);
             }));
+    }
+
+    public function ANewBackerWithTheKey_ShouldBeCreated($key) {
+        $this->shouldHaveRecorded(new BackerCreated(
+            new Binary($key)
+        ));
+    }
+
+    public function TheBacker_ShouldBeRegisteredUnder($address, $name) {
+        $this->shouldHaveRecorded(new BackerRegistered(
+            new Binary($address),
+            $name
+        ));
+    }
+
+    public function TheDetailsOfBacker_ShouldBeChangedTo($address, $details) {
+        $this->shouldHaveRecorded(new BackerDetailsChanged(
+            new Binary($address),
+            $details
+        ));
     }
 }
