@@ -2,6 +2,7 @@
 namespace spec\groupcash\bank\scenario;
 
 use groupcash\bank\app\Application;
+use groupcash\bank\app\crypto\FakeCryptography;
 use groupcash\bank\app\sourced\store\EventStore;
 use groupcash\bank\CreateAccount;
 use groupcash\php\algorithms\FakeAlgorithm;
@@ -26,7 +27,7 @@ class ApplicationCapabilities {
         $this->return = $return;
         $this->events = $events;
 
-        $this->app = new Application($events, new Groupcash(new FakeAlgorithm()));
+        $this->app = new Application($events, new Groupcash(new FakeAlgorithm()), new FakeCryptography());
     }
 
     public function handle($command) {
@@ -35,5 +36,9 @@ class ApplicationCapabilities {
 
     public function ICreateAnAccount() {
         $this->handle(new CreateAccount());
+    }
+
+    public function ICreateAnAccountWithThePassword($password) {
+        $this->handle(new CreateAccount($password));
     }
 }

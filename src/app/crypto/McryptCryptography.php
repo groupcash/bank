@@ -1,5 +1,7 @@
 <?php
-namespace groupcash\bank\app;
+namespace groupcash\bank\app\crypto;
+
+use groupcash\bank\app\Cryptography;
 
 class McryptCryptography implements Cryptography {
 

@@ -23,12 +23,17 @@ class Application implements Builder, DomainEventListener {
     /** @var Groupcash */
     private $library;
 
+    /** @var Cryptography */
+    private $crypto;
+
     /**
      * @param EventStore $events
      * @param Groupcash $library
+     * @param Cryptography $crypto
      */
-    public function __construct(EventStore $events, Groupcash $library) {
+    public function __construct(EventStore $events, Groupcash $library, Cryptography $crypto) {
         $this->library = $library;
+        $this->crypto = $crypto;
 
         $this->handler = new MessageHandler($events, $this);
         $this->handler->addListener($this);
@@ -58,7 +63,7 @@ class Application implements Builder, DomainEventListener {
      */
     public function buildAggregateRoot(AggregateIdentifier $identifier) {
         if ($identifier instanceof BankIdentifier) {
-            return new Bank($this->library);
+            return new Bank($this->library, $this->crypto);
         }
 
         throw new \Exception('Unknown aggregate.');
