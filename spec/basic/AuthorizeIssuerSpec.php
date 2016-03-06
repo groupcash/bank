@@ -6,4 +6,15 @@ namespace spec\groupcash\bank\basic;
  */
 class AuthorizeIssuerSpec {
 
+    function notAnEstablishedCurrency() {
+    }
+
+    function success() {
+    }
+
+    function issuerAlreadyAuthorized() {
+    }
+
+    function authorizedByAnotherCurrency() {
+    }
 }

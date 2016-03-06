@@ -6,4 +6,9 @@ namespace spec\groupcash\bank\basic;
  */
 class CreateAccountSpec {
 
+    function withoutPassword() {
+    }
+
+    function withPassword() {
+    }
 }

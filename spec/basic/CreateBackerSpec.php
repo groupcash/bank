@@ -6,4 +6,18 @@ namespace spec\groupcash\bank\basic;
  */
 class CreateBackerSpec {
 
+    function withoutPassword() {
+    }
+
+    function withPassword() {
+    }
+
+    function withName() {
+    }
+
+    function nameAlreadyTaken() {
+    }
+
+    function withDetails() {
+    }
 }

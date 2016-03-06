@@ -6,4 +6,21 @@ namespace spec\groupcash\bank\basic;
  */
 class SendCoinSpec {
 
+    function noCoins() {
+    }
+
+    function notEnoughCoins() {
+    }
+
+    function coinsInDifferentCurrency() {
+    }
+
+    function exactMatch() {
+    }
+
+    function keepChange() {
+    }
+
+    function combineCoins() {
+    }
 }

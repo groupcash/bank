@@ -6,4 +6,18 @@ namespace spec\groupcash\bank\basic;
  */
 class EstablishCurrencySpec {
 
+    function emptyRules() {
+    }
+
+    function withoutName() {
+    }
+
+    function currencyAlreadyEstablished() {
+    }
+
+    function withName() {
+    }
+
+    function nameAlreadyTaken() {
+    }
 }

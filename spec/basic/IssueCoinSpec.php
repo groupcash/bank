@@ -6,4 +6,15 @@ namespace spec\groupcash\bank\basic;
  */
 class IssueCoinSpec {
 
+    function emptyDescription() {
+    }
+
+    function notAuthorized() {
+    }
+
+    function notABacker() {
+    }
+
+    function succeed() {
+    }
 }
