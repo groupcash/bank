@@ -48,15 +48,15 @@ class ApplicationCapabilities {
         $this->handle(new CreateAccount($password));
     }
 
-    public function _EstablishesACurrencyWithTheRules($key, $rules) {
+    public function _EstablishesACurrencyWithTheRules($currency, $rules) {
         $this->handle(new EstablishCurrency(
-            new Authentication(new Binary($key)),
+            $this->auth($currency),
             $rules));
     }
 
-    public function _RegistersTheCurrencyUnderTheName($key, $name) {
+    public function _RegistersTheCurrencyUnderTheName($currency, $name) {
         $this->handle(new RegisterCurrency(
-            new Authentication(new Binary($key)),
+            $this->auth($currency),
             $name));
     }
 
@@ -72,10 +72,14 @@ class ApplicationCapabilities {
         $this->handle(new CreateBacker(null, $details));
     }
 
-    public function _Authorizes($currencyKey, $issuerAddress) {
+    public function _Authorizes($currency, $issuer) {
         $this->handle(new AuthorizeIssuer(
-            new Authentication(new Binary($currencyKey)),
-            new Binary($issuerAddress)
+            $this->auth($currency),
+            new Binary($issuer)
         ));
+    }
+
+    private function auth($address) {
+        return new Authentication(new Binary("$address key"));
     }
 }

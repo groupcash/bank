@@ -45,7 +45,8 @@ class ApplicationOutcome {
     }
 
     public function ItShouldReturnANewAccountWithTheKey_AndTheAddress($key, $address) {
-        $this->assert->equals($this->return->value, new CreatedAccount(new Binary($key), new Binary($address)));
+        $this->assert->equals($this->return->value,
+            new CreatedAccount(new Binary($key), new Binary($address)));
     }
 
     public function AnAccountWithTheAddress_ShouldBeCreated($address) {
@@ -60,13 +61,13 @@ class ApplicationOutcome {
         $this->except->thenTheException_ShouldBeThrown($message);
     }
 
-    public function ACurrency_WithTheRules_SignedBy_ShouldBeEstablished($address, $rules, $key) {
+    public function ACurrency_WithTheRules_ShouldBeEstablished($address, $rules) {
         $this->shouldHaveRecorded(
             new CurrencyEstablished(new CurrencyRules(
                 new Binary($address),
                 $rules,
                 null,
-                "$address\0$rules\0 signed with $key"
+                "$address\0$rules\0 signed with $address key"
             )));
     }
 
@@ -88,9 +89,9 @@ class ApplicationOutcome {
             }));
     }
 
-    public function ANewBackerWithTheKey_ShouldBeCreated($key) {
+    public function ANewBacker_ShouldBeCreated($address) {
         $this->shouldHaveRecorded(new BackerCreated(
-            new Binary($key)
+            new Binary("$address key")
         ));
     }
 

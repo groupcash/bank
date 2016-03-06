@@ -11,12 +11,12 @@ class CreateBackerSpec {
 
     function succeed() {
         $this->scenario->when->ICreateANewBacker();
-        $this->scenario->then->ANewBackerWithTheKey_ShouldBeCreated('fake key');
+        $this->scenario->then->ANewBacker_ShouldBeCreated('fake');
     }
 
     function withName() {
         $this->scenario->when->ICreateANewBackerWithTheName('foo');
-        $this->scenario->then->ANewBackerWithTheKey_ShouldBeCreated('fake key');
+        $this->scenario->then->ANewBacker_ShouldBeCreated('fake');
         $this->scenario->then->TheBacker_ShouldBeRegisteredUnder('fake', 'foo');
     }
 

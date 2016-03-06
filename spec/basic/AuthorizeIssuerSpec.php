@@ -14,18 +14,18 @@ class AuthorizeIssuerSpec {
     }
 
     function notAnEstablishedCurrency() {
-        $this->scenario->tryThat->_Authorizes('baz key', 'bar');
+        $this->scenario->tryThat->_Authorizes('baz', 'bar');
         $this->scenario->then->ItShouldFailWith('Not an established currency.');
     }
 
     function success() {
-        $this->scenario->when->_Authorizes('foo key', 'bar');
+        $this->scenario->when->_Authorizes('foo', 'bar');
         $this->scenario->then->TheIssuer_ShouldBeAuthorizedBy('bar', 'foo');
     }
 
     function issuerAlreadyAuthorized() {
         $this->scenario->given->_HasAuthorized('foo', 'bar');
-        $this->scenario->tryThat->_Authorizes('foo key', 'bar');
+        $this->scenario->tryThat->_Authorizes('foo', 'bar');
         $this->scenario->then->ItShouldFailWith('This issuer is already authorized.');
     }
 
@@ -33,7 +33,7 @@ class AuthorizeIssuerSpec {
         $this->scenario->given->TheCurrency_WasEstablished('baz');
         $this->scenario->given->_HasAuthorized('baz', 'bar');
 
-        $this->scenario->when->_Authorizes('foo key', 'bar');
+        $this->scenario->when->_Authorizes('foo', 'bar');
         $this->scenario->then->TheIssuer_ShouldBeAuthorizedBy('bar', 'foo');
     }
 }
