@@ -4,30 +4,43 @@ namespace groupcash\bank;
 use groupcash\bank\app\ApplicationCommand;
 use groupcash\bank\app\sourced\domain\AggregateIdentifier;
 use groupcash\bank\model\AccountIdentifier;
+use groupcash\bank\model\Authentication;
 use groupcash\bank\model\Authenticator;
 use groupcash\bank\model\CurrencyIdentifier;
-use groupcash\php\model\Coin;
+use groupcash\php\model\value\Fraction;
 
-class DeliverCoin implements ApplicationCommand {
+class SendCoins implements ApplicationCommand {
+
+    /** @var Authentication */
+    private $owner;
 
     /** @var AccountIdentifier */
     private $target;
 
-    /** @var Coin */
-    private $coin;
-
     /** @var CurrencyIdentifier */
     private $currency;
 
+    /** @var Fraction */
+    private $value;
+
     /**
+     * @param Authentication $owner
      * @param AccountIdentifier $target
      * @param CurrencyIdentifier $currency
-     * @param Coin $coin
+     * @param Fraction $value
      */
-    public function __construct(AccountIdentifier $target, CurrencyIdentifier $currency, Coin $coin) {
+    public function __construct(Authentication $owner, AccountIdentifier $target, CurrencyIdentifier $currency, Fraction $value) {
+        $this->owner = $owner;
         $this->target = $target;
-        $this->coin = $coin;
         $this->currency = $currency;
+        $this->value = $value;
+    }
+
+    /**
+     * @return Authentication
+     */
+    public function getOwner() {
+        return $this->owner;
     }
 
     /**
@@ -45,10 +58,10 @@ class DeliverCoin implements ApplicationCommand {
     }
 
     /**
-     * @return Coin
+     * @return Fraction
      */
-    public function getCoin() {
-        return $this->coin;
+    public function getValue() {
+        return $this->value;
     }
 
     /**
@@ -56,6 +69,6 @@ class DeliverCoin implements ApplicationCommand {
      * @return AggregateIdentifier
      */
     public function getAggregateIdentifier(Authenticator $auth) {
-        return $this->target;
+        return AccountIdentifier::fromBinary($auth->getAddress($this->owner));
     }
 }

@@ -9,6 +9,7 @@ use groupcash\bank\events\BackerDetailsChanged;
 use groupcash\bank\events\BackerRegistered;
 use groupcash\bank\events\CoinIssued;
 use groupcash\bank\events\CoinReceived;
+use groupcash\bank\events\CoinsSent;
 use groupcash\bank\events\CurrencyEstablished;
 use groupcash\bank\events\CurrencyRegistered;
 use groupcash\bank\events\IssuerAuthorized;
@@ -169,10 +170,27 @@ class ApplicationOutcome {
             if (!($event instanceof CoinReceived)) {
                 return false;
             }
-            return $event->getTarget()->getIdentifier() == $this->enc($account)
+            return
+                $event->getTarget()->getIdentifier() == $this->enc($account)
+                && $event->getCurrency() == new CurrencyIdentifier($this->enc($currency))
                 && $event->getCoin()->getOwner() == new Binary($account)
                 && $event->getCoin()->getValue() == new Fraction($value)
                 && $event->getCoin()->getCurrency() == new Binary($currency);
+        });
+    }
+
+    public function _CoinWorth_ShouldBeSentTo_By($count, $value, $currency, $target, $owner) {
+        $this->shouldHaveRecorded(function ($event) use ($count, $owner, $value, $currency, $target) {
+            if (!($event instanceof CoinsSent)) {
+                return false;
+            }
+            return
+                count($event->getCoins()) == $count
+                && $event->getOwner()->getIdentifier() == $this->enc($owner)
+                && $event->getTarget()->getIdentifier() == $this->enc($target)
+                && $event->getTransferred()->getOwner() == new Binary($target)
+                && $event->getTransferred()->getValue() == new Fraction($value)
+                && $event->getTransferred()->getCurrency() == new Binary($currency);
         });
     }
 }

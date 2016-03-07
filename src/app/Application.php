@@ -13,6 +13,7 @@ use groupcash\bank\app\sourced\messaging\Query;
 use groupcash\bank\app\sourced\store\EventStore;
 use groupcash\bank\DeliverCoin;
 use groupcash\bank\events\CoinIssued;
+use groupcash\bank\events\CoinsSent;
 use groupcash\bank\model\Account;
 use groupcash\bank\model\AccountIdentifier;
 use groupcash\bank\model\Authenticator;
@@ -96,7 +97,16 @@ class Application implements Builder, DomainEventListener {
     protected function onCoinIssued(CoinIssued $e) {
         $this->handle(new DeliverCoin(
             $e->getBacker(),
+            $e->getCurrency(),
             $e->getCoin()
+        ));
+    }
+
+    protected function onCoinsSent(CoinsSent $e) {
+        $this->handle(new DeliverCoin(
+            $e->getTarget(),
+            $e->getCurrency(),
+            $e->getTransferred()
         ));
     }
 

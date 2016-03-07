@@ -14,6 +14,7 @@ use groupcash\bank\model\Authentication;
 use groupcash\bank\model\BackerIdentifier;
 use groupcash\bank\model\CurrencyIdentifier;
 use groupcash\bank\RegisterCurrency;
+use groupcash\bank\SendCoins;
 use groupcash\php\algorithms\FakeAlgorithm;
 use groupcash\php\Groupcash;
 use groupcash\php\model\signing\Binary;
@@ -99,6 +100,15 @@ class ApplicationCapabilities {
             $description,
             new Fraction($value),
             new BackerIdentifier($this->enc($backer))
+        ));
+    }
+
+    public function _Sends__To($owner, $value, $currency, $target) {
+        $this->handle(new SendCoins(
+            $this->auth($owner),
+            new AccountIdentifier($this->enc($target)),
+            new CurrencyIdentifier($this->enc($currency)),
+            new Fraction($value)
         ));
     }
 }
