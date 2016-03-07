@@ -81,22 +81,22 @@ class ApplicationContext {
             ));
     }
 
-    public function _HasReceived($account, $value, $currency) {
+    public function _HasReceivedACoin_Worth($account, $description, $value, $currency) {
         $this->events->add(new AccountIdentifier($this->enc($account)),
             new CoinReceived(
                 new AccountIdentifier($this->enc($account)),
                 new CurrencyIdentifier($this->enc($currency)),
-                $this->coin($account, $value, $currency, 'Foo')
+                $this->coin($account, $value, $currency, $description)
             ));
     }
 
-    public function _HasSent__To($owner, $value, $currency, $target) {
+    public function _HasSentACoin_Worth__To($owner, $description, $value, $currency, $target) {
         $this->events->add(new AccountIdentifier($this->enc($owner)),
             new CoinsSent(
                 new AccountIdentifier($this->enc($owner)),
                 new AccountIdentifier($this->enc($target)),
                 new CurrencyIdentifier($this->enc($currency)),
-                [$this->coin($owner, $value, $currency, 'Foo')],
+                [$this->coin($owner, $value, $currency, $description)],
                 $this->coin($owner, $value, $currency, 'Transferred')
         ));
     }

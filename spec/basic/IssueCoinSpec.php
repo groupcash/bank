@@ -23,6 +23,6 @@ class IssueCoinSpec {
         $this->scenario->given->_HasAuthorized('coin', 'issuer');
         $this->scenario->when->_Issues__To_BackedBy('issuer', 1, 'coin', 'backer', 'Foo');
         $this->scenario->then->ACoinWorth__BackedBy_ShouldBeIssuedTo_SignedBy(1, 'coin', 'Foo', 'backer', 'issuer');
-        $this->scenario->then->_ShouldReceive('backer', 1, 'coin');
+        $this->scenario->then->_ShouldReceiveACoinWorth('backer', 1, 'coin');
     }
 }

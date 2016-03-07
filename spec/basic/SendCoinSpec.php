@@ -11,7 +11,7 @@ use spec\groupcash\bank\scenario\Scenario;
 class SendCoinSpec {
 
     function before() {
-        $this->scenario->given->_HasReceived('bart', 3, 'coin');
+        $this->scenario->given->_HasReceivedACoin_Worth('bart', 'foo', 3, 'coin');
     }
 
     function noCoins() {
@@ -31,12 +31,12 @@ class SendCoinSpec {
 
     function exactMatch() {
         $this->scenario->when->_Sends__To('bart', 3, 'coin', 'lisa');
-        $this->scenario->then->_CoinWorth_ShouldBeSentTo_By(1, 3, 'coin', 'lisa', 'bart');
-        $this->scenario->then->_ShouldReceive('lisa', 3, 'coin');
+        $this->scenario->then->Coin_Worth_ShouldBeSentFrom_To('foo', 3, 'coin', 'bart', 'lisa');
+        $this->scenario->then->_ShouldReceiveACoinWorth('lisa', 3, 'coin');
     }
 
     function sentCoinsAreGone() {
-        $this->scenario->given->_HasSent__To('bart', 3, 'coin', 'lisa');
+        $this->scenario->given->_HasSentACoin_Worth__To('bart', 'foo', 3, 'coin', 'lisa');
         $this->scenario->tryThat->_Sends__To('bart', 3, 'coin', 'lisa');
         $this->scenario->then->ItShouldFailWith('Not enough coins of currency in account.');
     }

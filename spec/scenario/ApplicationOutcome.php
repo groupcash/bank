@@ -17,6 +17,8 @@ use groupcash\bank\model\AccountIdentifier;
 use groupcash\bank\model\BackerIdentifier;
 use groupcash\bank\model\CreatedAccount;
 use groupcash\bank\model\CurrencyIdentifier;
+use groupcash\php\algorithms\FakeAlgorithm;
+use groupcash\php\Groupcash;
 use groupcash\php\model\Authorization;
 use groupcash\php\model\Base;
 use groupcash\php\model\Coin;
@@ -43,6 +45,9 @@ class ApplicationOutcome {
     /** @var EventStore */
     private $events;
 
+    /** @var Groupcash */
+    private $lib;
+
     /**
      * @param Assert $assert
      * @param ExceptionFixture $except
@@ -54,6 +59,8 @@ class ApplicationOutcome {
         $this->except = $except;
         $this->return = $return;
         $this->events = $events;
+
+        $this->lib = new Groupcash(new FakeAlgorithm());
     }
 
     private function enc($data) {
@@ -165,13 +172,11 @@ class ApplicationOutcome {
         ));
     }
 
-    public function _ShouldReceive($account, $value, $currency) {
+    public function _ShouldReceiveACoinWorth($account, $value, $currency) {
         $this->shouldHaveRecorded(function ($event) use ($account, $value, $currency) {
-            if (!($event instanceof CoinReceived)) {
-                return false;
-            }
             return
-                $event->getTarget()->getIdentifier() == $this->enc($account)
+                $event instanceof CoinReceived
+                && $event->getTarget()->getIdentifier() == $this->enc($account)
                 && $event->getCurrency() == new CurrencyIdentifier($this->enc($currency))
                 && $event->getCoin()->getOwner() == new Binary($account)
                 && $event->getCoin()->getValue() == new Fraction($value)
@@ -179,18 +184,24 @@ class ApplicationOutcome {
         });
     }
 
-    public function _CoinWorth_ShouldBeSentTo_By($count, $value, $currency, $target, $owner) {
-        $this->shouldHaveRecorded(function ($event) use ($count, $owner, $value, $currency, $target) {
-            if (!($event instanceof CoinsSent)) {
-                return false;
-            }
+    public function Coin_Worth_ShouldBeSentFrom_To($description, $value, $currency, $owner, $target) {
+        $this->shouldHaveRecorded(function ($event) use ($description, $owner, $value, $currency, $target) {
             return
-                count($event->getCoins()) == $count
-                && $event->getOwner()->getIdentifier() == $this->enc($owner)
-                && $event->getTarget()->getIdentifier() == $this->enc($target)
-                && $event->getTransferred()->getOwner() == new Binary($target)
-                && $event->getTransferred()->getValue() == new Fraction($value)
-                && $event->getTransferred()->getCurrency() == new Binary($currency);
+                $event instanceof CoinsSent
+                && in_array($this->coin($owner, $value, $currency, $description), $event->getCoins())
+                && $event->getTransferred()->getOwner() == new Binary($target);
         });
+    }
+
+    private function coin($owner, $value, $currency, $description) {
+        return $this->lib->issueCoin(
+            new Binary('foo key'),
+            new Binary($currency),
+            $description,
+            new Output(
+                new Binary($owner),
+                new Fraction($value)
+            )
+        );
     }
 }
