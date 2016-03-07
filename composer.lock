@@ -65,12 +65,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/groupcash/php.git",
-                "reference": "e752026ff9044cd210912e7f9f64e39de4877384"
+                "reference": "7856228b99cff220efd943224323594eba295da5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/groupcash/php/zipball/e752026ff9044cd210912e7f9f64e39de4877384",
-                "reference": "e752026ff9044cd210912e7f9f64e39de4877384",
+                "url": "https://api.github.com/repos/groupcash/php/zipball/7856228b99cff220efd943224323594eba295da5",
+                "reference": "7856228b99cff220efd943224323594eba295da5",
                 "shasum": ""
             },
             "require": {
@@ -97,7 +97,7 @@
                 }
             ],
             "description": "PHP implementation of groupcash algorithms",
-            "time": "2016-03-06 16:29:47"
+            "time": "2016-03-07 04:22:00"
         },
         {
             "name": "mdanter/ecc",

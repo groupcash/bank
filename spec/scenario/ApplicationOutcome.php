@@ -15,7 +15,7 @@ use groupcash\bank\model\BackerIdentifier;
 use groupcash\bank\model\CreatedAccount;
 use groupcash\bank\model\CurrencyIdentifier;
 use groupcash\php\model\Authorization;
-use groupcash\php\model\CurrencyRules;
+use groupcash\php\model\RuleBook;
 use groupcash\php\model\signing\Binary;
 use rtens\scrut\Assert;
 use rtens\scrut\fixtures\ExceptionFixture;
@@ -79,7 +79,7 @@ class ApplicationOutcome {
         $this->shouldHaveRecorded(
             new CurrencyEstablished(
                 new CurrencyIdentifier($this->enc($currency)),
-                new CurrencyRules(
+                new RuleBook(
                     new Binary($currency),
                     $rules,
                     null,

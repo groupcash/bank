@@ -3,11 +3,11 @@ namespace groupcash\bank\events;
 
 use groupcash\bank\app\sourced\domain\DomainEvent;
 use groupcash\bank\model\CurrencyIdentifier;
-use groupcash\php\model\CurrencyRules;
+use groupcash\php\model\RuleBook;
 
 class CurrencyEstablished extends DomainEvent {
 
-    /** @var CurrencyRules */
+    /** @var RuleBook */
     private $rules;
 
     /** @var CurrencyIdentifier */
@@ -15,9 +15,9 @@ class CurrencyEstablished extends DomainEvent {
 
     /**
      * @param CurrencyIdentifier $currency
-     * @param CurrencyRules $rules
+     * @param RuleBook $rules
      */
-    public function __construct(CurrencyIdentifier $currency, CurrencyRules $rules) {
+    public function __construct(CurrencyIdentifier $currency, RuleBook $rules) {
         parent::__construct();
 
         $this->rules = $rules;
@@ -32,7 +32,7 @@ class CurrencyEstablished extends DomainEvent {
     }
 
     /**
-     * @return CurrencyRules
+     * @return RuleBook
      */
     public function getRules() {
         return $this->rules;

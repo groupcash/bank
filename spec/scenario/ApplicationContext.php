@@ -11,7 +11,7 @@ use groupcash\bank\model\BackerIdentifier;
 use groupcash\bank\model\BankIdentifier;
 use groupcash\bank\model\CurrencyIdentifier;
 use groupcash\php\model\Authorization;
-use groupcash\php\model\CurrencyRules;
+use groupcash\php\model\RuleBook;
 use groupcash\php\model\signing\Binary;
 
 class ApplicationContext {
@@ -34,7 +34,7 @@ class ApplicationContext {
         $this->events->add(new CurrencyIdentifier($this->enc($currency)),
             new CurrencyEstablished(
                 new CurrencyIdentifier($this->enc($currency)),
-                new CurrencyRules(
+                new RuleBook(
                     new Binary($currency),
                     'whatever',
                     null,

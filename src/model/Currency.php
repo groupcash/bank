@@ -47,7 +47,7 @@ class Currency extends AggregateRoot {
         }
 
         $currency = CurrencyIdentifier::fromBinary($this->lib->getAddress($key));
-        $rules = $this->lib->signCurrencyRules($key, $c->getRules());
+        $rules = $this->lib->signRules($key, $c->getRules());
         $this->record(new CurrencyEstablished($currency, $rules));
     }
 
