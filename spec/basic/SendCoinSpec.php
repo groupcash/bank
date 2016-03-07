@@ -42,8 +42,21 @@ class SendCoinSpec {
     }
 
     function keepChange() {
+        $this->scenario->when->_Sends__To('bart', 2, 'coin', 'lisa');
+
+        $this->scenario->then->Coin_Worth_ShouldBeSentFrom_To('foo', 3, 'coin', 'bart', 'lisa');
+        $this->scenario->then->_ShouldReceiveACoinWorth('lisa', 2, 'coin');
+
+        $this->scenario->then->Coin_Worth_ShouldBeSentFrom_To('foo', 3, 'coin', 'bart', 'bart');
+        $this->scenario->then->_ShouldReceiveACoinWorth('bart', 1, 'coin');
     }
 
     function combineCoins() {
+        $this->scenario->given->_HasReceivedACoin_Worth('bart', 'bar', 2, 'coin');
+        $this->scenario->when->_Sends__To('bart', 5, 'coin', 'lisa');
+
+        $this->scenario->then->Coin_Worth_ShouldBeSentFrom_To('foo', 3, 'coin', 'bart', 'lisa');
+        $this->scenario->then->Coin_Worth_ShouldBeSentFrom_To('bar', 2, 'coin', 'bart', 'lisa');
+        $this->scenario->then->_ShouldReceiveACoinWorth('lisa', 5, 'coin');
     }
 }

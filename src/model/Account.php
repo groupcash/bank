@@ -64,27 +64,40 @@ class Account extends AggregateRoot {
             throw new \Exception('Not enough coins of currency in account.');
         }
 
-        $key = $this->auth->getKey($c->getOwner());
-        $owner = AccountIdentifier::fromBinary($this->lib->getAddress($key));
+        $outputs = [
+            new Output(
+                $c->getTarget()->toBinary(),
+                $c->getValue()
+            )
+        ];
 
-        $transferred = $this->lib->transferCoins(
-            $key,
+        $ownerKey = $this->auth->getKey($c->getOwner());
+        $ownerAddress = $this->lib->getAddress($ownerKey);
+
+        if ($remaining->isLessThan(new Fraction(0))) {
+            $outputs[] = new Output(
+                $ownerAddress,
+                $remaining->negative()
+            );
+        }
+
+        $owner = AccountIdentifier::fromBinary($ownerAddress);
+
+        $transferredCoins = $this->lib->transferCoins(
+            $ownerKey,
             $coins,
-            [
-                new Output(
-                    $c->getTarget()->toBinary(),
-                    $c->getValue()
-                )
-            ]
+            $outputs
         );
 
-        $this->record(new CoinsSent(
-            $owner,
-            $c->getTarget(),
-            $c->getCurrency(),
-            $coins,
-            $transferred[0]
-        ));
+        foreach ($transferredCoins as $transferredCoin) {
+            $this->record(new CoinsSent(
+                $owner,
+                AccountIdentifier::fromBinary($transferredCoin->getOwner()),
+                $c->getCurrency(),
+                $coins,
+                $transferredCoin
+            ));
+        }
     }
 
     protected function applyCoinsSent(CoinsSent $e) {
