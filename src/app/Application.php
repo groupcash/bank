@@ -11,6 +11,10 @@ use groupcash\bank\app\sourced\MessageHandler;
 use groupcash\bank\app\sourced\messaging\Command;
 use groupcash\bank\app\sourced\messaging\Query;
 use groupcash\bank\app\sourced\store\EventStore;
+use groupcash\bank\DeliverCoin;
+use groupcash\bank\events\CoinIssued;
+use groupcash\bank\model\Account;
+use groupcash\bank\model\AccountIdentifier;
 use groupcash\bank\model\Authenticator;
 use groupcash\bank\model\Bank;
 use groupcash\bank\model\BankIdentifier;
@@ -73,6 +77,8 @@ class Application implements Builder, DomainEventListener {
             return new Bank($this->library, $this->crypto);
         } else if ($identifier instanceof CurrencyIdentifier) {
             return new Currency($this->library, $this->crypto);
+        } else if ($identifier instanceof AccountIdentifier) {
+            return new Account($this->library, $this->crypto);
         }
 
         throw new \Exception('Unknown aggregate.');
@@ -85,6 +91,13 @@ class Application implements Builder, DomainEventListener {
      */
     public function buildProjection(Query $query) {
         throw new \Exception('Unknown query.');
+    }
+
+    protected function onCoinIssued(CoinIssued $e) {
+        $this->handle(new DeliverCoin(
+            $e->getBacker(),
+            $e->getCoin()
+        ));
     }
 
     /**

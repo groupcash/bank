@@ -8,12 +8,16 @@ use groupcash\bank\AuthorizeIssuer;
 use groupcash\bank\CreateAccount;
 use groupcash\bank\CreateBacker;
 use groupcash\bank\EstablishCurrency;
+use groupcash\bank\IssueCoin;
 use groupcash\bank\model\AccountIdentifier;
 use groupcash\bank\model\Authentication;
+use groupcash\bank\model\BackerIdentifier;
+use groupcash\bank\model\CurrencyIdentifier;
 use groupcash\bank\RegisterCurrency;
 use groupcash\php\algorithms\FakeAlgorithm;
 use groupcash\php\Groupcash;
 use groupcash\php\model\signing\Binary;
+use groupcash\php\model\value\Fraction;
 
 class ApplicationCapabilities {
 
@@ -35,6 +39,10 @@ class ApplicationCapabilities {
         $this->events = $events;
 
         $this->app = new Application($events, new Groupcash(new FakeAlgorithm()), new FakeCryptography());
+    }
+
+    private function enc($address) {
+        return base64_encode($address);
     }
 
     public function handle($command) {
@@ -76,11 +84,21 @@ class ApplicationCapabilities {
     public function _Authorizes($currency, $issuer) {
         $this->handle(new AuthorizeIssuer(
             $this->auth($currency),
-            new AccountIdentifier(base64_encode($issuer))
+            new AccountIdentifier($this->enc($issuer))
         ));
     }
 
     private function auth($address) {
         return new Authentication(new Binary("$address key"));
+    }
+
+    public function _Issues__To_BackedBy($issuer, $value, $currency, $backer, $description) {
+        $this->handle(new IssueCoin(
+            $this->auth($issuer),
+            new CurrencyIdentifier($this->enc($currency)),
+            $description,
+            new Fraction($value),
+            new BackerIdentifier($this->enc($backer))
+        ));
     }
 }

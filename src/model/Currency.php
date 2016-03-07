@@ -5,9 +5,12 @@ use groupcash\bank\app\Cryptography;
 use groupcash\bank\app\sourced\domain\AggregateRoot;
 use groupcash\bank\AuthorizeIssuer;
 use groupcash\bank\EstablishCurrency;
+use groupcash\bank\events\CoinIssued;
 use groupcash\bank\events\CurrencyEstablished;
 use groupcash\bank\events\IssuerAuthorized;
+use groupcash\bank\IssueCoin;
 use groupcash\php\Groupcash;
+use groupcash\php\model\Output;
 
 class Currency extends AggregateRoot {
 
@@ -75,5 +78,32 @@ class Currency extends AggregateRoot {
 
     protected function applyIssuerAuthorized(IssuerAuthorized $e) {
         $this->authorizedIssuers[] = $e->getIssuer();
+    }
+
+    protected function handleIssueCoin(IssueCoin $c) {
+        if (!trim($c->getDescription())) {
+            throw new \Exception('The description cannot be empty.');
+        }
+
+        $issuerKey = $this->auth->getKey($c->getIssuer());
+        $issuer = AccountIdentifier::fromBinary($this->lib->getAddress($issuerKey));
+
+        if (!in_array($issuer, $this->authorizedIssuers)) {
+            throw new \Exception('Not authorized to issue this currency.');
+        }
+
+        $this->record(new CoinIssued(
+            $c->getCurrency(),
+            $issuer,
+            $c->getBacker(),
+            $this->lib->issueCoin(
+                $issuerKey,
+                $c->getCurrency()->toBinary(),
+                $c->getDescription(),
+                new Output(
+                    $c->getBacker()->toBinary(),
+                    $c->getValue()
+                ))
+        ));
     }
 }
