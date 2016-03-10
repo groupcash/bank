@@ -266,12 +266,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/console.git",
-                "reference": "c25e03505656652c75cc7aa6ce65e3fec6ab14b4"
+                "reference": "7223e0768010b189d217d8304e0cca838dec4491"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/console/zipball/c25e03505656652c75cc7aa6ce65e3fec6ab14b4",
-                "reference": "c25e03505656652c75cc7aa6ce65e3fec6ab14b4",
+                "url": "https://api.github.com/repos/symfony/console/zipball/7223e0768010b189d217d8304e0cca838dec4491",
+                "reference": "7223e0768010b189d217d8304e0cca838dec4491",
                 "shasum": ""
             },
             "require": {
@@ -318,7 +318,7 @@
             ],
             "description": "Symfony Console Component",
             "homepage": "https://symfony.com",
-            "time": "2016-03-07 14:04:32"
+            "time": "2016-03-10 10:11:44"
         },
         {
             "name": "symfony/polyfill-mbstring",
@@ -430,29 +430,30 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/watoki/curir.git",
-                "reference": "6b79793a2d523cd9beaa3e8a0d9f87c06de2f3a4"
+                "reference": "855da994e35f13aa9fbb87777ddb9afab0cafdd9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/watoki/curir/zipball/6b79793a2d523cd9beaa3e8a0d9f87c06de2f3a4",
-                "reference": "6b79793a2d523cd9beaa3e8a0d9f87c06de2f3a4",
+                "url": "https://api.github.com/repos/watoki/curir/zipball/855da994e35f13aa9fbb87777ddb9afab0cafdd9",
+                "reference": "855da994e35f13aa9fbb87777ddb9afab0cafdd9",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.4",
                 "watoki/collections": "*",
-                "watoki/deli": "dev-master",
+                "watoki/deli": "*",
                 "watoki/factory": "*",
                 "watoki/stores": "*"
             },
             "require-dev": {
+                "phpunit/phpunit": "3.7.*@stable",
                 "watoki/scrut": "*"
             },
             "type": "library",
             "autoload": {
-                "psr-0": {
-                    "watoki\\curir": "src/",
-                    "spec\\watoki\\curir": ""
+                "psr-4": {
+                    "watoki\\curir\\": "src/",
+                    "spec\\watoki\\curir\\": "spec/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -474,7 +475,7 @@
                 "routing",
                 "watoki"
             ],
-            "time": "2016-02-18 01:40:26"
+            "time": "2016-03-10 11:17:21"
         },
         {
             "name": "watoki/deli",
@@ -482,12 +483,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/watoki/deli.git",
-                "reference": "af7a672d6208b564c24384bf1014d8c00e91fda4"
+                "reference": "cdc369f29d37cb51addbd9547acee5abf8b5c3e4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/watoki/deli/zipball/af7a672d6208b564c24384bf1014d8c00e91fda4",
-                "reference": "af7a672d6208b564c24384bf1014d8c00e91fda4",
+                "url": "https://api.github.com/repos/watoki/deli/zipball/cdc369f29d37cb51addbd9547acee5abf8b5c3e4",
+                "reference": "cdc369f29d37cb51addbd9547acee5abf8b5c3e4",
                 "shasum": ""
             },
             "require": {
@@ -498,13 +499,14 @@
                 "watoki/stores": "*"
             },
             "require-dev": {
+                "phpunit/phpunit": "3.7.*@stable",
                 "watoki/scrut": "*"
             },
             "type": "library",
             "autoload": {
-                "psr-0": {
-                    "watoki\\deli": "src/",
-                    "spec\\watoki\\deli": ""
+                "psr-4": {
+                    "watoki\\deli\\": "src/",
+                    "spec\\watoki\\deli\\": "spec/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -526,7 +528,7 @@
                 "routing",
                 "watoki"
             ],
-            "time": "2016-02-18 01:43:12"
+            "time": "2016-03-10 10:38:05"
         },
         {
             "name": "watoki/factory",
@@ -674,12 +676,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/watoki/stores.git",
-                "reference": "b00f93f79205bb1f21cd649791da311c3b55f9c6"
+                "reference": "cd26504cca89d5592cd086c8fcfa5bfc28fb40fa"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/watoki/stores/zipball/b00f93f79205bb1f21cd649791da311c3b55f9c6",
-                "reference": "b00f93f79205bb1f21cd649791da311c3b55f9c6",
+                "url": "https://api.github.com/repos/watoki/stores/zipball/cd26504cca89d5592cd086c8fcfa5bfc28fb40fa",
+                "reference": "cd26504cca89d5592cd086c8fcfa5bfc28fb40fa",
                 "shasum": ""
             },
             "require": {
@@ -716,7 +718,7 @@
                 "storage",
                 "watoki"
             ],
-            "time": "2016-03-09 15:09:07"
+            "time": "2016-03-10 08:42:50"
         }
     ],
     "packages-dev": [
