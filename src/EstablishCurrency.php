@@ -1,13 +1,13 @@
 <?php
 namespace groupcash\bank;
 
-use groupcash\bank\app\ApplicationCommand;
-use groupcash\bank\app\sourced\domain\AggregateIdentifier;
+use groupcash\bank\app\Command;
 use groupcash\bank\model\Authentication;
 use groupcash\bank\model\Authenticator;
 use groupcash\bank\model\CurrencyIdentifier;
+use groupcash\bank\model\Identifier;
 
-class EstablishCurrency implements ApplicationCommand {
+class EstablishCurrency implements Command {
 
     /** @var Authentication */
     private $currency;
@@ -40,7 +40,7 @@ class EstablishCurrency implements ApplicationCommand {
 
     /**
      * @param Authenticator $auth
-     * @return AggregateIdentifier
+     * @return Identifier
      */
     public function getAggregateIdentifier(Authenticator $auth) {
         return CurrencyIdentifier::fromBinary($auth->getAddress($this->currency));

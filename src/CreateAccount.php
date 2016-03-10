@@ -1,12 +1,11 @@
 <?php
 namespace groupcash\bank;
 
-use groupcash\bank\app\ApplicationCommand;
-use groupcash\bank\app\sourced\domain\AggregateIdentifier;
+use groupcash\bank\app\Command;
 use groupcash\bank\model\Authenticator;
 use groupcash\bank\model\BankIdentifier;
 
-class CreateAccount implements ApplicationCommand {
+class CreateAccount implements Command {
 
     /** @var null|string */
     private $password;
@@ -27,7 +26,7 @@ class CreateAccount implements ApplicationCommand {
 
     /**
      * @param Authenticator $auth
-     * @return AggregateIdentifier
+     * @return mixed
      */
     public function getAggregateIdentifier(Authenticator $auth) {
         return BankIdentifier::singleton();

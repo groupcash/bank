@@ -1,10 +1,9 @@
 <?php
 namespace groupcash\bank\events;
 
-use groupcash\bank\app\sourced\domain\DomainEvent;
 use groupcash\bank\model\AccountIdentifier;
 
-class AccountCreated extends DomainEvent {
+class AccountRegistered extends DomainEvent {
 
     /** @var AccountIdentifier */
     private $account;

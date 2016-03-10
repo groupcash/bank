@@ -1,5 +1,7 @@
 <?php
-namespace groupcash\bank\app\sourced\domain;
+namespace groupcash\bank\events;
+
+use groupcash\bank\model\Time;
 
 abstract class DomainEvent {
 

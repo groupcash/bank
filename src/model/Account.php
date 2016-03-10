@@ -2,7 +2,6 @@
 namespace groupcash\bank\model;
 
 use groupcash\bank\app\Cryptography;
-use groupcash\bank\app\sourced\domain\AggregateRoot;
 use groupcash\bank\DeliverCoin;
 use groupcash\bank\events\CoinReceived;
 use groupcash\bank\events\CoinsSent;
@@ -12,7 +11,7 @@ use groupcash\php\model\Coin;
 use groupcash\php\model\Output;
 use groupcash\php\model\value\Fraction;
 
-class Account extends AggregateRoot {
+class Account {
 
     /** @var Groupcash */
     private $lib;
@@ -36,19 +35,19 @@ class Account extends AggregateRoot {
         $this->auth = new Authenticator($crypto, $lib);
     }
 
-    protected function handleDeliverCoin(DeliverCoin $c) {
-        $this->record(new CoinReceived(
+    public function handleDeliverCoin(DeliverCoin $c) {
+        return new CoinReceived(
             $c->getTarget(),
             $c->getCurrency(),
             $c->getCoin()
-        ));
+        );
     }
 
-    protected function applyCoinReceived(CoinReceived $e) {
+    public function applyCoinReceived(CoinReceived $e) {
         $this->coins[(string)$e->getCurrency()][] = $e->getCoin();
     }
 
-    protected function handleSendCoins(SendCoins $c) {
+    public function handleSendCoins(SendCoins $c) {
         if (!array_key_exists((string)$c->getCurrency(), $this->coins)) {
             throw new \Exception('No coins of currency in account.');
         }
@@ -89,18 +88,20 @@ class Account extends AggregateRoot {
             $outputs
         );
 
+        $events = [];
         foreach ($transferredCoins as $transferredCoin) {
-            $this->record(new CoinsSent(
+            $events[] = new CoinsSent(
                 $owner,
                 AccountIdentifier::fromBinary($transferredCoin->getOwner()),
                 $c->getCurrency(),
                 $coins,
                 $transferredCoin
-            ));
+            );
         }
+        return $events;
     }
 
-    protected function applyCoinsSent(CoinsSent $e) {
+    public function applyCoinsSent(CoinsSent $e) {
         foreach ($this->coins[(string)$e->getCurrency()] as $i => $coin) {
             if (in_array($coin, $e->getCoins())) {
                 unset($this->coins[(string)$e->getCurrency()][$i]);

@@ -1,15 +1,15 @@
 <?php
 namespace groupcash\bank;
 
-use groupcash\bank\app\ApplicationCommand;
-use groupcash\bank\app\sourced\domain\AggregateIdentifier;
+use groupcash\bank\app\Command;
 use groupcash\bank\model\Authentication;
 use groupcash\bank\model\Authenticator;
 use groupcash\bank\model\BackerIdentifier;
 use groupcash\bank\model\CurrencyIdentifier;
+use groupcash\bank\model\Identifier;
 use groupcash\php\model\value\Fraction;
 
-class IssueCoin implements ApplicationCommand {
+class IssueCoin implements Command {
 
     /** @var Authentication */
     private $issuer;
@@ -78,7 +78,7 @@ class IssueCoin implements ApplicationCommand {
 
     /**
      * @param Authenticator $auth
-     * @return AggregateIdentifier
+     * @return Identifier
      */
     public function getAggregateIdentifier(Authenticator $auth) {
         return $this->currency;

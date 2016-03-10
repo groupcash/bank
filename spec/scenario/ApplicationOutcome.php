@@ -1,9 +1,8 @@
 <?php
 namespace spec\groupcash\bank\scenario;
 
-use groupcash\bank\app\sourced\domain\DomainEvent;
-use groupcash\bank\events\AccountCreated;
-use groupcash\bank\app\sourced\store\EventStore;
+use groupcash\bank\events\AccountRegistered;
+use groupcash\bank\app\sourced\EventStore;
 use groupcash\bank\events\BackerCreated;
 use groupcash\bank\events\BackerDetailsChanged;
 use groupcash\bank\events\BackerRegistered;
@@ -67,20 +66,20 @@ class ApplicationOutcome {
         return base64_encode($data);
     }
 
-    private function shouldHaveRecordedEvent(DomainEvent $event) {
-        $this->assert->contains($this->events->readAll()->getEvents(), $event);
+    private function shouldHaveRecordedEvent($event) {
+        $this->assert->contains($this->events->allEvents(), $event);
     }
 
     private function shouldHaveRecorded(callable $filter) {
-        $domainEvents = $this->events->readAll()->getEvents();
+        $domainEvents = $this->events->allEvents();
 
         $this->assert->not()->size(array_filter($domainEvents, $filter), 0,
             'Not found in ' . ValuePrinter::serialize($domainEvents));
     }
 
     private function shouldNotHaveRecorded($class) {
-        $this->assert->not(array_filter($this->events->readAll()->getEvents(),
-            function (DomainEvent $event) use ($class) {
+        $this->assert->not(array_filter($this->events->allEvents(),
+            function ($event) use ($class) {
                 return is_a($event, $class);
             }));
     }
@@ -90,8 +89,8 @@ class ApplicationOutcome {
             new CreatedAccount(new Binary($key), new Binary($address)));
     }
 
-    public function AnAccount_ShouldBeCreated($account) {
-        $this->shouldHaveRecordedEvent(new AccountCreated(new AccountIdentifier(base64_encode($account))));
+    public function AnAccount_ShouldBeRegistered($account) {
+        $this->shouldHaveRecordedEvent(new AccountRegistered(new AccountIdentifier(base64_encode($account))));
     }
 
     public function ItShouldFailWith($message) {

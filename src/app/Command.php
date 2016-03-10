@@ -1,15 +1,14 @@
 <?php
 namespace groupcash\bank\app;
 
-use groupcash\bank\app\sourced\domain\AggregateIdentifier;
-use groupcash\bank\app\sourced\messaging\Command;
 use groupcash\bank\model\Authenticator;
+use groupcash\bank\model\Identifier;
 
-interface ApplicationCommand extends Command {
+interface Command {
 
     /**
      * @param Authenticator $auth
-     * @return AggregateIdentifier
+     * @return Identifier
      */
     public function getAggregateIdentifier(Authenticator $auth);
 }

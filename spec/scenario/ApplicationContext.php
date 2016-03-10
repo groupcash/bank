@@ -1,7 +1,7 @@
 <?php
 namespace spec\groupcash\bank\scenario;
 
-use groupcash\bank\app\sourced\store\EventStore;
+use groupcash\bank\app\sourced\EventStore;
 use groupcash\bank\events\BackerRegistered;
 use groupcash\bank\events\CoinReceived;
 use groupcash\bank\events\CoinsSent;
@@ -41,64 +41,58 @@ class ApplicationContext {
     }
 
     public function TheCurrency_WasEstablished($currency) {
-        $this->events->add(new CurrencyIdentifier($this->enc($currency)),
-            new CurrencyEstablished(
-                new CurrencyIdentifier($this->enc($currency)),
-                new RuleBook(
-                    new Binary($currency),
-                    'whatever',
-                    null,
-                    'signed by me'
-                )));
+        $this->events->append(new CurrencyEstablished(
+            new CurrencyIdentifier($this->enc($currency)),
+            new RuleBook(
+                new Binary($currency),
+                'whatever',
+                null,
+                'signed by me'
+            )), new CurrencyIdentifier($this->enc($currency)));
     }
 
     public function ACurrencyWasRegisteredUnder($name) {
-        $this->events->add(BankIdentifier::singleton(),
-            new CurrencyRegistered(
-                new CurrencyIdentifier('foo'),
-                $name
-            ));
+        $this->events->append(new CurrencyRegistered(
+            new CurrencyIdentifier('foo'),
+            $name
+        ), BankIdentifier::singleton());
     }
 
     public function ABackerWasRegisteredUnder($name) {
-        $this->events->add(BankIdentifier::singleton(),
-            new BackerRegistered(
-                new BackerIdentifier('foo'),
-                $name
-            ));
+        $this->events->append(new BackerRegistered(
+            new BackerIdentifier('foo'),
+            $name
+        ), BankIdentifier::singleton());
     }
 
     public function _HasAuthorized($currency, $issuer) {
-        $this->events->add(new CurrencyIdentifier($this->enc($currency)),
-            new IssuerAuthorized(
-                new CurrencyIdentifier($this->enc($currency)),
-                new AccountIdentifier(base64_encode($issuer)),
-                new Authorization(
-                    new Binary($issuer),
-                    new Binary($currency),
-                    'some signature'
-                )
-            ));
+        $this->events->append(new IssuerAuthorized(
+            new CurrencyIdentifier($this->enc($currency)),
+            new AccountIdentifier(base64_encode($issuer)),
+            new Authorization(
+                new Binary($issuer),
+                new Binary($currency),
+                'some signature'
+            )
+        ), new CurrencyIdentifier($this->enc($currency)));
     }
 
     public function _HasReceivedACoin_Worth($account, $description, $value, $currency) {
-        $this->events->add(new AccountIdentifier($this->enc($account)),
-            new CoinReceived(
-                new AccountIdentifier($this->enc($account)),
-                new CurrencyIdentifier($this->enc($currency)),
-                $this->coin($account, $value, $currency, $description)
-            ));
+        $this->events->append(new CoinReceived(
+            new AccountIdentifier($this->enc($account)),
+            new CurrencyIdentifier($this->enc($currency)),
+            $this->coin($account, $value, $currency, $description)
+        ), new AccountIdentifier($this->enc($account)));
     }
 
     public function _HasSentACoin_Worth__To($owner, $description, $value, $currency, $target) {
-        $this->events->add(new AccountIdentifier($this->enc($owner)),
-            new CoinsSent(
-                new AccountIdentifier($this->enc($owner)),
-                new AccountIdentifier($this->enc($target)),
-                new CurrencyIdentifier($this->enc($currency)),
-                [$this->coin($owner, $value, $currency, $description)],
-                $this->coin($owner, $value, $currency, 'Transferred')
-        ));
+        $this->events->append(new CoinsSent(
+            new AccountIdentifier($this->enc($owner)),
+            new AccountIdentifier($this->enc($target)),
+            new CurrencyIdentifier($this->enc($currency)),
+            [$this->coin($owner, $value, $currency, $description)],
+            $this->coin($owner, $value, $currency, 'Transferred')
+        ), new AccountIdentifier($this->enc($owner)));
     }
 
     private function coin($owner, $value, $currency, $description) {

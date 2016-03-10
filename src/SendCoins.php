@@ -1,15 +1,15 @@
 <?php
 namespace groupcash\bank;
 
-use groupcash\bank\app\ApplicationCommand;
-use groupcash\bank\app\sourced\domain\AggregateIdentifier;
+use groupcash\bank\app\Command;
 use groupcash\bank\model\AccountIdentifier;
 use groupcash\bank\model\Authentication;
 use groupcash\bank\model\Authenticator;
 use groupcash\bank\model\CurrencyIdentifier;
 use groupcash\php\model\value\Fraction;
+use rtens\domin\parameters\Identifier;
 
-class SendCoins implements ApplicationCommand {
+class SendCoins implements Command {
 
     /** @var Authentication */
     private $owner;
@@ -66,7 +66,7 @@ class SendCoins implements ApplicationCommand {
 
     /**
      * @param Authenticator $auth
-     * @return AggregateIdentifier
+     * @return Identifier
      */
     public function getAggregateIdentifier(Authenticator $auth) {
         return AccountIdentifier::fromBinary($auth->getAddress($this->owner));

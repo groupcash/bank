@@ -1,8 +1,8 @@
 <?php
 namespace spec\groupcash\bank\scenario;
 
-use groupcash\bank\app\sourced\domain\Time;
-use groupcash\bank\app\sourced\store\FakeEventStore;
+use groupcash\bank\app\sourced\stores\MemoryEventStore;
+use groupcash\bank\model\Time;
 use rtens\scrut\Fixture;
 use rtens\scrut\fixtures\ExceptionFixture;
 
@@ -25,7 +25,7 @@ class Scenario extends Fixture {
         Time::$frozen = new \DateTimeImmutable();
         $returned = new ReturnValue();
 
-        $events = new FakeEventStore();
+        $events = new MemoryEventStore();
 
         $this->given = new ApplicationContext($events);
         $this->when = new ApplicationCapabilities($returned, $events);

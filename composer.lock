@@ -266,12 +266,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/console.git",
-                "reference": "79e3a4fd9006cd6d6b9ced7fd9d42c4c31d9b8f6"
+                "reference": "c25e03505656652c75cc7aa6ce65e3fec6ab14b4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/console/zipball/79e3a4fd9006cd6d6b9ced7fd9d42c4c31d9b8f6",
-                "reference": "79e3a4fd9006cd6d6b9ced7fd9d42c4c31d9b8f6",
+                "url": "https://api.github.com/repos/symfony/console/zipball/c25e03505656652c75cc7aa6ce65e3fec6ab14b4",
+                "reference": "c25e03505656652c75cc7aa6ce65e3fec6ab14b4",
                 "shasum": ""
             },
             "require": {
@@ -318,7 +318,7 @@
             ],
             "description": "Symfony Console Component",
             "homepage": "https://symfony.com",
-            "time": "2016-03-04 07:54:35"
+            "time": "2016-03-07 14:04:32"
         },
         {
             "name": "symfony/polyfill-mbstring",
@@ -674,12 +674,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/watoki/stores.git",
-                "reference": "a05679818891becb5d7278120a301ac00fd97ade"
+                "reference": "b00f93f79205bb1f21cd649791da311c3b55f9c6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/watoki/stores/zipball/a05679818891becb5d7278120a301ac00fd97ade",
-                "reference": "a05679818891becb5d7278120a301ac00fd97ade",
+                "url": "https://api.github.com/repos/watoki/stores/zipball/b00f93f79205bb1f21cd649791da311c3b55f9c6",
+                "reference": "b00f93f79205bb1f21cd649791da311c3b55f9c6",
                 "shasum": ""
             },
             "require": {
@@ -688,13 +688,12 @@
                 "watoki/reflect": "*"
             },
             "require-dev": {
-                "watoki/scrut": "*"
+                "rtens/scrut": "dev-master"
             },
             "type": "library",
             "autoload": {
-                "psr-0": {
-                    "watoki\\stores": "src/",
-                    "spec\\watoki\\stores": ""
+                "psr-4": {
+                    "watoki\\stores\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -708,16 +707,16 @@
                     "homepage": "http://rtens.org"
                 }
             ],
-            "description": "PHP library for simple PDO based data storage.",
+            "description": "PHP library for storing data.",
             "homepage": "http://github.com/watoki/stores",
             "keywords": [
                 "database",
-                "pdo",
+                "orm",
                 "repository",
                 "storage",
                 "watoki"
             ],
-            "time": "2016-02-17 17:29:28"
+            "time": "2016-03-09 15:09:07"
         }
     ],
     "packages-dev": [
@@ -727,12 +726,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/rtens/scrut.git",
-                "reference": "aac4c34f19c93a59fd917175ec7e64b9298c0921"
+                "reference": "83a23fab0e9ae23b6a7373fde9ef0e548162f40b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rtens/scrut/zipball/aac4c34f19c93a59fd917175ec7e64b9298c0921",
-                "reference": "aac4c34f19c93a59fd917175ec7e64b9298c0921",
+                "url": "https://api.github.com/repos/rtens/scrut/zipball/83a23fab0e9ae23b6a7373fde9ef0e548162f40b",
+                "reference": "83a23fab0e9ae23b6a7373fde9ef0e548162f40b",
                 "shasum": ""
             },
             "require": {
@@ -744,9 +743,8 @@
             ],
             "type": "library",
             "autoload": {
-                "psr-0": {
-                    "rtens\\scrut": "src/",
-                    "spec\\rtens\\scrut": ""
+                "psr-4": {
+                    "rtens\\scrut\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -768,7 +766,7 @@
                 "test",
                 "test runner"
             ],
-            "time": "2016-02-17 06:03:43"
+            "time": "2016-03-08 12:33:18"
         }
     ],
     "aliases": [],

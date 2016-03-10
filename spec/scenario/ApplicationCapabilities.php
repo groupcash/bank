@@ -3,7 +3,7 @@ namespace spec\groupcash\bank\scenario;
 
 use groupcash\bank\app\Application;
 use groupcash\bank\app\crypto\FakeCryptography;
-use groupcash\bank\app\sourced\store\EventStore;
+use groupcash\bank\app\sourced\EventStore;
 use groupcash\bank\AuthorizeIssuer;
 use groupcash\bank\CreateAccount;
 use groupcash\bank\CreateBacker;

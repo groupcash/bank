@@ -2,7 +2,6 @@
 namespace groupcash\bank\model;
 
 use groupcash\bank\app\Cryptography;
-use groupcash\bank\app\sourced\domain\AggregateRoot;
 use groupcash\bank\AuthorizeIssuer;
 use groupcash\bank\EstablishCurrency;
 use groupcash\bank\events\CoinIssued;
@@ -12,7 +11,7 @@ use groupcash\bank\IssueCoin;
 use groupcash\php\Groupcash;
 use groupcash\php\model\Output;
 
-class Currency extends AggregateRoot {
+class Currency {
 
     /** @var Groupcash */
     private $lib;
@@ -39,7 +38,7 @@ class Currency extends AggregateRoot {
         $this->auth = new Authenticator($crypto, $lib);
     }
 
-    protected function handleEstablishCurrency(EstablishCurrency $c) {
+    public function handleEstablishCurrency(EstablishCurrency $c) {
         if (!trim($c->getRules())) {
             throw new \Exception("The rules cannot be empty.");
         }
@@ -51,14 +50,15 @@ class Currency extends AggregateRoot {
 
         $currency = CurrencyIdentifier::fromBinary($this->lib->getAddress($key));
         $rules = $this->lib->signRules($key, $c->getRules());
-        $this->record(new CurrencyEstablished($currency, $rules));
+
+        return new CurrencyEstablished($currency, $rules);
     }
 
-    protected function applyCurrencyEstablished() {
+    public function applyCurrencyEstablished() {
         $this->established = true;
     }
 
-    protected function handleAuthorizeIssuer(AuthorizeIssuer $c) {
+    public function handleAuthorizeIssuer(AuthorizeIssuer $c) {
         if (!$this->established) {
             throw new \Exception('Not an established currency.');
         }
@@ -73,14 +73,16 @@ class Currency extends AggregateRoot {
         $issuer = AccountIdentifier::fromBinary($issuerAddress);
 
         $authorization = $this->lib->authorizeIssuer($currencyKey, $issuerAddress);
-        $this->record(new IssuerAuthorized($currency, $issuer, $authorization));
+
+
+        return new IssuerAuthorized($currency, $issuer, $authorization);
     }
 
-    protected function applyIssuerAuthorized(IssuerAuthorized $e) {
+    public function applyIssuerAuthorized(IssuerAuthorized $e) {
         $this->authorizedIssuers[] = $e->getIssuer();
     }
 
-    protected function handleIssueCoin(IssueCoin $c) {
+    public function handleIssueCoin(IssueCoin $c) {
         if (!trim($c->getDescription())) {
             throw new \Exception('The description cannot be empty.');
         }
@@ -92,7 +94,7 @@ class Currency extends AggregateRoot {
             throw new \Exception('Not authorized to issue this currency.');
         }
 
-        $this->record(new CoinIssued(
+        return new CoinIssued(
             $c->getCurrency(),
             $issuer,
             $c->getBacker(),
@@ -104,6 +106,6 @@ class Currency extends AggregateRoot {
                     $c->getBacker()->toBinary(),
                     $c->getValue()
                 ))
-        ));
+        );
     }
 }
