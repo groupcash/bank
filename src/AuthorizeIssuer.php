@@ -44,6 +44,6 @@ class AuthorizeIssuer implements Command {
      * @return Identifier
      */
     public function getAggregateIdentifier(Authenticator $auth) {
-        return new CurrencyIdentifier((string)$auth->getAddress($this->currency));
+        return CurrencyIdentifier::fromBinary($auth->getAddress($this->currency));
     }
 }

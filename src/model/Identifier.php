@@ -27,10 +27,10 @@ abstract class Identifier {
     }
 
     public static function fromBinary(Binary $binary) {
-        return new static(str_replace('/', '_', base64_encode($binary->getData())));
+        return new static(base64_encode($binary->getData()));
     }
 
     public function toBinary() {
-        return new Binary(base64_decode(str_replace('_', '/', $this->__toString())));
+        return new Binary(base64_decode($this->__toString()));
     }
 }
