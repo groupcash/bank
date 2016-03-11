@@ -1,5 +1,5 @@
 <?php
-namespace groupcash\bank\app\web;
+namespace groupcash\bank\app\io\web;
 
 use groupcash\php\model\signing\Binary;
 use rtens\domin\delivery\web\fields\StringField;

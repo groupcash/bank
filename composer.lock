@@ -65,12 +65,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/groupcash/php.git",
-                "reference": "faa0aa77f519af68ab743e8a57da1b49035a6e06"
+                "reference": "a01c10f793faf7579bee5d784724af1eba1fdc7a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/groupcash/php/zipball/faa0aa77f519af68ab743e8a57da1b49035a6e06",
-                "reference": "faa0aa77f519af68ab743e8a57da1b49035a6e06",
+                "url": "https://api.github.com/repos/groupcash/php/zipball/a01c10f793faf7579bee5d784724af1eba1fdc7a",
+                "reference": "a01c10f793faf7579bee5d784724af1eba1fdc7a",
                 "shasum": ""
             },
             "require": {
@@ -97,7 +97,7 @@
                 }
             ],
             "description": "PHP implementation of groupcash algorithms",
-            "time": "2016-03-07 10:35:03"
+            "time": "2016-03-11 09:10:48"
         },
         {
             "name": "mdanter/ecc",
@@ -209,12 +209,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/rtens/domin.git",
-                "reference": "1f7de47e1eb4bbd9c86511b18738e98f885e0360"
+                "reference": "f576123082447f34ce4889419b78bf2f5b714c2e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rtens/domin/zipball/1f7de47e1eb4bbd9c86511b18738e98f885e0360",
-                "reference": "1f7de47e1eb4bbd9c86511b18738e98f885e0360",
+                "url": "https://api.github.com/repos/rtens/domin/zipball/f576123082447f34ce4889419b78bf2f5b714c2e",
+                "reference": "f576123082447f34ce4889419b78bf2f5b714c2e",
                 "shasum": ""
             },
             "require": {
@@ -258,7 +258,7 @@
                 "ddd",
                 "domain model"
             ],
-            "time": "2016-03-04 08:55:01"
+            "time": "2016-03-10 12:06:34"
         },
         {
             "name": "symfony/console",
@@ -676,12 +676,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/watoki/stores.git",
-                "reference": "cd26504cca89d5592cd086c8fcfa5bfc28fb40fa"
+                "reference": "1f928aa4be4aa4f25383d37222443753d0c361dd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/watoki/stores/zipball/cd26504cca89d5592cd086c8fcfa5bfc28fb40fa",
-                "reference": "cd26504cca89d5592cd086c8fcfa5bfc28fb40fa",
+                "url": "https://api.github.com/repos/watoki/stores/zipball/1f928aa4be4aa4f25383d37222443753d0c361dd",
+                "reference": "1f928aa4be4aa4f25383d37222443753d0c361dd",
                 "shasum": ""
             },
             "require": {
@@ -718,7 +718,7 @@
                 "storage",
                 "watoki"
             ],
-            "time": "2016-03-10 08:42:50"
+            "time": "2016-03-11 06:58:59"
         }
     ],
     "packages-dev": [

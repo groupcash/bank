@@ -46,7 +46,6 @@ class ApplicationContext {
             new RuleBook(
                 new Binary($currency),
                 'whatever',
-                null,
                 'signed by me'
             )), new CurrencyIdentifier($this->enc($currency)));
     }

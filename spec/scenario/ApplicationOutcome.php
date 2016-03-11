@@ -104,7 +104,6 @@ class ApplicationOutcome {
                 new RuleBook(
                     new Binary($currency),
                     $rules,
-                    null,
                     "$currency\0$rules\0 signed with $currency key"
                 )));
     }

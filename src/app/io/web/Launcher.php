@@ -1,8 +1,9 @@
 <?php
-namespace groupcash\bank\app\web;
+namespace groupcash\bank\app\io\web;
 
 use groupcash\bank\app\Application;
 use groupcash\bank\app\crypto\McryptCryptography;
+use groupcash\bank\app\io\IdentifierTransformer;
 use groupcash\bank\app\sourced\stores\StoringEventStore;
 use groupcash\bank\AuthorizeIssuer;
 use groupcash\bank\CreateAccount;
@@ -19,6 +20,7 @@ use watoki\curir\WebDelivery;
 use watoki\stores\serializing\SerializerRepository;
 use watoki\stores\serializing\serializers\JsonSerializer;
 use watoki\stores\stores\FileStore;
+use watoki\stores\transforming\TransformerRegistryRepository;
 
 class Launcher {
 
@@ -39,10 +41,14 @@ class Launcher {
     }
 
     public function run() {
+        $this->configureStores();
+
         WebDelivery::quickResponse(IndexResource::class, WebApplication::init(function (WebApplication $app) {
             $app->setNameAndBrand('bank');
 
             $app->fields->add(new BinaryField());
+            $app->fields->add(new IdentifierField());
+            $app->fields->add(new FractionField());
 
             $this->addAction($app, CreateAccount::class);
             $this->addAction($app, CreateBacker::class);
@@ -57,5 +63,10 @@ class Launcher {
         $app->actions->add((new \ReflectionClass($class))->getShortName(), new GenericObjectAction($class, $app->types, $app->parser, function ($action) {
             return $this->application->handle($action);
         }));
+    }
+
+    private function configureStores() {
+        TransformerRegistryRepository::getDefaultTransformerRegistry()
+            ->insert(new IdentifierTransformer(TransformerRegistryRepository::getDefaultTypeMapper()));
     }
 }
