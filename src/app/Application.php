@@ -70,7 +70,7 @@ class Application implements AggregateFactory, ProjectionFactory, EventListener 
 
     protected function onCoinIssued(CoinIssued $e) {
         $this->handle(new DeliverCoin(
-            $e->getBacker(),
+            new AccountIdentifier($e->getBacker()->getIdentifier()),
             $e->getCurrency(),
             $e->getCoin()
         ));
