@@ -12,6 +12,7 @@ use groupcash\bank\events\CoinsSent;
 use groupcash\bank\events\CurrencyEstablished;
 use groupcash\bank\events\CurrencyRegistered;
 use groupcash\bank\events\IssuerAuthorized;
+use groupcash\bank\events\RequestCancelled;
 use groupcash\bank\model\AccountIdentifier;
 use groupcash\bank\model\BackerIdentifier;
 use groupcash\bank\model\CurrencyIdentifier;
@@ -210,6 +211,14 @@ class ApplicationOutcome {
             new AccountIdentifier($this->enc($account)),
             new CurrencyIdentifier($this->enc($currency)),
             new Fraction($value)
+        ));
+    }
+
+    public function theRequestFrom_For_ShouldBeCancelled_By($account, $currency, $issuer) {
+        $this->shouldHaveRecordedEvent(new RequestCancelled(
+            new AccountIdentifier($this->enc($issuer)),
+            new CurrencyIdentifier($this->enc($currency)),
+            new AccountIdentifier($this->enc($account))
         ));
     }
 }

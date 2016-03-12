@@ -5,6 +5,7 @@ use groupcash\bank\app\Application;
 use groupcash\bank\app\crypto\FakeCryptography;
 use groupcash\bank\app\sourced\EventStore;
 use groupcash\bank\AuthorizeIssuer;
+use groupcash\bank\CancelRequest;
 use groupcash\bank\CreateBacker;
 use groupcash\bank\EstablishCurrency;
 use groupcash\bank\GenerateAccount;
@@ -129,6 +130,14 @@ class ApplicationCapabilities {
             $this->auth($account),
             new CurrencyIdentifier($this->enc($currency)),
             new Fraction($value)
+        ));
+    }
+
+    public function _CancelsTheRequestOf_For($issuer, $account, $currency) {
+        $this->handle(new CancelRequest(
+            $this->auth($issuer),
+            new CurrencyIdentifier($this->enc($currency)),
+            new AccountIdentifier($this->enc($account))
         ));
     }
 }

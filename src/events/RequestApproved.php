@@ -4,7 +4,7 @@ namespace groupcash\bank\events;
 use groupcash\bank\model\AccountIdentifier;
 use groupcash\bank\model\CurrencyIdentifier;
 
-class RequestCancelled {
+class RequestApproved {
 
     /** @var AccountIdentifier */
     private $issuer;

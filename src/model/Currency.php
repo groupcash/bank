@@ -3,6 +3,7 @@ namespace groupcash\bank\model;
 
 use groupcash\bank\app\Cryptography;
 use groupcash\bank\AuthorizeIssuer;
+use groupcash\bank\CancelRequest;
 use groupcash\bank\CreateBacker;
 use groupcash\bank\EstablishCurrency;
 use groupcash\bank\events\BackerCreated;
@@ -10,6 +11,7 @@ use groupcash\bank\events\CoinIssued;
 use groupcash\bank\events\CoinsRequested;
 use groupcash\bank\events\CurrencyEstablished;
 use groupcash\bank\events\IssuerAuthorized;
+use groupcash\bank\events\RequestApproved;
 use groupcash\bank\events\RequestCancelled;
 use groupcash\bank\IssueCoin;
 use groupcash\bank\RequestCoins;
@@ -173,7 +175,29 @@ class Currency {
         $this->activeRequests[(string)$e->getAccount()] = $e->getValue();
     }
 
+    public function handleCancelRequest(CancelRequest $c) {
+        $issuer = AccountIdentifier::fromBinary($this->auth->getAddress($c->getIssuer()));
+        if (!in_array($issuer, $this->authorizedIssuers)) {
+            throw new \Exception('Not authorized for this currency.');
+        }
+
+        if (!array_key_exists((string)$c->getAccount(), $this->activeRequests)) {
+            throw new \Exception('There is not active request for this account.');
+        }
+
+        return new RequestCancelled(
+            $issuer,
+            $c->getCurrency(),
+            $c->getAccount()
+        );
+    }
+
     public function applyRequestCancelled(RequestCancelled $e) {
         $this->availableSum = $this->availableSum->plus($this->activeRequests[(string)$e->getAccount()]);
+        unset($this->activeRequests[(string)$e->getAccount()]);
+    }
+
+    public function applyRequestApproved(RequestApproved $e) {
+        unset($this->activeRequests[(string)$e->getAccount()]);
     }
 }

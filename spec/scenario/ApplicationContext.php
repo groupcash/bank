@@ -11,6 +11,7 @@ use groupcash\bank\events\CoinsSent;
 use groupcash\bank\events\CurrencyEstablished;
 use groupcash\bank\events\CurrencyRegistered;
 use groupcash\bank\events\IssuerAuthorized;
+use groupcash\bank\events\RequestApproved;
 use groupcash\bank\events\RequestCancelled;
 use groupcash\bank\model\AccountIdentifier;
 use groupcash\bank\model\BackerIdentifier;
@@ -138,6 +139,15 @@ class ApplicationContext {
 
     public function TheRequestBy_For_WasCancelled($account, $currency) {
         $this->events->append(new RequestCancelled(
+            new AccountIdentifier($this->enc('some issuer')),
+            new CurrencyIdentifier($this->enc($currency)),
+            new AccountIdentifier($this->enc($account))
+        ), new CurrencyIdentifier($this->enc($currency)));
+    }
+
+    public function TheRequestBy_For_WasApproved($account, $currency) {
+        $this->events->append(new RequestApproved(
+            new AccountIdentifier($this->enc('some issuer')),
             new CurrencyIdentifier($this->enc($currency)),
             new AccountIdentifier($this->enc($account))
         ), new CurrencyIdentifier($this->enc($currency)));
