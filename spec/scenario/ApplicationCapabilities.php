@@ -78,8 +78,8 @@ class ApplicationCapabilities {
         $this->handle(new CreateBacker($name));
     }
 
-    public function ICreateANewBackerWithTheDetails($details) {
-        $this->handle(new CreateBacker(null, $details));
+    public function ICreateANewBackerWithTheName_AndTheDetails($name, $details) {
+        $this->handle(new CreateBacker($name, $details));
     }
 
     public function _Authorizes($currency, $issuer) {

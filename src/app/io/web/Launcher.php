@@ -10,6 +10,7 @@ use groupcash\bank\GenerateAccount;
 use groupcash\bank\CreateBacker;
 use groupcash\bank\EstablishCurrency;
 use groupcash\bank\IssueCoin;
+use groupcash\bank\RegisterBacker;
 use groupcash\bank\SendCoins;
 use groupcash\php\algorithms\EccAlgorithm;
 use groupcash\php\Groupcash;
@@ -52,6 +53,7 @@ class Launcher {
 
             $this->addAction($app, GenerateAccount::class);
             $this->addAction($app, CreateBacker::class);
+            $this->addAction($app, RegisterBacker::class);
             $this->addAction($app, EstablishCurrency::class);
             $this->addAction($app, AuthorizeIssuer::class);
             $this->addAction($app, IssueCoin::class);

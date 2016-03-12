@@ -7,6 +7,7 @@ use groupcash\bank\events\BackerCreated;
 use groupcash\bank\events\BackerDetailsChanged;
 use groupcash\bank\events\BackerRegistered;
 use groupcash\bank\events\CurrencyRegistered;
+use groupcash\bank\RegisterBacker;
 use groupcash\bank\RegisterCurrency;
 use groupcash\php\Groupcash;
 
@@ -59,18 +60,19 @@ class Bank {
         $key = $this->lib->generateKey();
         $backer = BackerIdentifier::fromBinary($this->lib->getAddress($key));
 
-        $events = [];
-        $events[] = new BackerCreated($backer, $key);
+        $events = [new BackerCreated($backer, $key)];
 
         if ($c->getName()) {
-            if (in_array($c->getName(), $this->registeredBackers)) {
-                throw new \Exception('A backer with this name is already registered.');
-            }
-            $events[] = new BackerRegistered($backer, $c->getName());
-        }
-
-        if ($c->getDetails()) {
-            $events[] = new BackerDetailsChanged($backer, $c->getDetails());
+            $events = array_merge(
+                $events,
+                $this->handleRegisterBacker(new RegisterBacker(
+                    $backer,
+                    $c->getName(),
+                    $c->getDetails()
+                ))
+            );
+        } else if ($c->getDetails()) {
+            throw new \Exception('A backer needs a name to be registered with details.');
         }
 
         return $events;
@@ -78,5 +80,24 @@ class Bank {
 
     public function applyBackerRegistered(BackerRegistered $e) {
         $this->registeredBackers[] = $e->getName();
+    }
+
+    private function handleRegisterBacker(RegisterBacker $c) {
+        $name = trim($c->getName());
+        if (!$name) {
+            throw new \Exception('The name cannot be empty.');
+        }
+        $backer = new BackerIdentifier($c->getAccount()->getIdentifier());
+
+        if (in_array($name, $this->registeredBackers)) {
+            throw new \Exception('A backer with this name is already registered.');
+        }
+        $events = [new BackerRegistered($backer, $name)];
+
+        if ($c->getDetails()) {
+            $events[] = new BackerDetailsChanged($backer, $c->getDetails());
+        }
+
+        return $events;
     }
 }
