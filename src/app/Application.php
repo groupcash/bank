@@ -8,17 +8,23 @@ use groupcash\bank\app\sourced\EventStore;
 use groupcash\bank\app\sourced\query\ProjectionFactory;
 use groupcash\bank\app\sourced\query\QueryProjector;
 use groupcash\bank\DeliverCoin;
+use groupcash\bank\events\BackerCreated;
 use groupcash\bank\events\CoinIssued;
 use groupcash\bank\events\CoinsSent;
+use groupcash\bank\events\RequestApproved;
 use groupcash\bank\GenerateAccount;
 use groupcash\bank\model\Account;
 use groupcash\bank\model\AccountIdentifier;
 use groupcash\bank\model\Authenticator;
+use groupcash\bank\model\Backer;
+use groupcash\bank\model\BackerIdentifier;
 use groupcash\bank\model\Bank;
 use groupcash\bank\model\BankIdentifier;
 use groupcash\bank\model\Currency;
 use groupcash\bank\model\CurrencyIdentifier;
 use groupcash\bank\projecting\GeneratedAccount;
+use groupcash\bank\SendRequestedCoins;
+use groupcash\bank\StoreBackerKey;
 use groupcash\php\Groupcash;
 
 class Application implements AggregateFactory, ProjectionFactory, EventListener {
@@ -78,6 +84,24 @@ class Application implements AggregateFactory, ProjectionFactory, EventListener 
         ));
     }
 
+    protected function onBackerCreated(BackerCreated $e) {
+        $this->handle(new StoreBackerKey(
+            $e->getBacker(),
+            $e->getKey()
+        ));
+    }
+
+    protected function onRequestApproved(RequestApproved $e) {
+        foreach ($e->getContributors() as $backer) {
+            $this->handle(new SendRequestedCoins(
+                $backer,
+                $e->getContribution($backer),
+                $e->getCurrency(),
+                $e->getTarget()
+            ));
+        }
+    }
+
     /**
      * @param mixed $identifier
      * @return object
@@ -88,6 +112,8 @@ class Application implements AggregateFactory, ProjectionFactory, EventListener 
             return new Bank($this->library, $this->crypto);
         } else if ($identifier instanceof CurrencyIdentifier) {
             return new Currency($this->library, $this->crypto);
+        } else if ($identifier instanceof BackerIdentifier) {
+            return new Backer($this->library, $this->crypto);
         } else if ($identifier instanceof AccountIdentifier) {
             return new Account($this->library, $this->crypto);
         }

@@ -4,6 +4,7 @@ namespace spec\groupcash\bank\scenario;
 use groupcash\bank\app\Application;
 use groupcash\bank\app\crypto\FakeCryptography;
 use groupcash\bank\app\sourced\EventStore;
+use groupcash\bank\ApproveRequest;
 use groupcash\bank\AuthorizeIssuer;
 use groupcash\bank\CancelRequest;
 use groupcash\bank\CreateBacker;
@@ -50,6 +51,11 @@ class ApplicationCapabilities {
     }
 
     public function handle($command) {
+        foreach ($this->events->allEvents() as $event) {
+            if ($this->app->listensTo($event)) {
+                $this->app->on($event);
+            }
+        }
         $this->return->value = $this->app->handle($command);
     }
 
@@ -135,6 +141,14 @@ class ApplicationCapabilities {
 
     public function _CancelsTheRequestOf_For($issuer, $account, $currency) {
         $this->handle(new CancelRequest(
+            $this->auth($issuer),
+            new CurrencyIdentifier($this->enc($currency)),
+            new AccountIdentifier($this->enc($account))
+        ));
+    }
+
+    public function _ApprovesTheRequestOf_For($issuer, $account, $currency) {
+        $this->handle(new ApproveRequest(
             $this->auth($issuer),
             new CurrencyIdentifier($this->enc($currency)),
             new AccountIdentifier($this->enc($account))

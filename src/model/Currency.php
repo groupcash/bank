@@ -2,6 +2,7 @@
 namespace groupcash\bank\model;
 
 use groupcash\bank\app\Cryptography;
+use groupcash\bank\ApproveRequest;
 use groupcash\bank\AuthorizeIssuer;
 use groupcash\bank\CancelRequest;
 use groupcash\bank\CreateBacker;
@@ -44,6 +45,9 @@ class Currency {
 
     /** @var Fraction[] indexed by account identifier */
     private $activeRequests = [];
+
+    /** @var Fraction[] indexed by backer identifier */
+    private $availableToBackers = [];
 
     /**
      * @param Groupcash $lib
@@ -119,6 +123,7 @@ class Currency {
 
     public function applyBackerCreated(BackerCreated $e) {
         $this->createdBackers[] = $e->getBacker();
+        $this->availableToBackers[(string)$e->getBacker()] = new Fraction(0);
     }
 
     public function handleIssueCoin(IssueCoin $c) {
@@ -151,6 +156,8 @@ class Currency {
     public function applyCoinIssued(CoinIssued $e) {
         if (in_array($e->getBacker(), $this->createdBackers)) {
             $this->availableSum = $this->availableSum->plus($e->getCoin()->getValue());
+            $this->availableToBackers[(string)$e->getBacker()] =
+                $this->availableToBackers[(string)$e->getBacker()]->plus($e->getCoin()->getValue());
         }
     }
 
@@ -197,7 +204,48 @@ class Currency {
         unset($this->activeRequests[(string)$e->getAccount()]);
     }
 
+    public function handleApproveRequest(ApproveRequest $c) {
+        $issuer = AccountIdentifier::fromBinary($this->auth->getAddress($c->getIssuer()));
+        if (!in_array($issuer, $this->authorizedIssuers)) {
+            throw new \Exception('Not authorized for this currency.');
+        }
+
+        if (!array_key_exists((string)$c->getAccount(), $this->activeRequests)) {
+            throw new \Exception('There are not active requests for this account.');
+        }
+
+        $requestApproved = new RequestApproved(
+            $issuer,
+            $c->getCurrency(),
+            $c->getAccount()
+        );
+
+        $remaining = $this->activeRequests[(string)$c->getAccount()];
+        foreach ($this->availableToBackers as $backer => $available) {
+            if ($available == new Fraction(0)) {
+                continue;
+            }
+
+            if ($available->isGreaterThan($remaining)) {
+                $available = $remaining;
+            }
+            $requestApproved->addContribution(new BackerIdentifier($backer), $available);
+            $remaining = $remaining->minus($available);
+
+            if ($remaining == new Fraction(0)) {
+                break;
+            }
+        }
+
+        return $requestApproved;
+    }
+
     public function applyRequestApproved(RequestApproved $e) {
-        unset($this->activeRequests[(string)$e->getAccount()]);
+        unset($this->activeRequests[(string)$e->getTarget()]);
+
+        foreach ($e->getContributors() as $backer) {
+            $this->availableToBackers[(string)$backer] =
+                $this->availableToBackers[(string)$backer]->minus($e->getContribution($backer));
+        }
     }
 }

@@ -12,6 +12,7 @@ use groupcash\bank\events\CoinsSent;
 use groupcash\bank\events\CurrencyEstablished;
 use groupcash\bank\events\CurrencyRegistered;
 use groupcash\bank\events\IssuerAuthorized;
+use groupcash\bank\events\RequestApproved;
 use groupcash\bank\events\RequestCancelled;
 use groupcash\bank\model\AccountIdentifier;
 use groupcash\bank\model\BackerIdentifier;
@@ -71,11 +72,11 @@ class ApplicationOutcome {
         $this->assert->contains($this->events->allEvents(), $event);
     }
 
-    private function shouldHaveRecorded(callable $filter) {
+    private function shouldHaveRecorded(callable $filter, $description = 'Event') {
         $domainEvents = $this->events->allEvents();
 
         $this->assert->not()->size(array_filter($domainEvents, $filter), 0,
-            'Not found in ' . ValuePrinter::serialize($domainEvents));
+            $description . ' not found in ' . ValuePrinter::serialize($domainEvents));
     }
 
     private function shouldNotHaveRecorded($class) {
@@ -191,7 +192,22 @@ class ApplicationOutcome {
                 $event instanceof CoinsSent
                 && in_array($this->coin($owner, $value, $currency, $description), $event->getCoins())
                 && $event->getTransferred()->getOwner() == new Binary($target);
-        });
+        }, "Sent coin [$description]");
+    }
+
+    public function ACoinWorth_ShouldBeSentFrom_To($value, $currency, $owner, $target) {
+        $this->shouldHaveRecorded(function ($event) use ($owner, $value, $currency, $target) {
+            if (!($event instanceof CoinsSent)) {
+                return false;
+            }
+            $conditions = [
+                $event->getCoins()[0]->getOwner() == new Binary($owner),
+                $event->getTransferred()->getCurrency() == new Binary($currency),
+                $event->getTransferred()->getValue() == new Fraction($value),
+                $event->getTransferred()->getOwner() == new Binary($target)
+            ];
+            return array_filter($conditions);
+        }, "Coin worth $value $currency sent from $owner to $target");
     }
 
     private function coin($owner, $value, $currency, $description) {
@@ -220,5 +236,17 @@ class ApplicationOutcome {
             new CurrencyIdentifier($this->enc($currency)),
             new AccountIdentifier($this->enc($account))
         ));
+    }
+
+    public function TheRequestOf_For_ShouldBeApprovedBy_WithTheContributions($account, $currency, $issuer, $contributions) {
+        $event = new RequestApproved(
+            new AccountIdentifier($this->enc($issuer)),
+            new CurrencyIdentifier($this->enc($currency)),
+            new AccountIdentifier($this->enc($account))
+        );
+        foreach ($contributions as $backer => $contribution) {
+            $event->addContribution(new BackerIdentifier($this->enc($backer)), new Fraction($contribution));
+        }
+        $this->shouldHaveRecordedEvent($event);
     }
 }

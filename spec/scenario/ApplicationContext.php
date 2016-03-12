@@ -145,11 +145,20 @@ class ApplicationContext {
         ), new CurrencyIdentifier($this->enc($currency)));
     }
 
-    public function TheRequestBy_For_WasApproved($account, $currency) {
-        $this->events->append(new RequestApproved(
+    public function TheRequestBy_For_WasApprovedWithTheContributions($account, $currency, $contributions) {
+        $event = new RequestApproved(
             new AccountIdentifier($this->enc('some issuer')),
             new CurrencyIdentifier($this->enc($currency)),
             new AccountIdentifier($this->enc($account))
-        ), new CurrencyIdentifier($this->enc($currency)));
+        );
+
+        foreach ($contributions as $backer => $value) {
+            $event->addContribution(
+                new BackerIdentifier($this->enc($backer)),
+                new Fraction($value)
+            );
+        }
+
+        $this->events->append($event, new CurrencyIdentifier($this->enc($currency)));
     }
 }

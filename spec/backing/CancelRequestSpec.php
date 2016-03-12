@@ -32,7 +32,7 @@ class CancelRequestSpec {
     }
 
     function requestAlreadyApproved() {
-        $this->scenario->given->TheRequestBy_For_WasApproved('bart', 'foo');
+        $this->scenario->given->TheRequestBy_For_WasApprovedWithTheContributions('bart', 'foo', []);
         $this->scenario->tryThat->_CancelsTheRequestOf_For('issuer', 'bart', 'foo');
         $this->scenario->then->ItShouldFailWith('There is not active request for this account.');
     }
