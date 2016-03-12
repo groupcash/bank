@@ -1,7 +1,9 @@
 <?php
 namespace groupcash\bank\events;
 
+use groupcash\bank\model\AccountIdentifier;
 use groupcash\bank\model\BackerIdentifier;
+use groupcash\bank\model\CurrencyIdentifier;
 use groupcash\php\model\signing\Binary;
 
 class BackerCreated extends DomainEvent {
@@ -12,19 +14,43 @@ class BackerCreated extends DomainEvent {
     /** @var BackerIdentifier */
     private $backer;
 
+    /** @var CurrencyIdentifier */
+    private $currency;
+
+    /** @var AccountIdentifier */
+    private $issuer;
+
     /**
+     * @param CurrencyIdentifier $currency
+     * @param AccountIdentifier $issuer
      * @param BackerIdentifier $backer
      * @param Binary $key
      */
-    public function __construct(BackerIdentifier $backer, Binary $key) {
+    public function __construct(CurrencyIdentifier $currency, AccountIdentifier $issuer, BackerIdentifier $backer, Binary $key) {
         parent::__construct();
 
-        $this->key = base64_encode($key->getData());
         $this->backer = $backer;
+        $this->currency = $currency;
+        $this->issuer = $issuer;
+        $this->key = $key;
     }
 
     /**
-     * @return string
+     * @return CurrencyIdentifier
+     */
+    public function getCurrency() {
+        return $this->currency;
+    }
+
+    /**
+     * @return AccountIdentifier
+     */
+    public function getIssuer() {
+        return $this->issuer;
+    }
+
+    /**
+     * @return Binary
      */
     public function getKey() {
         return $this->key;

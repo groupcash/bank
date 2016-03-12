@@ -118,31 +118,33 @@ class ApplicationOutcome {
         $this->shouldNotHaveRecorded(CurrencyRegistered::class);
     }
 
-    public function ANewBacker_ShouldBeCreated($backer) {
+    public function ANewBacker_ShouldBeCreatedFor_By($backer, $currency, $issuer) {
         $this->shouldHaveRecordedEvent(new BackerCreated(
-            new BackerIdentifier(base64_encode($backer)),
+            new CurrencyIdentifier($this->enc($currency)),
+            new AccountIdentifier($this->enc($issuer)),
+            new BackerIdentifier($this->enc($backer)),
             new Binary("$backer key")
         ));
     }
 
     public function TheBacker_ShouldBeRegisteredUnder($backer, $name) {
         $this->shouldHaveRecordedEvent(new BackerRegistered(
-            new BackerIdentifier(base64_encode($backer)),
+            new BackerIdentifier($this->enc($backer)),
             $name
         ));
     }
 
     public function TheDetailsOfBacker_ShouldBeChangedTo($backer, $details) {
         $this->shouldHaveRecordedEvent(new BackerDetailsChanged(
-            new BackerIdentifier(base64_encode($backer)),
+            new BackerIdentifier($this->enc($backer)),
             $details
         ));
     }
 
     public function TheIssuer_ShouldBeAuthorizedBy($issuer, $currency) {
         $this->shouldHaveRecordedEvent(new IssuerAuthorized(
-            new CurrencyIdentifier(base64_encode($currency)),
-            new AccountIdentifier(base64_encode($issuer)),
+            new CurrencyIdentifier($this->enc($currency)),
+            new AccountIdentifier($this->enc($issuer)),
             new Authorization(
                 new Binary($issuer),
                 new Binary($currency),

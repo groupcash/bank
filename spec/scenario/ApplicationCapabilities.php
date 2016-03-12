@@ -5,14 +5,15 @@ use groupcash\bank\app\Application;
 use groupcash\bank\app\crypto\FakeCryptography;
 use groupcash\bank\app\sourced\EventStore;
 use groupcash\bank\AuthorizeIssuer;
-use groupcash\bank\GenerateAccount;
 use groupcash\bank\CreateBacker;
 use groupcash\bank\EstablishCurrency;
+use groupcash\bank\GenerateAccount;
 use groupcash\bank\IssueCoin;
 use groupcash\bank\model\AccountIdentifier;
 use groupcash\bank\model\Authentication;
 use groupcash\bank\model\BackerIdentifier;
 use groupcash\bank\model\CurrencyIdentifier;
+use groupcash\bank\RegisterBacker;
 use groupcash\bank\RegisterCurrency;
 use groupcash\bank\SendCoins;
 use groupcash\php\algorithms\FakeAlgorithm;
@@ -70,16 +71,26 @@ class ApplicationCapabilities {
             $name));
     }
 
-    public function ICreateANewBacker() {
-        $this->handle(new CreateBacker());
+    public function IRegister_AsBackerWithTheName($address, $name) {
+        $this->handle(new RegisterBacker(
+            new AccountIdentifier($this->enc($address)),
+            $name
+        ));
     }
 
-    public function ICreateANewBackerWithTheName($name) {
-        $this->handle(new CreateBacker($name));
+    public function IRegister_AsBackerWithTheName_AndTheDetails($address, $name, $details) {
+        $this->handle(new RegisterBacker(
+            new AccountIdentifier($this->enc($address)),
+            $name,
+            $details
+        ));
     }
 
-    public function ICreateANewBackerWithTheName_AndTheDetails($name, $details) {
-        $this->handle(new CreateBacker($name, $details));
+    public function _CreatesANewBackerFor($issuer, $currency) {
+        $this->handle(new CreateBacker(
+            $this->auth($issuer),
+            new CurrencyIdentifier($this->enc($currency))
+        ));
     }
 
     public function _Authorizes($currency, $issuer) {

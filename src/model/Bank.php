@@ -2,8 +2,6 @@
 namespace groupcash\bank\model;
 
 use groupcash\bank\app\Cryptography;
-use groupcash\bank\CreateBacker;
-use groupcash\bank\events\BackerCreated;
 use groupcash\bank\events\BackerDetailsChanged;
 use groupcash\bank\events\BackerRegistered;
 use groupcash\bank\events\CurrencyRegistered;
@@ -56,33 +54,7 @@ class Bank {
         $this->registeredCurrencies[] = $e->getName();
     }
 
-    public function handleCreateBacker(CreateBacker $c) {
-        $key = $this->lib->generateKey();
-        $backer = BackerIdentifier::fromBinary($this->lib->getAddress($key));
-
-        $events = [new BackerCreated($backer, $key)];
-
-        if ($c->getName()) {
-            $events = array_merge(
-                $events,
-                $this->handleRegisterBacker(new RegisterBacker(
-                    $backer,
-                    $c->getName(),
-                    $c->getDetails()
-                ))
-            );
-        } else if ($c->getDetails()) {
-            throw new \Exception('A backer needs a name to be registered with details.');
-        }
-
-        return $events;
-    }
-
-    public function applyBackerRegistered(BackerRegistered $e) {
-        $this->registeredBackers[] = $e->getName();
-    }
-
-    private function handleRegisterBacker(RegisterBacker $c) {
+    public function handleRegisterBacker(RegisterBacker $c) {
         $name = trim($c->getName());
         if (!$name) {
             throw new \Exception('The name cannot be empty.');
@@ -99,5 +71,9 @@ class Bank {
         }
 
         return $events;
+    }
+
+    public function applyBackerRegistered(BackerRegistered $e) {
+        $this->registeredBackers[] = $e->getName();
     }
 }

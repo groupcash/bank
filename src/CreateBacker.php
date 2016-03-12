@@ -2,39 +2,40 @@
 namespace groupcash\bank;
 
 use groupcash\bank\app\Command;
+use groupcash\bank\model\Authentication;
 use groupcash\bank\model\Authenticator;
-use groupcash\bank\model\BankIdentifier;
+use groupcash\bank\model\CurrencyIdentifier;
 use groupcash\bank\model\Identifier;
 
 class CreateBacker implements Command {
 
-    /** @var null|string */
-    private $name;
+    /** @var Authentication */
+    private $issuer;
 
-    /** @var null|string */
-    private $details;
+    /** @var CurrencyIdentifier */
+    private $currency;
 
     /**
-     * @param string|null $name
-     * @param string|null $details
+     * @param Authentication $issuer
+     * @param CurrencyIdentifier $currency
      */
-    public function __construct($name = null, $details = null) {
-        $this->name = $name;
-        $this->details = $details;
+    public function __construct(Authentication $issuer, CurrencyIdentifier $currency) {
+        $this->issuer = $issuer;
+        $this->currency = $currency;
     }
 
     /**
-     * @return null|string
+     * @return Authentication
      */
-    public function getName() {
-        return $this->name;
+    public function getIssuer() {
+        return $this->issuer;
     }
 
     /**
-     * @return null|string
+     * @return CurrencyIdentifier
      */
-    public function getDetails() {
-        return $this->details;
+    public function getCurrency() {
+        return $this->currency;
     }
 
     /**
@@ -42,6 +43,6 @@ class CreateBacker implements Command {
      * @return Identifier
      */
     public function getAggregateIdentifier(Authenticator $auth) {
-        return BankIdentifier::singleton();
+        return $this->currency;
     }
 }

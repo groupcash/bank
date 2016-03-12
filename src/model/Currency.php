@@ -3,7 +3,9 @@ namespace groupcash\bank\model;
 
 use groupcash\bank\app\Cryptography;
 use groupcash\bank\AuthorizeIssuer;
+use groupcash\bank\CreateBacker;
 use groupcash\bank\EstablishCurrency;
+use groupcash\bank\events\BackerCreated;
 use groupcash\bank\events\CoinIssued;
 use groupcash\bank\events\CurrencyEstablished;
 use groupcash\bank\events\IssuerAuthorized;
@@ -80,6 +82,23 @@ class Currency {
 
     public function applyIssuerAuthorized(IssuerAuthorized $e) {
         $this->authorizedIssuers[] = $e->getIssuer();
+    }
+
+    public function handleCreateBacker(CreateBacker $c) {
+        $issuer = AccountIdentifier::fromBinary($this->auth->getAddress($c->getIssuer()));
+        if (!in_array($issuer, $this->authorizedIssuers)) {
+            throw new \Exception('Not an authorized issuer for this currency.');
+        }
+
+        $key = $this->lib->generateKey();
+        $backer = BackerIdentifier::fromBinary($this->lib->getAddress($key));
+
+        return new BackerCreated(
+            $c->getCurrency(),
+            $issuer,
+            $backer,
+            $key
+        );
     }
 
     public function handleIssueCoin(IssueCoin $c) {
