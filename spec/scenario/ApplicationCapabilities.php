@@ -15,6 +15,7 @@ use groupcash\bank\model\BackerIdentifier;
 use groupcash\bank\model\CurrencyIdentifier;
 use groupcash\bank\RegisterBacker;
 use groupcash\bank\RegisterCurrency;
+use groupcash\bank\RequestCoins;
 use groupcash\bank\SendCoins;
 use groupcash\php\algorithms\FakeAlgorithm;
 use groupcash\php\Groupcash;
@@ -118,6 +119,14 @@ class ApplicationCapabilities {
         $this->handle(new SendCoins(
             $this->auth($owner),
             new AccountIdentifier($this->enc($target)),
+            new CurrencyIdentifier($this->enc($currency)),
+            new Fraction($value)
+        ));
+    }
+
+    public function _Requests($account, $value, $currency) {
+        $this->handle(new RequestCoins(
+            $this->auth($account),
             new CurrencyIdentifier($this->enc($currency)),
             new Fraction($value)
         ));

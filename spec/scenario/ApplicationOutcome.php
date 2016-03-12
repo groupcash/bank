@@ -7,6 +7,7 @@ use groupcash\bank\events\BackerDetailsChanged;
 use groupcash\bank\events\BackerRegistered;
 use groupcash\bank\events\CoinIssued;
 use groupcash\bank\events\CoinReceived;
+use groupcash\bank\events\CoinsRequested;
 use groupcash\bank\events\CoinsSent;
 use groupcash\bank\events\CurrencyEstablished;
 use groupcash\bank\events\CurrencyRegistered;
@@ -202,5 +203,13 @@ class ApplicationOutcome {
                 new Fraction($value)
             )
         );
+    }
+
+    public function ThereShouldBe__RequestedBy($value, $currency, $account) {
+        $this->shouldHaveRecordedEvent(new CoinsRequested(
+            new AccountIdentifier($this->enc($account)),
+            new CurrencyIdentifier($this->enc($currency)),
+            new Fraction($value)
+        ));
     }
 }

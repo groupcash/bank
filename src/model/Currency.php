@@ -7,11 +7,15 @@ use groupcash\bank\CreateBacker;
 use groupcash\bank\EstablishCurrency;
 use groupcash\bank\events\BackerCreated;
 use groupcash\bank\events\CoinIssued;
+use groupcash\bank\events\CoinsRequested;
 use groupcash\bank\events\CurrencyEstablished;
 use groupcash\bank\events\IssuerAuthorized;
+use groupcash\bank\events\RequestCancelled;
 use groupcash\bank\IssueCoin;
+use groupcash\bank\RequestCoins;
 use groupcash\php\Groupcash;
 use groupcash\php\model\Output;
+use groupcash\php\model\value\Fraction;
 
 class Currency {
 
@@ -30,6 +34,15 @@ class Currency {
     /** @var AccountIdentifier[] */
     private $authorizedIssuers = [];
 
+    /** @var Fraction */
+    private $availableSum;
+
+    /** @var BackerIdentifier[] */
+    private $createdBackers = [];
+
+    /** @var Fraction[] indexed by account identifier */
+    private $activeRequests = [];
+
     /**
      * @param Groupcash $lib
      * @param Cryptography $crypto
@@ -38,6 +51,7 @@ class Currency {
         $this->lib = $lib;
         $this->crypto = $crypto;
         $this->auth = new Authenticator($crypto, $lib);
+        $this->availableSum = new Fraction(0);
     }
 
     public function handleEstablishCurrency(EstablishCurrency $c) {
@@ -101,6 +115,10 @@ class Currency {
         );
     }
 
+    public function applyBackerCreated(BackerCreated $e) {
+        $this->createdBackers[] = $e->getBacker();
+    }
+
     public function handleIssueCoin(IssueCoin $c) {
         if (!trim($c->getDescription())) {
             throw new \Exception('The description cannot be empty.');
@@ -126,5 +144,36 @@ class Currency {
                     $c->getValue()
                 ))
         );
+    }
+
+    public function applyCoinIssued(CoinIssued $e) {
+        if (in_array($e->getBacker(), $this->createdBackers)) {
+            $this->availableSum = $this->availableSum->plus($e->getCoin()->getValue());
+        }
+    }
+
+    public function handleRequestCoins(RequestCoins $c) {
+        $account = AccountIdentifier::fromBinary($this->auth->getAddress($c->getAccount()));
+        if (array_key_exists((string)$account, $this->activeRequests)) {
+            throw new \Exception('There is already a request from this account for this currency.');
+        }
+        if ($c->getValue() > $this->availableSum) {
+            throw new \Exception('Value exceeds available coins: ' . $this->availableSum);
+        }
+
+        return new CoinsRequested(
+            $account,
+            $c->getCurrency(),
+            $c->getValue()
+        );
+    }
+
+    public function applyCoinsRequested(CoinsRequested $e) {
+        $this->availableSum = $this->availableSum->minus($e->getValue());
+        $this->activeRequests[(string)$e->getAccount()] = $e->getValue();
+    }
+
+    public function applyRequestCancelled(RequestCancelled $e) {
+        $this->availableSum = $this->availableSum->plus($this->activeRequests[(string)$e->getAccount()]);
     }
 }

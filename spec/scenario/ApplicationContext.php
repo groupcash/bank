@@ -2,12 +2,16 @@
 namespace spec\groupcash\bank\scenario;
 
 use groupcash\bank\app\sourced\EventStore;
+use groupcash\bank\events\BackerCreated;
 use groupcash\bank\events\BackerRegistered;
+use groupcash\bank\events\CoinIssued;
 use groupcash\bank\events\CoinReceived;
+use groupcash\bank\events\CoinsRequested;
 use groupcash\bank\events\CoinsSent;
 use groupcash\bank\events\CurrencyEstablished;
 use groupcash\bank\events\CurrencyRegistered;
 use groupcash\bank\events\IssuerAuthorized;
+use groupcash\bank\events\RequestCancelled;
 use groupcash\bank\model\AccountIdentifier;
 use groupcash\bank\model\BackerIdentifier;
 use groupcash\bank\model\BankIdentifier;
@@ -104,5 +108,38 @@ class ApplicationContext {
                 new Fraction($value)
             )
         );
+    }
+
+    public function _HasIssued__To($issuer, $value, $currency, $backer) {
+        $this->events->append(new CoinIssued(
+            new CurrencyIdentifier($this->enc($currency)),
+            new AccountIdentifier($this->enc($issuer)),
+            new BackerIdentifier($this->enc($backer)),
+            $this->coin($backer, $value, $currency, 'A Coin')
+        ), new CurrencyIdentifier($this->enc($currency)));
+    }
+
+    public function ABacker_WasCreatedFor($backer, $currency) {
+        $this->events->append(new BackerCreated(
+            new CurrencyIdentifier($this->enc($currency)),
+            new AccountIdentifier('issuer'),
+            new BackerIdentifier($this->enc($backer)),
+            new Binary("$backer key")
+        ), new CurrencyIdentifier($this->enc($currency)));
+    }
+
+    public function _HasRequested($account, $value, $currency) {
+        $this->events->append(new CoinsRequested(
+            new AccountIdentifier($this->enc($account)),
+            new CurrencyIdentifier($this->enc($currency)),
+            new Fraction($value)
+        ), new CurrencyIdentifier($this->enc($currency)));
+    }
+
+    public function TheRequestBy_For_WasCancelled($account, $currency) {
+        $this->events->append(new RequestCancelled(
+            new CurrencyIdentifier($this->enc($currency)),
+            new AccountIdentifier($this->enc($account))
+        ), new CurrencyIdentifier($this->enc($currency)));
     }
 }
