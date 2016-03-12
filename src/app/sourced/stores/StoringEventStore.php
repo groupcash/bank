@@ -21,10 +21,10 @@ class StoringEventStore implements EventStore {
      * @return mixed[]
      */
     public function eventsOf($aggregateIdentifier) {
-        if (!$this->store->has($this->normalize($aggregateIdentifier))) {
+        if (!$this->store->has($aggregateIdentifier)) {
             return [];
         }
-        return $this->store->read($this->normalize($aggregateIdentifier));
+        return $this->store->read($aggregateIdentifier);
     }
 
     /**
@@ -45,10 +45,6 @@ class StoringEventStore implements EventStore {
     public function append($event, $aggregateIdentifier) {
         $events = $this->eventsOf($aggregateIdentifier);
         $events[] = $event;
-        $this->store->write($events, $this->normalize($aggregateIdentifier));
-    }
-
-    private function normalize($aggregateIdentifier) {
-        return str_replace('/', '_', $aggregateIdentifier);
+        $this->store->write($events, $aggregateIdentifier);
     }
 }

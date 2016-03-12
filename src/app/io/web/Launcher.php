@@ -3,14 +3,18 @@ namespace groupcash\bank\app\io\web;
 
 use groupcash\bank\app\Application;
 use groupcash\bank\app\crypto\McryptCryptography;
+use groupcash\bank\app\io\BinaryTransformer;
 use groupcash\bank\app\io\IdentifierTransformer;
 use groupcash\bank\app\sourced\stores\StoringEventStore;
+use groupcash\bank\ApproveRequest;
 use groupcash\bank\AuthorizeIssuer;
+use groupcash\bank\CancelRequest;
 use groupcash\bank\GenerateAccount;
 use groupcash\bank\CreateBacker;
 use groupcash\bank\EstablishCurrency;
 use groupcash\bank\IssueCoin;
 use groupcash\bank\RegisterBacker;
+use groupcash\bank\RequestCoins;
 use groupcash\bank\SendCoins;
 use groupcash\php\algorithms\EccAlgorithm;
 use groupcash\php\Groupcash;
@@ -52,12 +56,15 @@ class Launcher {
             $app->fields->add(new FractionField());
 
             $this->addAction($app, GenerateAccount::class);
-            $this->addAction($app, CreateBacker::class);
             $this->addAction($app, RegisterBacker::class);
             $this->addAction($app, EstablishCurrency::class);
             $this->addAction($app, AuthorizeIssuer::class);
+            $this->addAction($app, CreateBacker::class);
             $this->addAction($app, IssueCoin::class);
             $this->addAction($app, SendCoins::class);
+            $this->addAction($app, RequestCoins::class);
+            $this->addAction($app, CancelRequest::class);
+            $this->addAction($app, ApproveRequest::class);
         }, WebDelivery::init()));
     }
 
@@ -69,6 +76,7 @@ class Launcher {
 
     private function configureStores() {
         TransformerRegistryRepository::getDefaultTransformerRegistry()
+            ->insert(new BinaryTransformer(TransformerRegistryRepository::getDefaultTypeMapper()))
             ->insert(new IdentifierTransformer(TransformerRegistryRepository::getDefaultTypeMapper()));
     }
 }

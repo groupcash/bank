@@ -8,7 +8,7 @@ use groupcash\php\model\signing\Binary;
 
 class BackerCreated extends DomainEvent {
 
-    /** @var string */
+    /** @var Binary */
     private $key;
 
     /** @var BackerIdentifier */
