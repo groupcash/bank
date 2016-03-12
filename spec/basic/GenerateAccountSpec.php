@@ -8,18 +8,16 @@ use spec\groupcash\bank\scenario\Scenario;
  *
  * @property Scenario scenario <-
  */
-class CreateAccountSpec {
+class GenerateAccountSpec {
 
     function withoutPassword() {
-        $this->scenario->when->ICreateAnAccount();
+        $this->scenario->when->IGenerateAnAccount();
         $this->scenario->then->ItShouldReturnANewAccountWithTheKey_AndTheAddress('fake key', 'fake');
-        $this->scenario->then->AnAccount_ShouldBeRegistered('fake');
     }
 
     function withPassword() {
         $this->scenario->when->ICreateAnAccountWithThePassword('foo');
         $this->scenario->then->ItShouldReturnANewAccountWithTheKey_AndTheAddress('fake key encrypted with foo', 'fake');
-        $this->scenario->then->AnAccount_ShouldBeRegistered('fake');
     }
 
     function emptyPassword() {

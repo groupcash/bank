@@ -1,7 +1,6 @@
 <?php
 namespace spec\groupcash\bank\scenario;
 
-use groupcash\bank\events\AccountRegistered;
 use groupcash\bank\app\sourced\EventStore;
 use groupcash\bank\events\BackerCreated;
 use groupcash\bank\events\BackerDetailsChanged;
@@ -14,8 +13,8 @@ use groupcash\bank\events\CurrencyRegistered;
 use groupcash\bank\events\IssuerAuthorized;
 use groupcash\bank\model\AccountIdentifier;
 use groupcash\bank\model\BackerIdentifier;
-use groupcash\bank\model\CreatedAccount;
 use groupcash\bank\model\CurrencyIdentifier;
+use groupcash\bank\projecting\GeneratedAccount;
 use groupcash\php\algorithms\FakeAlgorithm;
 use groupcash\php\Groupcash;
 use groupcash\php\model\Authorization;
@@ -85,12 +84,12 @@ class ApplicationOutcome {
     }
 
     public function ItShouldReturnANewAccountWithTheKey_AndTheAddress($key, $address) {
-        $this->assert->equals($this->return->value,
-            new CreatedAccount(new Binary($key), new Binary($address)));
-    }
-
-    public function AnAccount_ShouldBeRegistered($account) {
-        $this->shouldHaveRecordedEvent(new AccountRegistered(new AccountIdentifier(base64_encode($account))));
+        $account = $this->return->value;
+        if (!($account instanceof GeneratedAccount)) {
+            $this->assert->isInstanceOf($account, GeneratedAccount::class);
+        }
+        $this->assert->equals($account->getKey(), new Binary($key));
+        $this->assert->equals($account->getAddress(), new Binary($address));
     }
 
     public function ItShouldFailWith($message) {

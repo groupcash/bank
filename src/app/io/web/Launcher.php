@@ -6,7 +6,7 @@ use groupcash\bank\app\crypto\McryptCryptography;
 use groupcash\bank\app\io\IdentifierTransformer;
 use groupcash\bank\app\sourced\stores\StoringEventStore;
 use groupcash\bank\AuthorizeIssuer;
-use groupcash\bank\CreateAccount;
+use groupcash\bank\GenerateAccount;
 use groupcash\bank\CreateBacker;
 use groupcash\bank\EstablishCurrency;
 use groupcash\bank\IssueCoin;
@@ -50,7 +50,7 @@ class Launcher {
             $app->fields->add(new IdentifierField());
             $app->fields->add(new FractionField());
 
-            $this->addAction($app, CreateAccount::class);
+            $this->addAction($app, GenerateAccount::class);
             $this->addAction($app, CreateBacker::class);
             $this->addAction($app, EstablishCurrency::class);
             $this->addAction($app, AuthorizeIssuer::class);

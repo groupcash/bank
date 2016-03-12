@@ -3,12 +3,10 @@ namespace groupcash\bank\model;
 
 use groupcash\bank\app\Cryptography;
 use groupcash\bank\CreateBacker;
-use groupcash\bank\events\AccountRegistered;
 use groupcash\bank\events\BackerCreated;
 use groupcash\bank\events\BackerDetailsChanged;
 use groupcash\bank\events\BackerRegistered;
 use groupcash\bank\events\CurrencyRegistered;
-use groupcash\bank\RegisterAccount;
 use groupcash\bank\RegisterCurrency;
 use groupcash\php\Groupcash;
 
@@ -37,10 +35,6 @@ class Bank {
         $this->lib = $lib;
         $this->crypto = $crypto;
         $this->auth = new Authenticator($crypto, $lib);
-    }
-
-    public function handleRegisterAccount(RegisterAccount $c) {
-        return new AccountRegistered(AccountIdentifier::fromBinary($c->getAddress()));
     }
 
     public function handleRegisterCurrency(RegisterCurrency $c) {

@@ -7,21 +7,19 @@ use groupcash\bank\app\sourced\command\EventListener;
 use groupcash\bank\app\sourced\EventStore;
 use groupcash\bank\app\sourced\query\ProjectionFactory;
 use groupcash\bank\app\sourced\query\QueryProjector;
-use groupcash\bank\CreateAccount;
 use groupcash\bank\DeliverCoin;
 use groupcash\bank\events\CoinIssued;
 use groupcash\bank\events\CoinsSent;
+use groupcash\bank\GenerateAccount;
 use groupcash\bank\model\Account;
 use groupcash\bank\model\AccountIdentifier;
 use groupcash\bank\model\Authenticator;
 use groupcash\bank\model\Bank;
 use groupcash\bank\model\BankIdentifier;
-use groupcash\bank\model\CreatedAccount;
 use groupcash\bank\model\Currency;
 use groupcash\bank\model\CurrencyIdentifier;
-use groupcash\bank\RegisterAccount;
+use groupcash\bank\projecting\GeneratedAccount;
 use groupcash\php\Groupcash;
-use groupcash\php\model\signing\Binary;
 
 class Application implements AggregateFactory, ProjectionFactory, EventListener {
 
@@ -56,27 +54,12 @@ class Application implements AggregateFactory, ProjectionFactory, EventListener 
     }
 
     public function handle($message) {
-        if ($message instanceof CreateAccount) {
-            return $this->createAccount($message);
-        } else if ($message instanceof Command) {
+        if ($message instanceof Command) {
             $this->command->handle($message);
             return null;
         } else {
             return $this->query->project($message);
         }
-    }
-
-    private function createAccount(CreateAccount $c) {
-        $key = $this->library->generateKey();
-        $address = $this->library->getAddress($key);
-
-        if ($c->getPassword()) {
-            $key = new Binary($this->crypto->encrypt($key->getData(), $c->getPassword()));
-        }
-
-        $this->command->handle(new RegisterAccount($address));
-
-        return new CreatedAccount($key, $address);
     }
 
     protected function onCoinIssued(CoinIssued $e) {
@@ -118,6 +101,9 @@ class Application implements AggregateFactory, ProjectionFactory, EventListener 
      * @throws \Exception
      */
     public function buildProjection($query) {
+        if ($query instanceof GenerateAccount) {
+            return new GeneratedAccount($query, $this->library, $this->crypto);
+        }
         throw new \Exception('Unknown query.');
     }
 

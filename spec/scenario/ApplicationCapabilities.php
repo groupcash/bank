@@ -5,7 +5,7 @@ use groupcash\bank\app\Application;
 use groupcash\bank\app\crypto\FakeCryptography;
 use groupcash\bank\app\sourced\EventStore;
 use groupcash\bank\AuthorizeIssuer;
-use groupcash\bank\CreateAccount;
+use groupcash\bank\GenerateAccount;
 use groupcash\bank\CreateBacker;
 use groupcash\bank\EstablishCurrency;
 use groupcash\bank\IssueCoin;
@@ -50,12 +50,12 @@ class ApplicationCapabilities {
         $this->return->value = $this->app->handle($command);
     }
 
-    public function ICreateAnAccount() {
-        $this->handle(new CreateAccount());
+    public function IGenerateAnAccount() {
+        $this->handle(new GenerateAccount());
     }
 
     public function ICreateAnAccountWithThePassword($password) {
-        $this->handle(new CreateAccount($password));
+        $this->handle(new GenerateAccount($password));
     }
 
     public function _EstablishesACurrencyWithTheRules($currency, $rules) {
