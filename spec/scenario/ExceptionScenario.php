@@ -5,13 +5,13 @@ use groupcash\bank\app\sourced\Specification;
 
 class ExceptionScenario {
 
-    /** @var ApplicationCapabilities */
+    /** @var SpecificationCapabilities */
     private $app;
 
     /** @var Specification */
     private $specification;
 
-    public function __construct(ApplicationCapabilities $app, Specification $specification) {
+    public function __construct(SpecificationCapabilities $app, Specification $specification) {
         $this->app = $app;
         $this->specification = $specification;
     }

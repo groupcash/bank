@@ -20,7 +20,7 @@ use groupcash\bank\SendCoins;
 use groupcash\php\model\signing\Binary;
 use groupcash\php\model\value\Fraction;
 
-class ApplicationCapabilities {
+class SpecificationCapabilities {
 
     /** @var Specification */
     private $specification;

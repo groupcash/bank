@@ -29,7 +29,7 @@ use groupcash\php\model\RuleBook;
 use groupcash\php\model\signing\Binary;
 use groupcash\php\model\value\Fraction;
 
-class ApplicationOutcome {
+class SpecificationOutcome {
 
     /** @var Specification */
     private $specification;

@@ -6,16 +6,16 @@ use rtens\scrut\failures\IncompleteTestFailure;
 
 class Scenario {
 
-    /** @var ApplicationCapabilities */
+    /** @var SpecificationCapabilities */
     public $tryThat;
 
-    /** @var ApplicationContext */
+    /** @var SpecificationContext */
     public $given;
 
-    /** @var ApplicationCapabilities */
+    /** @var SpecificationCapabilities */
     public $when;
 
-    /** @var ApplicationOutcome */
+    /** @var SpecificationOutcome */
     public $then;
 
     public function before() {
@@ -23,9 +23,9 @@ class Scenario {
 
         $specification = new ApplicationSpecification();
 
-        $this->given = new ApplicationContext($specification);
-        $this->when = new ApplicationCapabilities($specification);
-        $this->then = new ApplicationOutcome($specification);
+        $this->given = new SpecificationContext($specification);
+        $this->when = new SpecificationCapabilities($specification);
+        $this->then = new SpecificationOutcome($specification);
         $this->tryThat = new ExceptionScenario($this->when, $specification);
     }
 
