@@ -6,7 +6,7 @@ use groupcash\bank\model\BackerIdentifier;
 use groupcash\bank\model\CurrencyIdentifier;
 use groupcash\php\model\value\Fraction;
 
-class RequestApproved {
+class RequestApproved extends DomainEvent {
 
     /** @var AccountIdentifier */
     private $issuer;
@@ -26,6 +26,7 @@ class RequestApproved {
      * @param AccountIdentifier $target
      */
     public function __construct(AccountIdentifier $issuer, CurrencyIdentifier $currency, AccountIdentifier $target) {
+        parent::__construct();
         $this->currency = $currency;
         $this->target = $target;
         $this->issuer = $issuer;
