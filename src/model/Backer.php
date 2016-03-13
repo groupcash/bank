@@ -21,6 +21,10 @@ class Backer extends Account {
     }
 
     public function handleSendRequestedCoins(SendRequestedCoins $c) {
+        if (!$this->key) {
+            throw new \Exception('Backer key was never stored.');
+        }
+
         return $this->handleSendCoins(new SendCoins(
             new Authentication($this->key),
             $c->getTarget(),
