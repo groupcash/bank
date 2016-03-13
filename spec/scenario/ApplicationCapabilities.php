@@ -1,9 +1,7 @@
 <?php
 namespace spec\groupcash\bank\scenario;
 
-use groupcash\bank\app\Application;
-use groupcash\bank\app\crypto\FakeCryptography;
-use groupcash\bank\app\sourced\EventStore;
+use groupcash\bank\app\sourced\Specification;
 use groupcash\bank\ApproveRequest;
 use groupcash\bank\AuthorizeIssuer;
 use groupcash\bank\CancelRequest;
@@ -19,44 +17,27 @@ use groupcash\bank\RegisterBacker;
 use groupcash\bank\RegisterCurrency;
 use groupcash\bank\RequestCoins;
 use groupcash\bank\SendCoins;
-use groupcash\php\algorithms\FakeAlgorithm;
-use groupcash\php\Groupcash;
 use groupcash\php\model\signing\Binary;
 use groupcash\php\model\value\Fraction;
 
 class ApplicationCapabilities {
 
-    /** @var ReturnValue */
-    private $return;
-
-    /** @var EventStore */
-    private $events;
-
-    /** @var Application */
-    private $app;
+    /** @var Specification */
+    private $specification;
 
     /**
-     * @param ReturnValue $return
-     * @param EventStore $events
+     * @param Specification $specification
      */
-    public function __construct(ReturnValue $return, EventStore $events) {
-        $this->return = $return;
-        $this->events = $events;
-
-        $this->app = new Application($events, new Groupcash(new FakeAlgorithm()), new FakeCryptography());
+    public function __construct(Specification $specification) {
+        $this->specification = $specification;
     }
 
     private function enc($address) {
         return base64_encode($address);
     }
 
-    public function handle($command) {
-        foreach ($this->events->allEvents() as $event) {
-            if ($this->app->listensTo($event)) {
-                $this->app->on($event);
-            }
-        }
-        $this->return->value = $this->app->handle($command);
+    private function handle($command) {
+        $this->specification->when($command);
     }
 
     public function IGenerateAnAccount() {

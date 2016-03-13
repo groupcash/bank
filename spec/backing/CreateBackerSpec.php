@@ -4,22 +4,21 @@ use spec\groupcash\bank\scenario\Scenario;
 
 /**
  * Backers that are created by issuers of a currency are managed by the system
- *
- * @property Scenario scenario <-
  */
-class CreateBackerSpec {
+class CreateBackerSpec extends Scenario {
 
     function before() {
-        $this->scenario->given->_HasAuthorized('foo', 'issuer');
+        parent::before();
+        $this->given->_HasAuthorized('foo', 'issuer');
     }
 
     function notAuthorized() {
-        $this->scenario->tryThat->_CreatesANewBackerFor('not issuer', 'foo');
-        $this->scenario->then->ItShouldFailWith('Not an authorized issuer for this currency.');
+        $this->tryThat->_CreatesANewBackerFor('not issuer', 'foo');
+        $this->then->ItShouldFailWith('Not an authorized issuer for this currency.');
     }
 
     function succeed() {
-        $this->scenario->when->_CreatesANewBackerFor('issuer', 'foo');
-        $this->scenario->then->ANewBacker_ShouldBeCreatedFor_By('fake', 'foo', 'issuer');
+        $this->when->_CreatesANewBackerFor('issuer', 'foo');
+        $this->then->ANewBacker_ShouldBeCreatedFor_By('fake', 'foo', 'issuer');
     }
 }

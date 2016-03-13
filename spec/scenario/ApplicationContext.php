@@ -1,7 +1,7 @@
 <?php
 namespace spec\groupcash\bank\scenario;
 
-use groupcash\bank\app\sourced\EventStore;
+use groupcash\bank\app\sourced\Specification;
 use groupcash\bank\events\BackerCreated;
 use groupcash\bank\events\BackerRegistered;
 use groupcash\bank\events\CoinIssued;
@@ -27,18 +27,14 @@ use groupcash\php\model\value\Fraction;
 
 class ApplicationContext {
 
-    /** @var EventStore */
-    private $events;
-
-    /** @var Groupcash */
-    private $lib;
+    /** @var Specification */
+    private $specification;
 
     /**
-     * @param EventStore $events
+     * @param Specification $specification
      */
-    public function __construct(EventStore $events) {
-        $this->events = $events;
-        $this->lib = new Groupcash(new FakeAlgorithm());
+    public function __construct(Specification $specification) {
+        $this->specification = $specification;
     }
 
     private function enc($data) {
@@ -46,7 +42,7 @@ class ApplicationContext {
     }
 
     public function TheCurrency_WasEstablished($currency) {
-        $this->events->append(new CurrencyEstablished(
+        $this->specification->given(new CurrencyEstablished(
             new CurrencyIdentifier($this->enc($currency)),
             new RuleBook(
                 new Binary($currency),
@@ -56,21 +52,21 @@ class ApplicationContext {
     }
 
     public function ACurrencyWasRegisteredUnder($name) {
-        $this->events->append(new CurrencyRegistered(
+        $this->specification->given(new CurrencyRegistered(
             new CurrencyIdentifier('foo'),
             $name
         ), BankIdentifier::singleton());
     }
 
     public function ABackerWasRegisteredUnder($name) {
-        $this->events->append(new BackerRegistered(
+        $this->specification->given(new BackerRegistered(
             new BackerIdentifier('foo'),
             $name
         ), BankIdentifier::singleton());
     }
 
     public function _HasAuthorized($currency, $issuer) {
-        $this->events->append(new IssuerAuthorized(
+        $this->specification->given(new IssuerAuthorized(
             new CurrencyIdentifier($this->enc($currency)),
             new AccountIdentifier(base64_encode($issuer)),
             new Authorization(
@@ -82,7 +78,7 @@ class ApplicationContext {
     }
 
     public function _HasReceivedACoin_Worth($account, $description, $value, $currency) {
-        $this->events->append(new CoinReceived(
+        $this->specification->given(new CoinReceived(
             new AccountIdentifier($this->enc($account)),
             new CurrencyIdentifier($this->enc($currency)),
             $this->coin($account, $value, $currency, $description)
@@ -90,7 +86,7 @@ class ApplicationContext {
     }
 
     public function _HasSentACoin_Worth__To($owner, $description, $value, $currency, $target) {
-        $this->events->append(new CoinsSent(
+        $this->specification->given(new CoinsSent(
             new AccountIdentifier($this->enc($owner)),
             new AccountIdentifier($this->enc($target)),
             new CurrencyIdentifier($this->enc($currency)),
@@ -100,7 +96,8 @@ class ApplicationContext {
     }
 
     private function coin($owner, $value, $currency, $description) {
-        return $this->lib->issueCoin(
+        $lib = new Groupcash(new FakeAlgorithm());
+        return $lib->issueCoin(
             new Binary('foo key'),
             new Binary($currency),
             $description,
@@ -112,7 +109,7 @@ class ApplicationContext {
     }
 
     public function _HasIssued__To($issuer, $value, $currency, $backer) {
-        $this->events->append(new CoinIssued(
+        $this->specification->given(new CoinIssued(
             new CurrencyIdentifier($this->enc($currency)),
             new AccountIdentifier($this->enc($issuer)),
             new BackerIdentifier($this->enc($backer)),
@@ -121,7 +118,7 @@ class ApplicationContext {
     }
 
     public function ABacker_WasCreatedFor($backer, $currency) {
-        $this->events->append(new BackerCreated(
+        $this->specification->given(new BackerCreated(
             new CurrencyIdentifier($this->enc($currency)),
             new AccountIdentifier('issuer'),
             new BackerIdentifier($this->enc($backer)),
@@ -130,7 +127,7 @@ class ApplicationContext {
     }
 
     public function _HasRequested($account, $value, $currency) {
-        $this->events->append(new CoinsRequested(
+        $this->specification->given(new CoinsRequested(
             new AccountIdentifier($this->enc($account)),
             new CurrencyIdentifier($this->enc($currency)),
             new Fraction($value)
@@ -138,7 +135,7 @@ class ApplicationContext {
     }
 
     public function TheRequestBy_For_WasCancelled($account, $currency) {
-        $this->events->append(new RequestCancelled(
+        $this->specification->given(new RequestCancelled(
             new AccountIdentifier($this->enc('some issuer')),
             new CurrencyIdentifier($this->enc($currency)),
             new AccountIdentifier($this->enc($account))
@@ -159,6 +156,6 @@ class ApplicationContext {
             );
         }
 
-        $this->events->append($event, new CurrencyIdentifier($this->enc($currency)));
+        $this->specification->given($event, new CurrencyIdentifier($this->enc($currency)));
     }
 }

@@ -1,23 +1,23 @@
 <?php
 namespace spec\groupcash\bank\scenario;
 
-use rtens\scrut\fixtures\ExceptionFixture;
+use groupcash\bank\app\sourced\Specification;
 
 class ExceptionScenario {
 
     /** @var ApplicationCapabilities */
     private $app;
 
-    /** @var ExceptionFixture */
-    private $except;
+    /** @var Specification */
+    private $specification;
 
-    public function __construct(ApplicationCapabilities $app, ExceptionFixture $except) {
+    public function __construct(ApplicationCapabilities $app, Specification $specification) {
         $this->app = $app;
-        $this->except = $except;
+        $this->specification = $specification;
     }
 
     function __call($name, $arguments) {
-        $this->except->tryTo(function () use ($name, $arguments) {
+        $this->specification->tryTo(function () use ($name, $arguments) {
             call_user_func_array([$this->app, $name], $arguments);
         });
     }

@@ -1,12 +1,10 @@
 <?php
 namespace spec\groupcash\bank\scenario;
 
-use groupcash\bank\app\sourced\stores\MemoryEventStore;
 use groupcash\bank\model\Time;
-use rtens\scrut\Fixture;
-use rtens\scrut\fixtures\ExceptionFixture;
+use rtens\scrut\failures\IncompleteTestFailure;
 
-class Scenario extends Fixture {
+class Scenario {
 
     /** @var ApplicationCapabilities */
     public $tryThat;
@@ -21,19 +19,17 @@ class Scenario extends Fixture {
     public $then;
 
     public function before() {
-        $except = new ExceptionFixture($this->assert);
         Time::$frozen = new \DateTimeImmutable();
-        $returned = new ReturnValue();
 
-        $events = new MemoryEventStore();
+        $specification = new ApplicationSpecification();
 
-        $this->given = new ApplicationContext($events);
-        $this->when = new ApplicationCapabilities($returned, $events);
-        $this->then = new ApplicationOutcome($this->assert, $except, $returned, $events);
-        $this->tryThat = new ExceptionScenario($this->when, $except);
+        $this->given = new ApplicationContext($specification);
+        $this->when = new ApplicationCapabilities($specification);
+        $this->then = new ApplicationOutcome($specification);
+        $this->tryThat = new ExceptionScenario($this->when, $specification);
     }
 
     public function blockedBy($reason) {
-        $this->assert->incomplete("Blocked by $reason");
+        throw new IncompleteTestFailure("Blocked by $reason");
     }
 }
