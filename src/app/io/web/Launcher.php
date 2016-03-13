@@ -13,6 +13,7 @@ use groupcash\bank\GenerateAccount;
 use groupcash\bank\CreateBacker;
 use groupcash\bank\EstablishCurrency;
 use groupcash\bank\IssueCoin;
+use groupcash\bank\ListTransactions;
 use groupcash\bank\RegisterBacker;
 use groupcash\bank\RequestCoins;
 use groupcash\bank\SendCoins;
@@ -62,6 +63,7 @@ class Launcher {
             $this->addAction($app, CreateBacker::class);
             $this->addAction($app, IssueCoin::class);
             $this->addAction($app, SendCoins::class);
+            $this->addAction($app, ListTransactions::class);
             $this->addAction($app, RequestCoins::class);
             $this->addAction($app, CancelRequest::class);
             $this->addAction($app, ApproveRequest::class);

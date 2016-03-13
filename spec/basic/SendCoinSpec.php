@@ -58,4 +58,10 @@ class SendCoinSpec extends Scenario {
         $this->then->Coin_Worth_ShouldBeSentFrom_To('bar', 2, 'coin', 'bart', 'lisa');
         $this->then->_ShouldReceiveACoinWorth('lisa', 5, 'coin');
     }
+
+    function withSubject() {
+        $this->when->_Sends__To_WithTheSubject('bart', 3, 'coin', 'lisa', 'Foo!');
+        $this->then->ACoinWorth_ShouldBeSentFrom_To_WithTheSubject(3, 'coin', 'bart', 'lisa', 'Foo!');
+        $this->then->_ShouldReceiveACoinWorth__WithTheSubject('lisa', 3, 'coin', 'Foo!');
+    }
 }

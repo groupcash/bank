@@ -17,6 +17,7 @@ use groupcash\bank\model\AccountIdentifier;
 use groupcash\bank\model\BackerIdentifier;
 use groupcash\bank\model\BankIdentifier;
 use groupcash\bank\model\CurrencyIdentifier;
+use groupcash\bank\model\Time;
 use groupcash\php\algorithms\FakeAlgorithm;
 use groupcash\php\Groupcash;
 use groupcash\php\model\Authorization;
@@ -78,20 +79,30 @@ class SpecificationContext {
     }
 
     public function _HasReceivedACoin_Worth($account, $description, $value, $currency) {
+        $this->_HasReceivedACoin_WorthWithTheSubject($account, $description, $value, $currency, null);
+    }
+
+    public function _HasReceivedACoin_WorthWithTheSubject($account, $description, $value, $currency, $subject) {
         $this->specification->given(new CoinReceived(
             new AccountIdentifier($this->enc($account)),
             new CurrencyIdentifier($this->enc($currency)),
-            $this->coin($account, $value, $currency, $description)
+            $this->coin($account, $value, $currency, $description),
+            $subject
         ), new AccountIdentifier($this->enc($account)));
     }
 
     public function _HasSentACoin_Worth__To($owner, $description, $value, $currency, $target) {
+        $this->_HasSentACoin_Worth__To_WithSubject($owner, $description, $value, $currency, $target, null);
+    }
+
+    public function _HasSentACoin_Worth__To_WithSubject($owner, $description, $value, $currency, $target, $subject) {
         $this->specification->given(new CoinsSent(
             new AccountIdentifier($this->enc($owner)),
             new AccountIdentifier($this->enc($target)),
             new CurrencyIdentifier($this->enc($currency)),
             [$this->coin($owner, $value, $currency, $description)],
-            $this->coin($owner, $value, $currency, 'Transferred')
+            $this->coin($owner, $value, $currency, 'Transferred'),
+            $subject
         ), new AccountIdentifier($this->enc($owner)));
     }
 
@@ -157,5 +168,9 @@ class SpecificationContext {
         }
 
         $this->specification->given($event, new CurrencyIdentifier($this->enc($currency)));
+    }
+
+    public function NowIs($when) {
+        Time::$frozen = new \DateTimeImmutable($when);
     }
 }

@@ -39,7 +39,8 @@ class Account {
         return new CoinReceived(
             $c->getTarget(),
             $c->getCurrency(),
-            $c->getCoin()
+            $c->getCoin(),
+            $c->getSubject()
         );
     }
 
@@ -95,7 +96,8 @@ class Account {
                 AccountIdentifier::fromBinary($transferredCoin->getOwner()),
                 $c->getCurrency(),
                 $coins,
-                $transferredCoin
+                $transferredCoin,
+                $c->getSubject()
             );
         }
         return $events;

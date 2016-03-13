@@ -9,6 +9,7 @@ use groupcash\bank\CreateBacker;
 use groupcash\bank\EstablishCurrency;
 use groupcash\bank\GenerateAccount;
 use groupcash\bank\IssueCoin;
+use groupcash\bank\ListTransactions;
 use groupcash\bank\model\AccountIdentifier;
 use groupcash\bank\model\Authentication;
 use groupcash\bank\model\BackerIdentifier;
@@ -36,39 +37,35 @@ class SpecificationCapabilities {
         return base64_encode($address);
     }
 
-    private function handle($command) {
-        $this->specification->when($command);
-    }
-
     public function IGenerateAnAccount() {
-        $this->handle(new GenerateAccount());
+        $this->specification->when(new GenerateAccount());
     }
 
     public function ICreateAnAccountWithThePassword($password) {
-        $this->handle(new GenerateAccount($password));
+        $this->specification->when(new GenerateAccount($password));
     }
 
     public function _EstablishesACurrencyWithTheRules($currency, $rules) {
-        $this->handle(new EstablishCurrency(
+        $this->specification->when(new EstablishCurrency(
             $this->auth($currency),
             $rules));
     }
 
     public function _RegistersTheCurrencyUnderTheName($currency, $name) {
-        $this->handle(new RegisterCurrency(
+        $this->specification->when(new RegisterCurrency(
             $this->auth($currency),
             $name));
     }
 
     public function IRegister_AsBackerWithTheName($address, $name) {
-        $this->handle(new RegisterBacker(
+        $this->specification->when(new RegisterBacker(
             new AccountIdentifier($this->enc($address)),
             $name
         ));
     }
 
     public function IRegister_AsBackerWithTheName_AndTheDetails($address, $name, $details) {
-        $this->handle(new RegisterBacker(
+        $this->specification->when(new RegisterBacker(
             new AccountIdentifier($this->enc($address)),
             $name,
             $details
@@ -76,14 +73,14 @@ class SpecificationCapabilities {
     }
 
     public function _CreatesANewBackerFor($issuer, $currency) {
-        $this->handle(new CreateBacker(
+        $this->specification->when(new CreateBacker(
             $this->auth($issuer),
             new CurrencyIdentifier($this->enc($currency))
         ));
     }
 
     public function _Authorizes($currency, $issuer) {
-        $this->handle(new AuthorizeIssuer(
+        $this->specification->when(new AuthorizeIssuer(
             $this->auth($currency),
             new AccountIdentifier($this->enc($issuer))
         ));
@@ -94,7 +91,7 @@ class SpecificationCapabilities {
     }
 
     public function _Issues__To_BackedBy($issuer, $value, $currency, $backer, $description) {
-        $this->handle(new IssueCoin(
+        $this->specification->when(new IssueCoin(
             $this->auth($issuer),
             new CurrencyIdentifier($this->enc($currency)),
             $description,
@@ -104,16 +101,21 @@ class SpecificationCapabilities {
     }
 
     public function _Sends__To($owner, $value, $currency, $target) {
-        $this->handle(new SendCoins(
+        $this->_Sends__To_WithTheSubject($owner, $value, $currency, $target, null);
+    }
+
+    public function _Sends__To_WithTheSubject($owner, $value, $currency, $target, $subject) {
+        $this->specification->when(new SendCoins(
             $this->auth($owner),
             new AccountIdentifier($this->enc($target)),
             new CurrencyIdentifier($this->enc($currency)),
-            new Fraction($value)
+            new Fraction($value),
+            $subject
         ));
     }
 
     public function _Requests($account, $value, $currency) {
-        $this->handle(new RequestCoins(
+        $this->specification->when(new RequestCoins(
             $this->auth($account),
             new CurrencyIdentifier($this->enc($currency)),
             new Fraction($value)
@@ -121,7 +123,7 @@ class SpecificationCapabilities {
     }
 
     public function _CancelsTheRequestOf_For($issuer, $account, $currency) {
-        $this->handle(new CancelRequest(
+        $this->specification->when(new CancelRequest(
             $this->auth($issuer),
             new CurrencyIdentifier($this->enc($currency)),
             new AccountIdentifier($this->enc($account))
@@ -129,10 +131,16 @@ class SpecificationCapabilities {
     }
 
     public function _ApprovesTheRequestOf_For($issuer, $account, $currency) {
-        $this->handle(new ApproveRequest(
+        $this->specification->when(new ApproveRequest(
             $this->auth($issuer),
             new CurrencyIdentifier($this->enc($currency)),
             new AccountIdentifier($this->enc($account))
+        ));
+    }
+
+    public function _ListsTheirTransactions($account) {
+        $this->specification->when(new ListTransactions(
+            $this->auth($account)
         ));
     }
 }

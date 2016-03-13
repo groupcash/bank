@@ -19,15 +19,20 @@ class DeliverCoin implements Command {
     /** @var CurrencyIdentifier */
     private $currency;
 
+    /** @var null|string */
+    private $subject;
+
     /**
      * @param AccountIdentifier $target
      * @param CurrencyIdentifier $currency
      * @param Coin $coin
+     * @param null|string $subject
      */
-    public function __construct(AccountIdentifier $target, CurrencyIdentifier $currency, Coin $coin) {
+    public function __construct(AccountIdentifier $target, CurrencyIdentifier $currency, Coin $coin, $subject = null) {
         $this->target = $target;
         $this->coin = $coin;
         $this->currency = $currency;
+        $this->subject = $subject;
     }
 
     /**
@@ -49,6 +54,13 @@ class DeliverCoin implements Command {
      */
     public function getCoin() {
         return $this->coin;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getSubject() {
+        return $this->subject;
     }
 
     /**

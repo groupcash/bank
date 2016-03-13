@@ -18,6 +18,7 @@ use groupcash\bank\model\AccountIdentifier;
 use groupcash\bank\model\BackerIdentifier;
 use groupcash\bank\model\CurrencyIdentifier;
 use groupcash\bank\projecting\GeneratedAccount;
+use groupcash\bank\projecting\TransactionHistory;
 use groupcash\php\algorithms\FakeAlgorithm;
 use groupcash\php\Groupcash;
 use groupcash\php\model\Authorization;
@@ -146,13 +147,19 @@ class SpecificationOutcome {
     }
 
     public function _ShouldReceiveACoinWorth($account, $value, $currency) {
-        $this->shouldHaveRecorded(CoinReceived::class, function (CoinReceived $event) use ($account, $value, $currency) {
-            return
-                $event->getTarget()->getIdentifier() == $this->enc($account)
-                && $event->getCurrency() == new CurrencyIdentifier($this->enc($currency))
-                && $event->getCoin()->getOwner() == new Binary($account)
-                && $event->getCoin()->getValue() == new Fraction($value)
-                && $event->getCoin()->getCurrency() == new Binary($currency);
+        $this->_ShouldReceiveACoinWorth__WithTheSubject($account, $value, $currency, null);
+    }
+
+    public function _ShouldReceiveACoinWorth__WithTheSubject($account, $value, $currency, $subject) {
+        $this->shouldHaveRecorded(CoinReceived::class, function (CoinReceived $event) use ($account, $value, $currency, $subject) {
+            return [
+                [$event->getTarget()->getIdentifier(), $this->enc($account)],
+                [$event->getSubject(), $subject],
+                [$event->getCurrency(), new CurrencyIdentifier($this->enc($currency))],
+                [$event->getCoin()->getOwner(), new Binary($account)],
+                [$event->getCoin()->getValue(), new Fraction($value)],
+                [$event->getCoin()->getCurrency(), new Binary($currency)],
+            ];
         });
     }
 
@@ -165,12 +172,18 @@ class SpecificationOutcome {
     }
 
     public function ACoinWorth_ShouldBeSentFrom_To($value, $currency, $owner, $target) {
-        $this->shouldHaveRecorded(CoinsSent::class, function (CoinsSent $event) use ($owner, $value, $currency, $target) {
-            return
-                $event->getCoins()[0]->getOwner() == new Binary($owner)
-                && $event->getTransferred()->getCurrency() == new Binary($currency)
-                && $event->getTransferred()->getValue() == new Fraction($value)
-                && $event->getTransferred()->getOwner() == new Binary($target);
+        $this->ACoinWorth_ShouldBeSentFrom_To_WithTheSubject($value, $currency, $owner, $target, null);
+    }
+
+    public function ACoinWorth_ShouldBeSentFrom_To_WithTheSubject($value, $currency, $owner, $target, $subject) {
+        $this->shouldHaveRecorded(CoinsSent::class, function (CoinsSent $event) use ($owner, $value, $currency, $target, $subject) {
+            return [
+                'owner' => [$event->getCoins()[0]->getOwner(), new Binary($owner)],
+                'currency' => [$event->getTransferred()->getCurrency(), new Binary($currency)],
+                'value' => [$event->getTransferred()->getValue(), new Fraction($value)],
+                'coin owner' => [$event->getTransferred()->getOwner(), new Binary($target)],
+                'subject' => [$event->getSubject(), $subject]
+            ];
         });
     }
 
@@ -214,5 +227,48 @@ class SpecificationOutcome {
             $event->addContribution(new BackerIdentifier($this->enc($backer)), new Fraction($contribution));
         }
         $this->shouldHaveRecordedEvent($event);
+    }
+
+    public function ThereShouldBeNoTransactions() {
+        $this->ThereShouldBe_Transactions(0);
+    }
+
+    public function ThereShouldBe_Transactions($count) {
+        $this->specification->thenItShouldReturn(function (TransactionHistory $history) use ($count) {
+            return [
+                'count' => [count($history->getTransactions()), $count]
+            ];
+        });
+    }
+
+    public function Transaction_ShouldBeOf($pos, $value, $currency) {
+        $this->specification->thenItShouldReturn(function (TransactionHistory $history) use ($pos, $value, $currency) {
+            $transactions = $history->getTransactions();
+            return [
+                'pos' => isset($transactions[$pos - 1]),
+                'value' => [$transactions[$pos - 1]->getValue(), new Fraction($value)],
+                'currency' => [$transactions[$pos - 1]->getCurrency(), new CurrencyIdentifier($this->enc($currency))]
+            ];
+        });
+    }
+
+    public function Transaction_ShouldHaveTheSubject($pos, $subject) {
+        $this->specification->thenItShouldReturn(function (TransactionHistory $history) use ($pos, $subject) {
+            $transactions = $history->getTransactions();
+            return [
+                'pos' => isset($transactions[$pos - 1]),
+                'subject' => [$transactions[$pos - 1]->getSubject(), $subject]
+            ];
+        });
+    }
+
+    public function TheTransactionTotalIn_ShouldBe($currency, $value) {
+        $currency = $this->enc($currency);
+
+        $this->specification->thenItShouldReturn(function (TransactionHistory $history) use ($currency, $value) {
+            return [
+                [$history->getTotals()[$currency], new Fraction($value)]
+            ];
+        });
     }
 }

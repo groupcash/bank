@@ -22,20 +22,26 @@ class CoinsSent extends DomainEvent {
     /** @var Coin[] */
     private $coins;
 
+    /** @var null|string */
+    private $subject;
+
     /**
      * @param AccountIdentifier $owner
      * @param AccountIdentifier $target
      * @param CurrencyIdentifier $currency
      * @param Coin[] $coins
      * @param Coin $transferred
+     * @param null|string $subject
      */
-    public function __construct(AccountIdentifier $owner, AccountIdentifier $target, CurrencyIdentifier $currency, array $coins, Coin $transferred) {
+    public function __construct(AccountIdentifier $owner, AccountIdentifier $target, CurrencyIdentifier $currency,
+                                array $coins, Coin $transferred, $subject = null) {
         parent::__construct();
         $this->owner = $owner;
         $this->target = $target;
         $this->currency = $currency;
         $this->coins = $coins;
         $this->transferred = $transferred;
+        $this->subject = $subject;
     }
 
     /**
@@ -71,5 +77,12 @@ class CoinsSent extends DomainEvent {
      */
     public function getCoins() {
         return $this->coins;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getSubject() {
+        return $this->subject;
     }
 }

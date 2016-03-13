@@ -13,6 +13,7 @@ use groupcash\bank\events\CoinIssued;
 use groupcash\bank\events\CoinsSent;
 use groupcash\bank\events\RequestApproved;
 use groupcash\bank\GenerateAccount;
+use groupcash\bank\ListTransactions;
 use groupcash\bank\model\Account;
 use groupcash\bank\model\AccountIdentifier;
 use groupcash\bank\model\Authenticator;
@@ -23,6 +24,7 @@ use groupcash\bank\model\BankIdentifier;
 use groupcash\bank\model\Currency;
 use groupcash\bank\model\CurrencyIdentifier;
 use groupcash\bank\projecting\GeneratedAccount;
+use groupcash\bank\projecting\TransactionHistory;
 use groupcash\bank\SendRequestedCoins;
 use groupcash\bank\StoreBackerKey;
 use groupcash\php\Groupcash;
@@ -72,7 +74,8 @@ class Application implements AggregateFactory, ProjectionFactory, EventListener 
         $this->handle(new DeliverCoin(
             new AccountIdentifier($e->getBacker()->getIdentifier()),
             $e->getCurrency(),
-            $e->getCoin()
+            $e->getCoin(),
+            'Issued'
         ));
     }
 
@@ -80,7 +83,8 @@ class Application implements AggregateFactory, ProjectionFactory, EventListener 
         $this->handle(new DeliverCoin(
             $e->getTarget(),
             $e->getCurrency(),
-            $e->getTransferred()
+            $e->getTransferred(),
+            $e->getSubject()
         ));
     }
 
@@ -129,6 +133,9 @@ class Application implements AggregateFactory, ProjectionFactory, EventListener 
     public function buildProjection($query) {
         if ($query instanceof GenerateAccount) {
             return new GeneratedAccount($query, $this->library, $this->crypto);
+        }
+        if ($query instanceof ListTransactions) {
+            return new TransactionHistory($query, $this->auth);
         }
         throw new \Exception('Unknown query.');
     }

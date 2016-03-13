@@ -23,17 +23,23 @@ class SendCoins implements Command {
     /** @var Fraction */
     private $value;
 
+    /** @var null|string */
+    private $subject;
+
     /**
      * @param Authentication $owner
      * @param AccountIdentifier $target
      * @param CurrencyIdentifier $currency
      * @param Fraction $value
+     * @param null|string $subject
      */
-    public function __construct(Authentication $owner, AccountIdentifier $target, CurrencyIdentifier $currency, Fraction $value) {
+    public function __construct(Authentication $owner, AccountIdentifier $target, CurrencyIdentifier $currency,
+                                Fraction $value, $subject = null) {
         $this->owner = $owner;
         $this->target = $target;
         $this->currency = $currency;
         $this->value = $value;
+        $this->subject = $subject;
     }
 
     /**
@@ -62,6 +68,13 @@ class SendCoins implements Command {
      */
     public function getValue() {
         return $this->value;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getSubject() {
+        return $this->subject;
     }
 
     /**
